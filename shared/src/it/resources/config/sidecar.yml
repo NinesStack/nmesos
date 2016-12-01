@@ -1,0 +1,42 @@
+## Config to deploy $name$ to Mesos using Singularity
+## This configuration should be located at github.com/Nitro/detonator/mesos-services/
+
+nmesos_version: '0.0.1' ## Min nmesos required to execute this config
+
+common:
+
+  resources:
+    instances: 1 # Number of instances to deploy
+    cpus: 0.1
+    memoryMb: 64
+
+  container:
+    network: HOST            # Optional parameter the default is Bridge
+    image:  gonitro/sidecar  # Docker repo/image without the tag
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   #  (HOST:CONTAINER) with default rw or (HOST:CONTAINER:rw)
+
+    labels:
+      SidecarDiscover: "false"
+
+    env_vars:
+      SIDECAR_SEEDS: 127.0.0.1
+      SIDECAR_LOGGING_LEVEL: info
+
+
+    dockerParameters: ## Optional extra parameters in addition to labels and env_vars
+      cap-add: NET_ADMIN
+
+  singularity:
+    deployInstanceCountPerStep: 1   # Number of instances deployed at once.
+    autoAdvanceDeploySteps: true    # false to have Canary deployments.
+    deployStepWaitTimeMs: 1000      # Time to wait between deployments
+    slavePlacement: SEPARATE        # Optional parameter, default is OPTIMISTIC
+
+environments:
+  dev:
+    mesos:
+      url: "http://test"
+    singularity:
+      url: "http://192.168.99.100:7099/singularity"
