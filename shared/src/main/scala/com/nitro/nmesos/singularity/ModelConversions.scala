@@ -112,7 +112,6 @@ object ModelConversions {
     id = toSingularityRequestId(config),
     requestType = "SERVICE",
     instances = config.environment.resources.instances,
-    bounceAfterScale = false,
     slavePlacement = config.environment.singularity.slavePlacement.getOrElse("OPTIMISTIC")
   )
 

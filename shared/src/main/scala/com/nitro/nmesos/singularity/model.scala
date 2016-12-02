@@ -64,7 +64,6 @@ object model {
     id: String,
     requestType: String,
     instances: Int,
-    bounceAfterScale: Boolean,
     slavePlacement: String
   )
 
