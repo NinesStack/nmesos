@@ -122,7 +122,7 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
     }
 
 
-    "Ask for force when deploying an existing service with the same version." in {
+    "Ask for '--force' when deploying an existing service with the same version." in {
 
       // create a new service (in case it doesn't exist already
       val serviceConfig = buildConfig("example-service").copy(serviceName = serviceNameInThisTest)

@@ -37,7 +37,7 @@ case class ReleaseCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean
       )
     }
 
-    // Check visibility before attesting to process the command.
+    // Check visibility before attempting to process the command.
     manager.ping() match {
       case Failure(_) =>
         CommandError(s"Unable to connect to ${localConfig.environment.singularity.url}")

@@ -22,7 +22,7 @@ common:
 
     labels:
       ServiceName: "$name$"
-      ## Sindecar config
+      ## Sidecar config
       HealthCheck: "HttpGet"
       HealthCheckArgs: "http://{{ host }}:{{ tcp 8080 }}/hello"
 

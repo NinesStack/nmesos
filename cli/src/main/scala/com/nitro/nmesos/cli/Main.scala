@@ -64,9 +64,9 @@ object CliManager {
           sys.exit(1)
 
       }
-    case noImplemented =>
+    case other =>
       // nothing to do.
-      log.error(s"Action '$noImplemented'no implemented yet :( ")
+      log.error(s"Action '$other' not implemented yet :( ")
       sys.exit(1)
 
   }
