@@ -31,6 +31,6 @@ The current (and temporal) way to install and use it:
 
 ```
 sbt shared/it:test
-sbt assembly
+sbt cli/assembly
 ```
 
