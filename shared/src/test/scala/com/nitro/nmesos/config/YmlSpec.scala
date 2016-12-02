@@ -8,8 +8,8 @@ import org.specs2.mutable.Specification
 import scala.io.Source
 
 /**
-  * Test Yaml config file
-  */
+ * Test Yaml config file
+ */
 class YmlSpec extends Specification with YmlTestFixtures {
 
   "Yml Parser" should {

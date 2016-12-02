@@ -103,8 +103,9 @@ trait HttpClientHelper {
    */
   private def failure(url: String, response: HttpResponse[String]) = {
     //show only a few lines. plain error can be a large html
-    log.debug(s"Response > ${response.code}: ${response.body.take(500)}...\n")
-    sys.error(s"HTTP ${response.statusLine} - ${response.code}: $url")
+    val msg = response.body.take(500)
+    log.debug(s"Response > ${response.code}: $msg...\n")
+    sys.error(s"HTTP ${response.statusLine} - ${response.code}: $url\n $msg")
   }
 }
 

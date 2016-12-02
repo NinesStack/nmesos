@@ -134,10 +134,10 @@ trait DeployCommandHelper {
         if (localConfig.force) {
           val deployId = generateRandomDeployId(defaultId)
           val localDeploy = toSingularityDeploy(localConfig, deployId)
-          log.info(s" There is already a deploy with id $defaultId , forcing deploy with new id $deployId")
+          log.info(s" There is already a deploy with id $defaultId , forcing deploy with new id '$deployId'")
           manager.deploySingularityDeploy(local, localDeploy).map(_ => localDeploy.id)
         } else {
-          log.info(s" There is already a deploy with same id '$defaultId' for request '${local.id}")
+          log.info(s" There is already a deploy with same id '$defaultId' for request '${local.id}'")
           Failure(sys.error(s"There is already a deploy with id $defaultId, use --force to force the redeploy"))
         }
 

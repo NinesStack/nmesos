@@ -26,6 +26,11 @@ The current (and temporal) way to install and use it:
 `curl -O https://dl.dropboxusercontent.com/u/2853977/nmesos && chmod u+x nmesos`
 ./nmesos release example-service --environment dev --tag latest
 
-## Release
+## Release cli
 
-`sbt assembly`
+
+```
+sbt shared/it:test
+sbt assembly
+```
+
