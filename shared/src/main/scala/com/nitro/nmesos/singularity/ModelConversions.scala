@@ -16,7 +16,8 @@ object ModelConversions {
   )
 
   def imageWithTag(config: CmdConfig): String = {
-    s"${config.environment.container.image}:${config.tag}"
+    val tag = if (config.tag.isEmpty) "latest" else config.tag
+    s"${config.environment.container.image}:${tag}"
   }
 
   def toSingularityContainerInfo(config: CmdConfig): SingularityContainerInfo = {

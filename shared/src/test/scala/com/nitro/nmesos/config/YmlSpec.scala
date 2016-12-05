@@ -94,6 +94,6 @@ trait YmlTestFixtures {
       |    # image and all other required parameters are missing here
     """.stripMargin
 
-  val YamlExampleValid = Source.fromURL(getClass.getResource("/config/example-service.yml")).mkString
+  val YamlExampleValid = Source.fromURL(getClass.getResource("/config/example-config.yml")).mkString
 
 }

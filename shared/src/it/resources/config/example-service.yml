@@ -29,13 +29,7 @@ common:
     env_vars:
       NEW_RELIC_LICENSE_KEY: "xxxxx"
       JAVA_OPTS: >
-        -Xms1024m
-        -Xmx1024m
-        -Xss2M
-        -XX:+UseConcMarkSweepGC
-        -XX:+CMSClassUnloadingEnabled
-        -Dconfig.file=conf/app.conf
-        -Dlogger.resource=papertrail.xml
+        -Xmx64m
         -Dcom.sun.management.jmxremote
         -Dcom.sun.management.jmxremote=true
         -Dcom.sun.management.jmxremote.port=9990

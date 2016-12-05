@@ -60,6 +60,7 @@ object CliParser {
           .abbr("t")
           .text("Tag/Version to release")
           .required()
+          .validate(tag => if(tag.isEmpty) Left("Tag is required") else Right())
           .action((input, params) => params.copy(tag = input)),
 
         opt[Unit]("force")
@@ -69,7 +70,7 @@ object CliParser {
           .action((input, params) => params.copy(force = true)),
 
         opt[Boolean]("dryrun")
-          .abbr("d")
+          .abbr("n")
           .text("Is this a dry run?")
           .optional()
           .action((input, params) => params.copy(isDryrun = input))

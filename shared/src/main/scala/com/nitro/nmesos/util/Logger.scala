@@ -53,9 +53,8 @@ trait AnsiLogger {
   val ErrorColor = Console.RED
   val ResetColor = Console.RESET
   val SeparatorColor = Console.BLUE
-  private val HIGH_INTENSITY = "\u001B[1m"
-  val ImportantColor = s"$ResetColor$HIGH_INTENSITY"
-  private val EraseLine = "\r"
+  val ImportantColor = Console.RED
+  private val EraseLine = "\r\b"
 
   def importantColor(body: => Any) = {
     if (ansiEnabled) s"$ImportantColor$body$ResetColor" else body
@@ -95,6 +94,7 @@ trait Annimations extends AnsiLogger {
     fetchMessage() match {
       case None =>
         eraseLine()
+        println("")
       case Some(msg) =>
         val animationFrame = frames(step % frames.size)
         updateLine(s"$animationFrame $msg")

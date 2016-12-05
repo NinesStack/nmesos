@@ -129,7 +129,7 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger) extends Si
   }
 
   def scaleSingularityRequest(previous: SingularityRequest, request: SingularityRequest) = {
-    val message = s"Scaling up '${request.id}' from ${previous.instances} to ${request.instances} instances"
+    val message = s"Scaling '${request.id}' from ${previous.instances} to ${request.instances} instances"
     log.info(message)
     val scaleRequest = SingularityScaleRequest(message, request.instances)
 
