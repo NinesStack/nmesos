@@ -57,6 +57,7 @@ object model {
     deployInstanceCountPerStep: Int,
     deployStepWaitTimeMs: Int,
     autoAdvanceDeploySteps: Boolean,
+    env: Map[String,String] = Map.empty,
     healthcheckUri: Option[String] = None
   )
 

@@ -106,6 +106,7 @@ object ModelConversions {
     healthcheckUri = config.environment.singularity.healthcheckUri,
     deployInstanceCountPerStep = config.environment.singularity.deployInstanceCountPerStep,
     deployStepWaitTimeMs = config.environment.singularity.deployStepWaitTimeMs.getOrElse(0),
+    env = config.environment.executor.map(_.env_vars).getOrElse(Map.empty),
     autoAdvanceDeploySteps = config.environment.singularity.autoAdvanceDeploySteps
   )
 

@@ -14,7 +14,8 @@ object YamlParserHelper {
     implicit val containerFormat = yamlFormat7(Container)
     implicit val mesosFormat = yamlFormat1(MesosConf)
     implicit val singularityFormat = yamlFormat6(SingularityConf)
-    implicit val environmentFormat = yamlFormat4(Environment)
+    implicit val executorFormat = yamlFormat1(ExecutorConf)
+    implicit val environmentFormat = yamlFormat5(Environment)
     implicit val configFormat = yamlFormat2(Config)
   }
 

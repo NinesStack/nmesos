@@ -29,6 +29,7 @@ object model {
     resources: Resources,
     container: Container,
     mesos: MesosConf,
+    executor: Option[ExecutorConf],
     singularity: SingularityConf
   )
 
@@ -61,4 +62,7 @@ object model {
     slavePlacement: Option[String]
   )
 
+  case class ExecutorConf(
+    env_vars: Map[String, String]
+  )
 }
