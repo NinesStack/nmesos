@@ -1,6 +1,6 @@
 name in ThisBuild := "nmesos"
 organization in ThisBuild := "com.nitro.nmesos"
-version in ThisBuild := "0.1-SNAPSHOT"
+version in ThisBuild := "0.1.0"
 scalaVersion in ThisBuild := "2.11.8"
 
 
