@@ -45,6 +45,7 @@ common:
 
 ## Optional configuration to define environments variables to be passed to the Mesos executor
   executor:
+    customExecutorCmd: "/opt/mesos/executor.sh"   # Optional custom Mesos Executor.
     env_vars:
       EXECUTOR_SIDECAR_DISCOVER: "false" # Default true, false => the executor will not healthcheck
       EXECUTOR_SIDECAR_BACKOFF: "20m"    # default 1m

@@ -63,6 +63,7 @@ object model {
   )
 
   case class ExecutorConf(
+    customExecutorCmd: Option[String],
     env_vars: Map[String, String]
   )
 }
