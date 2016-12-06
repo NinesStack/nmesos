@@ -63,6 +63,7 @@ object ModelConversions {
         network = network,
         image = imageWithTag(config),
         portMappings = portMappings,
+        forcePullImage = config.environment.container.forcePullImage.getOrElse(false),
         dockerParameters = dockerParameters
       )
     )

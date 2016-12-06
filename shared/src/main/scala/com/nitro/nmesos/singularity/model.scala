@@ -29,6 +29,7 @@ object model {
     network: String,
     image: String,
     portMappings: Seq[SingularityDockerPortMapping],
+    forcePullImage: Boolean,
     dockerParameters: Seq[SingularityDockerParameter]
   )
 

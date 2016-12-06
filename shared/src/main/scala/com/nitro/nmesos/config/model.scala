@@ -41,6 +41,7 @@ object model {
 
   case class Container(
     image: String,
+    forcePullImage: Option[Boolean],
     ports: Option[Seq[Int]],
     labels: Option[Map[String, String]],
     env_vars: Option[Map[String, String]],

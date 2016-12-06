@@ -13,6 +13,7 @@ common:
   container:
 
     image: hubspot/singularity-test-service # Docker repo/image without the tag
+    #forcePullImage: true                    # Optional to force pull (default false)
 
     ports:
       - 8080 # Exposed port by the container (Mesos will auto assign a external port)
