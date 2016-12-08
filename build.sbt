@@ -1,6 +1,6 @@
 name in ThisBuild := "nmesos"
 organization in ThisBuild := "com.nitro"
-version in ThisBuild := "0.1-SNAPSHOT"
+version in ThisBuild := "0.0.1"
 
 crossScalaVersions in ThisBuild := Seq("2.12.0", "2.10.6")
 

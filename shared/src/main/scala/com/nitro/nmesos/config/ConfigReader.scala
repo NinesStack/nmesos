@@ -1,13 +1,15 @@
 package com.nitro.nmesos.config
 
-import java.io.{ File, FileNotFoundException }
+import java.io.{File, FileNotFoundException}
 
-import com.nitro.nmesos.util.Logger
+import com.nitro.nmesos.BuildInfo
+import com.nitro.nmesos.util.{Logger, VersionUtil}
 import com.nitro.nmesos.config.model._
 import com.nitro.nmesos.config.YamlParser._
+import com.nitro.nmesos.util.VersionUtil.Version
 
 import scala.io.Source
-import scala.util.{ Failure, Success, Try }
+import scala.util.{Failure, Success, Try}
 
 object ConfigReader {
 
@@ -29,17 +31,9 @@ object ConfigReader {
       case InvalidYaml(msg) =>
         ConfigError(msg, file)
 
-      case ValidYaml(config, hash) if (isCompatibleVersion(config)) =>
+      case ValidYaml(config, hash) =>
         environmentFromConfig(config, environmentName, hash, file)
 
-      case ValidYaml(config, _) if (!isCompatibleVersion(config)) =>
-        ConfigError(
-          msg =
-            s"""A newer version of nmesos is required.
-             |current: required: ${config.nmesos_version} 
-           """.stripMargin,
-          yamlFile = file
-        )
     }
   }
 
@@ -55,7 +49,14 @@ object ConfigReader {
       case Failure(ex) =>
         InvalidYaml(s"Unexpected error reading file '${file.getAbsoluteFile}'. ${ex.getMessage}")
 
-      case Success(yamlContent) =>
+      case Success((yamlContent, version)) if (!VersionUtil.isCompatible(version, logger)) =>
+        InvalidYaml(msg =
+          s"""
+             |A newer version of nmesos is required.
+             |Installed: ${BuildInfo.version}, required: ${version.mkString(".")}
+          """.stripMargin
+        )
+      case Success((yamlContent, version)) =>
         YamlParser.parse(yamlContent, logger)
     }
   }
@@ -73,9 +74,10 @@ object ConfigReader {
 
     }
 
-  // wrap unsafe read file
-  private def tryRead(file: File): Try[String] = Try(Source.fromFile(file).mkString)
+  // wrap unsafe read file and version
+  private def tryRead(file: File): Try[(String, Version)] = for {
+    yamlContent <- Try(Source.fromFile(file).mkString)
+    requiredVersion <- VersionUtil.tryExtractFromYaml(yamlContent)
+  } yield (yamlContent, requiredVersion)
 
-  // TODO check compatibility between yaml and cli installed versions
-  private def isCompatibleVersion(config: Config): Boolean = true // config.nmversion vs app version
 }
