@@ -13,15 +13,5 @@ brew install nmesos-cli
 Update:
 ```
 brew update
-brew upgrade  nmesos-cli
+brew upgrade nmesos-cli
 ```
-
-## Release a new version
-
-* Build and release a new tgz with:
-```
-sbt cli/assembly cli/universal:packageZipTarball  cli/universal:publish
-```
-
-* Update the Formula `nmesos-cli.rb` with the new public url 
-and push the changes to the Master branch.

@@ -13,8 +13,10 @@ Requirements
 
 ```
 sbt shared/it:test
-sbt cli/assembly
+sbt cli/assembly cli/universal:packageZipTarball cli/universal:publish
 ```
 
+## Release a brew update
 
-
+Update the Formula `nmesos-cli.rb` with the new public url 
+and push the changes to the Master branch.
