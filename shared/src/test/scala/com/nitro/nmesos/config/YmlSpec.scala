@@ -2,6 +2,7 @@ package com.nitro.nmesos.config
 
 import com.nitro.nmesos.util.InfoLogger
 import com.nitro.nmesos.config.YamlParser._
+import com.nitro.nmesos.config.model.ExecutorConf
 import com.nitro.nmesos.util.VerboseLogger
 import org.specs2.mutable.Specification
 
@@ -31,6 +32,19 @@ class YmlSpec extends Specification with YmlTestFixtures {
 
     "return a valid config from a valid Yaml file" in {
       YamlParser.parse(YamlExampleValid, VerboseLogger) should beAnInstanceOf[ValidYaml]
+    }
+
+    "Parse the executor configuration in a valid Yaml file" in {
+      val conf = YamlParser.parse(YamlExampleExecutorEnvs, VerboseLogger)
+      conf should beAnInstanceOf[ValidYaml]
+
+      val ExpectedConf = Some(ExecutorConf(
+        customExecutorCmd = Some("/opt/mesos/executor.sh"),
+        env_vars = Map(
+          "EXECUTOR_SIDECAR_DISCOVER" -> "false",
+          "EXECUTOR_SIDECAR_BACKOFF" -> "20m")
+      ))
+      conf.asInstanceOf[ValidYaml].config.environments("dev").executor should be equalTo (ExpectedConf)
     }
 
   }
@@ -94,6 +108,7 @@ trait YmlTestFixtures {
       |    # image and all other required parameters are missing here
     """.stripMargin
 
-  val YamlExampleValid = Source.fromURL(getClass.getResource("/config/example-config.yml")).mkString
+  def YamlExampleValid = Source.fromURL(getClass.getResource("/config/example-config.yml")).mkString
 
+  def YamlExampleExecutorEnvs = Source.fromURL(getClass.getResource("/config/example-config-with-executor.yml")).mkString
 }
