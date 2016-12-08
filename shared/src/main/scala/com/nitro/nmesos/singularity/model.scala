@@ -29,6 +29,7 @@ object model {
     network: String,
     image: String,
     portMappings: Seq[SingularityDockerPortMapping],
+    forcePullImage: Boolean,
     dockerParameters: Seq[SingularityDockerParameter]
   )
 
@@ -57,6 +58,8 @@ object model {
     deployInstanceCountPerStep: Int,
     deployStepWaitTimeMs: Int,
     autoAdvanceDeploySteps: Boolean,
+    customExecutorCmd: Option[String] = None,
+    env: Map[String,String] = Map.empty,
     healthcheckUri: Option[String] = None
   )
 

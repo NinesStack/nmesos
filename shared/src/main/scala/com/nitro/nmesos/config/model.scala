@@ -29,6 +29,7 @@ object model {
     resources: Resources,
     container: Container,
     mesos: MesosConf,
+    executor: Option[ExecutorConf],
     singularity: SingularityConf
   )
 
@@ -40,6 +41,7 @@ object model {
 
   case class Container(
     image: String,
+    forcePullImage: Option[Boolean],
     ports: Option[Seq[Int]],
     labels: Option[Map[String, String]],
     env_vars: Option[Map[String, String]],
@@ -61,4 +63,8 @@ object model {
     slavePlacement: Option[String]
   )
 
+  case class ExecutorConf(
+    customExecutorCmd: Option[String],
+    env_vars: Map[String, String]
+  )
 }

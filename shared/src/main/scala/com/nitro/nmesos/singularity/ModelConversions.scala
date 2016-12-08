@@ -63,6 +63,7 @@ object ModelConversions {
         network = network,
         image = imageWithTag(config),
         portMappings = portMappings,
+        forcePullImage = config.environment.container.forcePullImage.getOrElse(false),
         dockerParameters = dockerParameters
       )
     )
@@ -106,6 +107,8 @@ object ModelConversions {
     healthcheckUri = config.environment.singularity.healthcheckUri,
     deployInstanceCountPerStep = config.environment.singularity.deployInstanceCountPerStep,
     deployStepWaitTimeMs = config.environment.singularity.deployStepWaitTimeMs.getOrElse(0),
+    customExecutorCmd = config.environment.executor.flatMap(_.customExecutorCmd),
+    env = config.environment.executor.map(_.env_vars).getOrElse(Map.empty),
     autoAdvanceDeploySteps = config.environment.singularity.autoAdvanceDeploySteps
   )
 

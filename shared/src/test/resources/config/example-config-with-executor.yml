@@ -1,20 +1,19 @@
-## Config to deploy a simple java app to Mesos using Singularity
-## This configuration should be located at github.com/Nitro/detonator/example-service/
+## Config to deploy $name$ to Mesos using Singularity
+## This configuration should be located at github.com/Nitro/detonator/mesos-services/
 
 nmesos_version: '0.0.1' ## Min nmesos required to execute this config
 
 common:
 
   resources:
-    instances: 1 # Number of instances to deploy
+    instances: 2 # Number of instances to deploy
     cpus: 0.1
-    memoryMb: 128
+    memoryMb: 64
 
   container:
 
     image: hubspot/singularity-test-service # Docker repo/image without the tag
-    #forcePullImage: true                    # Optional to force pull (default false)
-
+    forcePullImage: true                    # Optional to force pull (default false)
     ports:
       - 8080 # Exposed port by the container (Mesos will auto assign a external port)
 
@@ -30,15 +29,8 @@ common:
     env_vars:
       NEW_RELIC_LICENSE_KEY: "xxxxx"
       JAVA_OPTS: >
+        -Xms64m
         -Xmx64m
-        -Dcom.sun.management.jmxremote
-        -Dcom.sun.management.jmxremote=true
-        -Dcom.sun.management.jmxremote.port=9990
-        -Dcom.sun.management.jmxremote.rmi.port=9990
-        -Djava.rmi.server.hostname={{ inventory_hostname }}
-        -Djava.net.preferIPv4Stack=true
-        -Dcom.sun.management.jmxremote.authenticate=false
-        -Dcom.sun.management.jmxremote.ssl=false"
 
     extraDockerConf:
       network: HOST
@@ -49,18 +41,18 @@ common:
     deployInstanceCountPerStep: 1   # Number of instances deployed at once.
     autoAdvanceDeploySteps: true    # false to have Canary deployments.
     deployStepWaitTimeMs: 1000      # Time to wait between deployments
-    healthcheckUri: "/hello"        # Used for singularity to determine if a deploy was success
+    healthcheckUri: "/hello"  # Used for singularity to determine if a deploy was success
 
 ## Optional configuration to define environments variables to be passed to the Mesos executor
-#  executor:
-#    customExecutorCmd: "/opt/mesos/executor.sh"   # Optional custom Mesos Executor.
-#    env_vars:
-#      EXECUTOR_SIDECAR_DISCOVER: "false" # Default true, false => the executor will not healthcheck
-#      EXECUTOR_SIDECAR_BACKOFF: "20m"    # default 1m
+  executor:
+    customExecutorCmd: "/opt/mesos/executor.sh"   # Optional custom Mesos Executor.
+    env_vars:
+      EXECUTOR_SIDECAR_DISCOVER: "false" # Default true, false => the executor will not healthcheck
+      EXECUTOR_SIDECAR_BACKOFF: "20m"    # default 1m
 
 environments:
   dev:
     mesos:
       url: "http://test"
     singularity:
-      url: "http://192.168.99.100:7099/singularity"
+      url: "http://test"
