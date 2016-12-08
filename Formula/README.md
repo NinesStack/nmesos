@@ -18,6 +18,10 @@ brew upgrade  nmesos-cli
 
 ## Release a new version
 
-* Build a new tgz with `sbt cli/universal:packageZipTarball`
+* Build and release a new tgz with:
+```
+sbt cli/assembly cli/universal:packageZipTarball  cli/universal:publish
+```
 
-* Update the Formula `nmesos-cli.rb` with the public url and push the changes to the Master branch.
+* Update the Formula `nmesos-cli.rb` with the new public url 
+and push the changes to the Master branch.
