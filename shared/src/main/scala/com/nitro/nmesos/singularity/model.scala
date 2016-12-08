@@ -59,7 +59,7 @@ object model {
     deployStepWaitTimeMs: Int,
     autoAdvanceDeploySteps: Boolean,
     customExecutorCmd: Option[String] = None,
-    env: Map[String,String] = Map.empty,
+    env: Map[String, String] = Map.empty,
     healthcheckUri: Option[String] = None
   )
 

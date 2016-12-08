@@ -21,10 +21,28 @@ and try to release the latest tag in the dev environment.
 nmesos release example-service --environment dev --tag latest
 ```
 
-# Getting Started
+# Getting Started with the CLI tool
 
-The current (and temporal) way to install and use it:
-`curl -O https://dl.dropboxusercontent.com/u/2853977/nmesos && chmod u+x nmesos`
+Install Nmesos cli:
+
+```
+brew  -v tap nitro/nmesos  git@github.com:Nitro/nmesos.git
+brew install nmesos-cli
+```
+
+Update Nmesos cli:
+```
+brew update
+brew upgrade nmesos-cli
+```
+
+Uninstall Nmesos cli:
+```
+brew uninstall nmesos-cli
+```
+
+## Usage
+
 ./nmesos release example-service --environment dev --tag latest
 
 
