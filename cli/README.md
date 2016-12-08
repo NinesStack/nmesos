@@ -13,7 +13,7 @@ Requirements
 
 ```
 sbt shared/it:test
-sbt cli/assembly cli/universal:packageZipTarball cli/universal:publish
+sbt nmesos-cli/assembly nmesos-cli/universal:packageZipTarball nmesos-cli/universal:publish
 ```
 
 ## Release a brew update

@@ -1,6 +1,7 @@
 // Assembly as a CLI auto runnable bin.
 
 scalaVersion := "2.12.0"
+organization := "nitro"
 
 val cli = Seq(
   "#!/usr/bin/env sh",

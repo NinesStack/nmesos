@@ -33,7 +33,12 @@ brew install nmesos-cli
 Update Nmesos cli:
 ```
 brew update
-brew upgrade  nmesos-cli
+brew upgrade nmesos-cli
+```
+
+Uninstall Nmesos cli:
+```
+brew uninstall nmesos-cli
 ```
 
 ## Usage
