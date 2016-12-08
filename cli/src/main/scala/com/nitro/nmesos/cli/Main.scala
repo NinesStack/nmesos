@@ -1,7 +1,5 @@
 package com.nitro.nmesos.cli
 
-import com.nitro.nmesos.config.ConfigReader.ConfigError
-
 object Main {
   def main(args: Array[String]): Unit = {
     println(s"Nitro Mesos Deploy tool")
