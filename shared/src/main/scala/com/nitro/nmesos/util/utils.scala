@@ -2,7 +2,7 @@ package com.nitro.nmesos.util
 
 import com.nitro.nmesos.BuildInfo
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 // Scala conversions boilerplate .
 object Conversions {
@@ -68,8 +68,9 @@ object VersionUtil {
 
   // compare compatibility between semantic versions
   private def isCompatible(required: Version, installed: Version): Boolean = {
-    required.zip(installed).foldLeft(true) { case (stillCompatible, (required, installed)) =>
-      stillCompatible && required <= installed
+    required.zip(installed).foldLeft(true) {
+      case (stillCompatible, (required, installed)) =>
+        stillCompatible && required <= installed
     }
   }
 

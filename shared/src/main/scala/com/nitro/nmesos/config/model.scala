@@ -28,7 +28,6 @@ object model {
   case class Environment(
     resources: Resources,
     container: Container,
-    mesos: MesosConf,
     executor: Option[ExecutorConf],
     singularity: SingularityConf
   )
@@ -48,10 +47,6 @@ object model {
     volumes: Option[Seq[String]],
     network: Option[String],
     dockerParameters: Option[Map[String, String]]
-  )
-
-  case class MesosConf(
-    url: String
   )
 
   case class SingularityConf(

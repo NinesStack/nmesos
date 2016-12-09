@@ -94,7 +94,7 @@ trait Annimations extends AnsiLogger {
     fetchMessage() match {
       case None =>
         eraseLine()
-        println("")
+        println("\n")
       case Some(msg) =>
         val animationFrame = frames(step % frames.size)
         updateLine(s"$animationFrame $msg")

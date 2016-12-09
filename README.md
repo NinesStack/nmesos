@@ -26,7 +26,7 @@ nmesos release example-service --environment dev --tag latest
 Install Nmesos cli:
 
 ```
-brew  -v tap nitro/nmesos  git@github.com:Nitro/nmesos.git
+brew tap nitro/nmesos  git@github.com:Nitro/nmesos.git
 brew install nmesos-cli
 ```
 

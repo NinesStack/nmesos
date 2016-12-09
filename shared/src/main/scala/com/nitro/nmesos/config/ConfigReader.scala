@@ -1,15 +1,15 @@
 package com.nitro.nmesos.config
 
-import java.io.{File, FileNotFoundException}
+import java.io.{ File, FileNotFoundException }
 
 import com.nitro.nmesos.BuildInfo
-import com.nitro.nmesos.util.{Logger, VersionUtil}
+import com.nitro.nmesos.util.{ Logger, VersionUtil }
 import com.nitro.nmesos.config.model._
 import com.nitro.nmesos.config.YamlParser._
 import com.nitro.nmesos.util.VersionUtil.Version
 
 import scala.io.Source
-import scala.util.{Failure, Success, Try}
+import scala.util.{ Failure, Success, Try }
 
 object ConfigReader {
 
@@ -54,8 +54,7 @@ object ConfigReader {
           s"""
              |A newer version of nmesos is required.
              |Installed: ${BuildInfo.version}, required: ${version.mkString(".")}
-          """.stripMargin
-        )
+          """.stripMargin)
       case Success((yamlContent, version)) =>
         YamlParser.parse(yamlContent, logger)
     }
