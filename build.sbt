@@ -1,8 +1,6 @@
 name in ThisBuild := "nmesos"
 organization in ThisBuild := "com.nitro"
-version in ThisBuild := "0.0.1"
-
-crossScalaVersions in ThisBuild := Seq("2.12.0", "2.10.6")
+version in ThisBuild := "0.0.2"
 
 lazy val cli = Project("nmesos-cli", file("cli"))
   .dependsOn(shared)
@@ -20,13 +18,13 @@ lazy val sbtPlugin = Project("sbt-plugin", file("sbt-plugin"))
       "org.specs2" %% "specs2-core" % "3.8.6" % "test"
     ))
 
-lazy val shared = Project("shared", file("shared"))
+lazy val shared = Project("nmesos-shared", file("shared"))
   .enablePlugins(BuildInfoPlugin)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(
     scalaVersion := "2.12.0",
-    crossScalaVersions := Seq("2.12.0", "2.10.6"),
+    crossScalaVersions := Seq("2.12.1", "2.10.6"),
     buildInfoPackage := "com.nitro.nmesos",
     parallelExecution in Test := false,
     libraryDependencies ++= Seq(

@@ -1,6 +1,6 @@
 // Assembly as a CLI auto runnable bin.
 
-scalaVersion := "2.12.0"
+scalaVersion := "2.12.1"
 organization := "nitro"
 
 val cli = Seq(

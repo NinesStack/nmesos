@@ -1,17 +1,17 @@
 package com.nitro.nmesos.sbt
 
-import com.nitro.nmesos.commands.{CommandError, CommandSuccess, ReleaseCommand}
+import com.nitro.nmesos.commands.{ CommandError, CommandSuccess, ReleaseCommand }
 import com.nitro.nmesos.config.ConfigReader
-import com.nitro.nmesos.config.ConfigReader.{ConfigError, ValidConfig}
+import com.nitro.nmesos.config.ConfigReader.{ ConfigError, ValidConfig }
 import com.nitro.nmesos.config.model.CmdConfig
 import com.nitro.nmesos.sbt.model.ReleaseArgs
-import com.nitro.nmesos.util.{Logger => NLogger}
+import com.nitro.nmesos.util.{ Logger => NLogger }
 import sbt._
 import sbt.Logger
 
 /**
-  * Parse sbt args, read the configuration file and execute the command.
-  */
+ * Parse sbt args, read the configuration file and execute the command.
+ */
 object NmesosPluginImpl {
 
   val ConfigRepositoryEnvName = "NMESOS_CONFIG_REPOSITORY"

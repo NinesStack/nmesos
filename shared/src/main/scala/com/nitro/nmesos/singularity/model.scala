@@ -151,7 +151,12 @@ object model {
 
   case class SingularityTask(
     taskId: SingularityTaskId,
-    mesosTask: SingularityTaskInfo
+    mesosTask: SingularityTaskInfo,
+    offer: Offer
+  )
+
+  case class Offer(
+    hostname: String
   )
 
 }

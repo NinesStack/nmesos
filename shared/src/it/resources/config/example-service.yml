@@ -60,7 +60,5 @@ common:
 
 environments:
   dev:
-    mesos:
-      url: "http://test"
     singularity:
       url: "http://192.168.99.100:7099/singularity"

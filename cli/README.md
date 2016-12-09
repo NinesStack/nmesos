@@ -12,7 +12,7 @@ Requirements
 ## Release cli
 
 ```
-sbt shared/it:test
+sbt it:test
 sbt nmesos-cli/assembly nmesos-cli/universal:packageZipTarball nmesos-cli/universal:publish
 ```
 

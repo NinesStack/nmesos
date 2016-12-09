@@ -33,12 +33,12 @@ By default it'll assume the `baseDirectory` but you can change the configuration
 
 Publish locally first with:
 
-`sbt ++2.10.6 shared/publishLocal`
-`sbt ++2.10.6 sbt-plugin/publishLocal`
+`sbt "++2.10.6 nmesos-shared/publishLocal" `
+`sbt "++2.10.6 sbt-plugin/publishLocal" `
 
 Remote publish:
 
-`sbt ++2.10.6 shared/publish`
-`sbt ++2.10.6 sbt-plugin/publish`
+`sbt "++2.10.6 nmesos-shared/publish" `
+`sbt v++2.10.6 sbt-plugin/publish" `
 
 Note: This is a cross scala version project (2.10 and 2.12). The sbt plugin needs to use Scala 2.10.

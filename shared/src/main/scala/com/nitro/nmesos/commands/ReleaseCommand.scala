@@ -3,12 +3,15 @@ package com.nitro.nmesos.commands
 import com.nitro.nmesos.config.model.CmdConfig
 import com.nitro.nmesos.singularity.SingularityManager
 import com.nitro.nmesos.singularity.model._
+
 import scala.util.{ Failure, Success, Try }
 import com.nitro.nmesos.singularity.ModelConversions._
 import com.nitro.nmesos.util.Logger
 
 sealed trait CommandResult
+
 case object CommandSuccess extends CommandResult
+
 case class CommandError(msg: String) extends CommandResult
 
 /**
@@ -68,13 +71,15 @@ case class ReleaseCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean
 
     ///////////////////////////////////////////////////////
     // Show Mesos task info if successful deploy
-    tryDeployId.flatMap { deployId =>
-      if (!isDryrun) showFinalDeployStatus(localRequest, deployId) else Success(())
+    val tryGetStatus = tryDeployId.flatMap { deployId =>
+      if (!isDryrun) showFinalDeployStatus(localRequest, deployId) else Success(true)
     }
 
-    tryDeployId match {
-      case Success(_) =>
+    tryGetStatus match {
+      case Success(true) =>
         CommandSuccess
+      case Success(false) =>
+        CommandError(s"Unable to deploy")
       case Failure(ex) =>
         CommandError(s"Unable to deploy - ${ex.getMessage}")
     }
@@ -146,7 +151,7 @@ trait DeployCommandHelper {
   }
 
   // Show the Mesos TaskId and final deploy status.
-  final def showFinalDeployStatus(request: SingularityRequest, deployId: DeployId): Try[Unit] = {
+  final def showFinalDeployStatus(request: SingularityRequest, deployId: DeployId): Try[Boolean] = {
     log.logBlock("Mesos Tasks Info") {
       log.info(s" Deploy progress at ${localConfig.environment.singularity.url}/request/${request.id}/deploy/$deployId")
 
@@ -161,6 +166,7 @@ trait DeployCommandHelper {
             s"Waiting until the deploy is completed [deployId: '$deployId', status: $status, instances ${count}/${request.instances}]"
           }
       }
+
       log.showAnimated(fetchMessage)
 
       ///////////////////////////////////////////////////////
@@ -174,15 +180,19 @@ trait DeployCommandHelper {
 
         log.info(s" Deploy Mesos Deploy State: ${deploy.deployResult.deployState}")
 
-        activeTasks
+        val tasks = activeTasks
           .filter(_.taskId.deployId == deployId)
-          .foreach { task =>
-            log.println(s"""   * TaskId: ${log.infoColor(task.taskId.id)}""")
-            task.mesosTask.container.docker.portMappings.foreach { port =>
-              log.println(s"""     - http://${task.taskId.host}:${port.hostPort}  -> ${port.containerPort}""")
-            }
+
+        tasks.foreach { task =>
+          log.println(s"""   * TaskId: ${log.infoColor(task.taskId.id)}""")
+          task.mesosTask.container.docker.portMappings.foreach { port =>
+            log.println(s"""     - http://${task.offer.hostname}:${port.hostPort}  -> ${port.containerPort}""")
           }
+        }
+        // The operation is successful if number of active task is equal requested task
+        tasks.size == request.instances
       }
     }
   }
+
 }
