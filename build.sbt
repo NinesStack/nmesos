@@ -1,6 +1,6 @@
 name in ThisBuild := "nmesos"
 organization in ThisBuild := "com.nitro"
-version in ThisBuild := "0.0.4"
+version in ThisBuild := "0.0.5"
 
 lazy val cli = Project("nmesos-cli", file("cli"))
   .dependsOn(shared)
@@ -23,7 +23,7 @@ lazy val shared = Project("nmesos-shared", file("shared"))
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(
-    scalaVersion := "2.12.0",
+    scalaVersion := "2.12.1",
     crossScalaVersions := Seq("2.12.1", "2.10.6"),
     buildInfoPackage := "com.nitro.nmesos",
     parallelExecution in Test := false,

@@ -45,8 +45,8 @@ Alternatively, you can also download and run it with:
 
 ```
 
-curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.0.4/nmesos-cli-0.0.4.tgz | tar -xz
-cd nmesos-cli-0.0.4 && chmod u+x nmesos
+curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.0.5/nmesos-cli-0.0.5.tgz | tar -xz
+cd nmesos-cli-0.0.5 && chmod u+x nmesos
 ````
 
 ## Usage

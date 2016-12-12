@@ -1,5 +1,7 @@
 package com.nitro.nmesos.util
 
+import com.nitro.nmesos.singularity.model.SingularityRequestParent
+
 import scala.util.Try
 import scalaj.http._
 
@@ -119,6 +121,10 @@ object CustomPicklers {
   import upickle.Js
 
   object OptionPickler extends upickle.AttributeTagged {
+
+    // Support for option of custom case classes
+    implicit val customSingularityRequestParentReader = OptionR[Option[SingularityRequestParent]]
+
     override implicit def OptionW[T: Writer]: Writer[Option[T]] = Writer {
       case None => Js.Null
       case Some(s) => implicitly[Writer[T]].write(s)
