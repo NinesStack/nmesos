@@ -19,6 +19,7 @@ object SingularityManager {
 
 trait SingularityManager extends HttpClientHelper {
   val apiUrl: String
+  import com.nitro.nmesos.util.CustomPicklers.OptionPickler._
 
   def createSingularityRequest(newRequest: SingularityRequest): Try[SingularityRequestParent]
 
