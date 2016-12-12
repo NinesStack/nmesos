@@ -1,5 +1,7 @@
 package com.nitro.nmesos.cli
 
+import com.nitro.nmesos.commands.{ CommandResult, ScaleCommand }
+
 object Main {
   def main(args: Array[String]): Unit = {
     println(s"Nitro Mesos Deploy tool")
@@ -47,26 +49,30 @@ object CliManager {
   /**
    * Execute the detected command for a valid configuration.
    */
-  def executeCommand(cmd: Cmd, config: ValidConfig, log: Logger): Unit = cmd.action match {
-    case ReleaseAction =>
-      val serviceConfig = toServiceConfig(cmd, config)
-      val cmdResult = ReleaseCommand(serviceConfig, log, isDryrun = cmd.isDryrun).run()
+  def executeCommand(cmd: Cmd, config: ValidConfig, log: Logger): Unit = {
+    val cmdResult: CommandResult = cmd.action match {
+      case ReleaseAction =>
+        val serviceConfig = toServiceConfig(cmd, config)
+        ReleaseCommand(serviceConfig, log, isDryrun = cmd.isDryrun).run()
+      case ScaleAction =>
+        val serviceConfig = toServiceConfig(cmd, config)
+        ScaleCommand(serviceConfig, log, isDryrun = cmd.isDryrun).run()
+      case other =>
+        // nothing to do.
+        log.error(s"Action '$other' not implemented yet :( ")
+        sys.exit(1)
+    }
 
-      cmdResult match {
-        case CommandSuccess =>
-          val warningDryRun = if (cmd.isDryrun) log.importantColor("[dryrun true]") else ""
-          log.info(s"Done, without errors! $warningDryRun")
+    cmdResult match {
+      case CommandSuccess =>
+        val warningDryRun = if (cmd.isDryrun) log.importantColor("[dryrun true]") else ""
+        log.info(s"Done, without errors! $warningDryRun")
 
-        case CommandError(error) =>
-          log.error(error)
-          sys.exit(1)
+      case CommandError(error) =>
+        log.error(error)
+        sys.exit(1)
 
-      }
-    case other =>
-      // nothing to do.
-      log.error(s"Action '$other' not implemented yet :( ")
-      sys.exit(1)
-
+    }
   }
 
   def showConfigError(cmd: Cmd, configError: ConfigError, log: Logger): Unit = {

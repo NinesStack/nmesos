@@ -1,5 +1,7 @@
 package com.nitro.nmesos.singularity
 
+import com.nitro.nmesos.singularity.ModelConversions.DeployId
+import com.nitro.nmesos.singularity.model.SingularityRequestParent.SingularityActiveDeployResponse
 import com.nitro.nmesos.singularity.model.SingularityTask.SingularityTaskInfo
 
 /**
@@ -82,9 +84,17 @@ object model {
     skipHealthchecks: Boolean = true //If set to true, healthchecks will be skipped while scaling this request (only)
   )
 
+  object SingularityRequestParent {
+    case class SingularityActiveDeployResponse(
+      id: DeployId,
+      resources: SingularityResources
+    )
+  }
+
   case class SingularityRequestParent(
     request: SingularityRequest,
-    state: String
+    state: String,
+    activeDeploy: Option[SingularityActiveDeployResponse] = None
   )
 
   case class SingularityDeployResult(

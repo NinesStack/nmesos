@@ -58,12 +58,12 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
           | [dryrun] Need to create a new Mesos service with id: dev_example_service, instances: 1
           | [dryrun] Need to deploy image 'hubspot/singularity-test-service:latest'
           | [dryrun] Deploy to apply:
-          |         requestId: dev_example_service
-          |         deployId:  latest_${HashExampleService}
-          |         image:     hubspot/singularity-test-service:latest
-          |         instances: 1
-          |         resources: [cpus: 0.1, memory: 128.0Mb]
-          |         ports:   8080
+          |           * requestId: dev_example_service
+          |           * deployId:  latest_${HashExampleService}
+          |           * image:     hubspot/singularity-test-service:latest
+          |           * instances: 1
+          |           * resources: [cpus: 0.1, memory: 128.0Mb]
+          |           * ports:   8080
           |--------------------------------------------------------------------------------""".stripMargin
 
       compareOutput(ExpectedOutput, logger)
@@ -98,14 +98,14 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
            |Applying config! ---------------------------------------------------------------
            | No Mesos service found with id: '${ExpectedRequestId}'
            | Created new Mesos service with Id: ${ExpectedRequestId}, instances: 1, state: ACTIVE
-           | Deploying service version 'hubspot/singularity-test-service:latest'
+           | Deploying version 'hubspot/singularity-test-service:latest:latest'
            | Deploy applied:
-           |         requestId: ${ExpectedRequestId}
-           |         deployId:  latest_${HashExampleService}
-           |         image:     hubspot/singularity-test-service:latest
-           |         instances: 1
-           |         resources: [cpus: 0.1, memory: 128.0Mb]
-           |         ports:   8080
+           |   * requestId: ${ExpectedRequestId}
+           |   * deployId:  latest_${HashExampleService}
+           |   * image:     hubspot/singularity-test-service:latest
+           |   * instances: 1
+           |   * resources: [cpus: 0.1, memory: 128.0Mb]
+           |   * ports:   8080
            |--------------------------------------------------------------------------------
            |
            |
@@ -172,7 +172,7 @@ trait ReleaseCommandFixtures extends Specification {
   }
 
 
-  val HashExampleService = "37a1a5a"
+  val HashExampleService = "a39297e"
 
   def buildConfig(serviceName: String) = {
     val yamlFile = new File(getClass.getResource(s"/config/$serviceName.yml").toURI)

@@ -8,12 +8,6 @@ import scala.util.{ Failure, Success, Try }
 import com.nitro.nmesos.singularity.ModelConversions._
 import com.nitro.nmesos.util.Logger
 
-sealed trait CommandResult
-
-case object CommandSuccess extends CommandResult
-
-case class CommandError(msg: String) extends CommandResult
-
 /**
  * Command to deploy a service to Mesos.
  * Features:
@@ -26,31 +20,7 @@ case class CommandError(msg: String) extends CommandResult
  */
 case class ReleaseCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean) extends DeployCommandHelper {
 
-  def run(): CommandResult = {
-
-    log.logBlock("Deploying Config") {
-      log.info(
-        s""" Service Name: ${localConfig.serviceName}
-           | Config File:  ${localConfig.file.getAbsolutePath}
-           | environment:  ${localConfig.environmentName}
-           | dry-run:      ${isDryrun}
-           | force:        ${localConfig.force}
-           | image:        ${localConfig.environment.container.image}:${localConfig.tag}
-           | api:          ${localConfig.environment.singularity.url}""".stripMargin
-      )
-    }
-
-    // Check visibility before attempting to process the command.
-    manager.ping() match {
-      case Failure(_) =>
-        CommandError(s"Unable to connect to ${localConfig.environment.singularity.url}")
-      case Success(_) =>
-        processCmd()
-    }
-
-  }
-
-  private def processCmd(): CommandResult = {
+  def processCmd(): CommandResult = {
 
     val localRequest = toSingularityRequest(localConfig)
 
@@ -86,39 +56,7 @@ case class ReleaseCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean
   }
 }
 
-trait DeployCommandHelper {
-  self: ReleaseCommand =>
-
-  val manager = SingularityManager(localConfig.environment.singularity, log, isDryrun = isDryrun)
-
-  def getRemoteRequest(localRequest: SingularityRequest) = {
-    log.debug("Fetching the remote request configuration...")
-    manager.getSingularityRequest(localRequest.id)
-  }
-
-  /**
-   * Create or update the Singularity request based on the diff between local and remote.
-   */
-  def updateSingularityRequestIfNeeded(remoteOpt: Option[SingularityRequest], local: SingularityRequest) = {
-
-    log.debug("Comparing remote and local configuration...")
-
-    remoteOpt match {
-      case None =>
-        log.info(s" No Mesos service found with id: '${local.id}'")
-        manager.createSingularityRequest(local).map(_ => local)
-
-      case Some(remote) if (remote.instances != local.instances) =>
-        // Remote Singularity request exist but need to be updated.
-        // TODO check cpu/mem changes too (for the deploy)
-        manager.scaleSingularityRequest(remote, local).map(_ => local)
-
-      case Some(other) =>
-        // Remote Singularity Request is up to date, nothing to do here!
-        Success(log.info(s" The configuration for '${localConfig.serviceName}' is up to date! [requestId: ${other.id}]"))
-        Success(local)
-    }
-  }
+trait DeployCommandHelper extends BaseCommand {
 
   /**
    * Compare remote deploy running and desired deploy, deploying a new Singularity Deploy if needed.
@@ -132,15 +70,22 @@ trait DeployCommandHelper {
       case None =>
         log.debug(s"There is no deploy with id '$defaultId'")
         val localDeploy = toSingularityDeploy(localConfig, defaultId)
-        manager.deploySingularityDeploy(local, localDeploy).map(_ => localDeploy.id)
+        val newImage = s"${localDeploy.containerInfo.docker.image}:${localConfig.tag}"
+        val message = s" Deploying version '$newImage'"
+        manager.deploySingularityDeploy(local, localDeploy, message).map(_ => localDeploy.id)
 
       case Some(_) =>
         // Already a deploy with same id, force required.
         if (localConfig.force) {
           val deployId = generateRandomDeployId(defaultId)
           val localDeploy = toSingularityDeploy(localConfig, deployId)
+
           log.info(s" There is already a deploy with id $defaultId , forcing deploy with new id '$deployId'")
-          manager.deploySingularityDeploy(local, localDeploy).map(_ => localDeploy.id)
+          val newImage = s"${localDeploy.containerInfo.docker.image}:${localConfig.tag}"
+          val message = s"Redeploy of $deployId forced. Image: $newImage"
+
+          manager.deploySingularityDeploy(local, localDeploy, message).map(_ => localDeploy.id)
+
         } else {
           log.info(s" There is already a deploy with same id '$defaultId' for request '${local.id}'")
           Failure(sys.error(s"There is already a deploy with id $defaultId, use --force to force the redeploy"))

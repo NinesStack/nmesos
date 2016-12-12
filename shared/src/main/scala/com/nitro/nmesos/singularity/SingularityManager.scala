@@ -24,14 +24,14 @@ trait SingularityManager extends HttpClientHelper {
 
   def scaleSingularityRequest(previous: SingularityRequest, request: SingularityRequest): Try[SingularityScaleUpResult]
 
-  def deploySingularityDeploy(currentRequest: SingularityRequest, newDeploy: SingularityDeploy): Try[SingularityRequestParent]
+  def deploySingularityDeploy(currentRequest: SingularityRequest, newDeploy: SingularityDeploy, message: String): Try[SingularityRequestParent]
 
   def ping(): Try[Unit] = {
     get[Unit](s"$apiUrl/api/requests").map(_.getOrElse(()))
   }
 
-  def getSingularityRequest(requestId: String): Try[Option[SingularityRequest]] = {
-    get[SingularityRequestParent](s"$apiUrl/api/requests/request/$requestId").map(_.map(_.request))
+  def getSingularityRequest(requestId: String): Try[Option[SingularityRequestParent]] = {
+    get[SingularityRequestParent](s"$apiUrl/api/requests/request/$requestId")
   }
 
   def getSingularityDeployHistory(requestId: String, deployId: DeployId): Try[Option[SingularityDeployHistory]] = {
@@ -95,13 +95,13 @@ case class DryrunSingularityManager(conf: SingularityConf, log: Logger) extends 
     Success(SingularityScaleUpResult(state = "ACTIVE"))
   }
 
-  def deploySingularityDeploy(currentRequest: SingularityRequest, newDeploy: SingularityDeploy): Try[SingularityRequestParent] = {
+  def deploySingularityDeploy(currentRequest: SingularityRequest, newDeploy: SingularityDeploy, message: String): Try[SingularityRequestParent] = {
     val message = s" [dryrun] Need to deploy image '${newDeploy.containerInfo.docker.image}'"
     log.info(message)
     val detail = ModelConversions.describeDeploy(currentRequest, newDeploy)
     log.info(
       s""" [dryrun] Deploy to apply:
-         |         ${detail.mkString("\n         ")}""".stripMargin
+         |${detail.mkString("           * ", "\n           * ", "")}""".stripMargin
     )
 
     Success(SingularityRequestParent(currentRequest, state = "ACTIVE"))
@@ -129,7 +129,7 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger) extends Si
   }
 
   def scaleSingularityRequest(previous: SingularityRequest, request: SingularityRequest) = {
-    val message = s"Scaling '${request.id}' from ${previous.instances} to ${request.instances} instances"
+    val message = s" Scaling '${request.id}' from ${previous.instances} to ${request.instances} instances"
     log.info(message)
     val scaleRequest = SingularityScaleRequest(message, request.instances)
 
@@ -143,9 +143,7 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger) extends Si
     response
   }
 
-  def deploySingularityDeploy(currentRequest: SingularityRequest, newDeploy: SingularityDeploy) = {
-    val newImage = newDeploy.containerInfo.docker.image
-    val message = s" Deploying service version '$newImage'"
+  def deploySingularityDeploy(currentRequest: SingularityRequest, newDeploy: SingularityDeploy, message: String) = {
     log.info(message)
     log.debug(s" [requestId: ${newDeploy.requestId}, deployId: ${newDeploy.id}]")
 
@@ -157,7 +155,7 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger) extends Si
       val detail = ModelConversions.describeDeploy(currentRequest, newDeploy)
       log.info(
         s""" Deploy applied:
-           |         ${detail.mkString("\n         ")}""".stripMargin
+           |${detail.mkString("   * ", "\n   * ", "")}""".stripMargin
       )
 
     }

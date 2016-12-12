@@ -1,6 +1,7 @@
 package com.nitro.nmesos.util
 
 import com.nitro.nmesos.BuildInfo
+import org.joda.time.DateTime
 
 import scala.util.{ Failure, Success, Try }
 
@@ -74,4 +75,10 @@ object VersionUtil {
     }
   }
 
+}
+
+object SequenceUtil {
+  val SequenceBaseTime = new DateTime(2016, 12, 1, 0, 0)
+
+  def sequenceId(): Long = (DateTime.now.getMillis / 1000) - (SequenceBaseTime.getMillis / 1000)
 }
