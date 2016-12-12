@@ -3,7 +3,7 @@ require 'formula'
 class NmesosCli < Formula
   desc "Nmesos is a CLI tool to deploy into Mesos."
   homepage "https://github.com/Nitro/nmesos"
-  url "https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.0.2/nmesos-cli-0.0.2.tgz"
+  url "https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.0.3/nmesos-cli-0.0.3.tgz"
 
   def install
     bin.install 'nmesos'

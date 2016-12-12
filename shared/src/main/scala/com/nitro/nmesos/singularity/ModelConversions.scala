@@ -2,6 +2,8 @@ package com.nitro.nmesos.singularity
 
 import com.nitro.nmesos.config.model.{ CmdConfig, Environment }
 import com.nitro.nmesos.singularity.model._
+import com.nitro.nmesos.util.SequenceUtil
+import org.joda.time.DateTime
 
 /**
  * Conversion from local config models to Singularity Models.
@@ -95,7 +97,7 @@ object ModelConversions {
    * Deploy Id used if there are collisions
    */
   def generateRandomDeployId(defaultId: DeployId): DeployId = {
-    val sequence = System.currentTimeMillis
+    val sequence = SequenceUtil.sequenceId()
     normalizeId(s"${defaultId}-$sequence")
   }
 
