@@ -14,7 +14,7 @@ to deploy new services into Mesos.
 
 ### Release a service
 
-The following command will read [example-service.yml](sbt-plugin/example-service/example-service.yml)
+The following command will read [example-project.yml](sbt-plugin/example-project/example-project.yml)
 and try to release the latest tag in the dev environment.
 
 ```
