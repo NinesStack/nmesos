@@ -110,7 +110,7 @@ object ModelConversions {
     deployInstanceCountPerStep = config.environment.singularity.deployInstanceCountPerStep,
     deployStepWaitTimeMs = config.environment.singularity.deployStepWaitTimeMs.getOrElse(0),
     customExecutorCmd = config.environment.executor.flatMap(_.customExecutorCmd),
-    env = config.environment.executor.map(_.env_vars).getOrElse(Map.empty),
+    env = config.environment.executor.flatMap(_.env_vars).getOrElse(Map.empty),
     autoAdvanceDeploySteps = config.environment.singularity.autoAdvanceDeploySteps
   )
 

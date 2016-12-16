@@ -1,6 +1,6 @@
 name in ThisBuild := "nmesos"
 organization in ThisBuild := "com.nitro"
-version in ThisBuild := "0.0.5"
+version in ThisBuild := "0.0.6"
 
 lazy val cli = Project("nmesos-cli", file("cli"))
   .dependsOn(shared)
