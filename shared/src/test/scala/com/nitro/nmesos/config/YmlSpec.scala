@@ -40,9 +40,10 @@ class YmlSpec extends Specification with YmlTestFixtures {
 
       val ExpectedConf = Some(ExecutorConf(
         customExecutorCmd = Some("/opt/mesos/executor.sh"),
-        env_vars = Map(
+        env_vars = Some(Map(
           "EXECUTOR_SIDECAR_DISCOVER" -> "false",
-          "EXECUTOR_SIDECAR_BACKOFF" -> "20m")
+          "EXECUTOR_SIDECAR_BACKOFF" -> "20m"
+        ))
       ))
       conf.asInstanceOf[ValidYaml].config.environments("dev").executor should be equalTo (ExpectedConf)
     }
