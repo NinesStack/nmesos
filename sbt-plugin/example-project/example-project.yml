@@ -1,7 +1,7 @@
 ## Config to deploy a simple java app to Mesos using Singularity
-## This configuration should be located at github.com/Nitro/detonator/example-service/
+## This configuration should be located under github.com/Nitro/mesos-deploy-configs/ in folder configs
 
-nmesos_version: '0.0.1' ## Min nmesos required to execute this config
+nmesos_version: '0.0.5' ## Min nmesos required to execute this config
 
 common:
 
