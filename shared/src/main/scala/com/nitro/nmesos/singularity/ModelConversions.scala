@@ -13,7 +13,7 @@ object ModelConversions {
   def toSingularityResources(environment: Environment) = SingularityResources(
     cpus = environment.resources.cpus,
     memoryMb = environment.resources.memoryMb,
-    numPorts = environment.container.ports.size,
+    numPorts = environment.container.ports.map(_.size).getOrElse(0),
     diskMb = 0
   )
 
@@ -30,14 +30,15 @@ object ModelConversions {
       sys.error("Port mappings are only supported for bridge network")
     }
 
-    val portMappings = containerPorts.map { port =>
-      SingularityDockerPortMapping(
-        containerPort = port,
-        hostPortType = "FROM_OFFER",
-        containerPortType = "LITERAL",
-        hostPort = 0, // It has to be 0!
-        protocol = "tcp"
-      )
+    val portMappings = containerPorts.zipWithIndex.map {
+      case (port, index) =>
+        SingularityDockerPortMapping(
+          containerPort = port,
+          hostPortType = "FROM_OFFER",
+          containerPortType = "LITERAL",
+          hostPort = index, // When using Literal Host (PORT0, PORT1, PORT2)
+          protocol = "tcp"
+        )
     }
 
     val labels = config.environment.container.labels
