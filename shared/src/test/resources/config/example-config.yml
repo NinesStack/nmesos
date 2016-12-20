@@ -1,5 +1,5 @@
 ## Config to deploy $name$ to Mesos using Singularity
-## This configuration should be located at github.com/Nitro/detonator/mesos-services/
+## This configuration should be located at https://github.com/Nitro/mesos-deploy-configs/configs
 
 nmesos_version: '0.0.1' ## Min nmesos required to execute this config
 
@@ -21,7 +21,7 @@ common:
       - /tmp/foo:/tmp/foo  #  (HOST:CONTAINER) with default rw or (HOST:CONTAINER:rw)
 
     labels:
-      ServiceName: "$name$"
+      ServiceName: "exampleServer"
       ## Sidecar config
       HealthCheck: "HttpGet"
       HealthCheckArgs: "http://{{ host }}:{{ tcp 8080 }}/hello"

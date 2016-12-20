@@ -22,7 +22,7 @@ common:
       - /tmp/foo:/tmp/foo  #  (HOST:CONTAINER) with default rw or (HOST:CONTAINER:rw)
 
     labels:
-      ServiceName: "$name$"
+      ServiceName: "exampleServer"
       ## Sidecar config
       HealthCheck: "HttpGet"
       HealthCheckArgs: "http://{{ host }}:{{ tcp 8080 }}/hello"

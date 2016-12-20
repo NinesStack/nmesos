@@ -70,7 +70,7 @@ trait DeployCommandHelper extends BaseCommand {
       case None =>
         log.debug(s"There is no deploy with id '$defaultId'")
         val localDeploy = toSingularityDeploy(localConfig, defaultId)
-        val newImage = s"${localDeploy.containerInfo.docker.image}:${localConfig.tag}"
+        val newImage = localDeploy.containerInfo.docker.image
         val message = s" Deploying version '$newImage'"
         manager.deploySingularityDeploy(local, localDeploy, message).map(_ => localDeploy.id)
 
@@ -81,7 +81,7 @@ trait DeployCommandHelper extends BaseCommand {
           val localDeploy = toSingularityDeploy(localConfig, deployId)
 
           log.info(s" There is already a deploy with id $defaultId , forcing deploy with new id '$deployId'")
-          val newImage = s"${localDeploy.containerInfo.docker.image}:${localConfig.tag}"
+          val newImage = localDeploy.containerInfo.docker.image
           val message = s"Redeploy of $deployId forced. Image: $newImage"
 
           manager.deploySingularityDeploy(local, localDeploy, message).map(_ => localDeploy.id)
@@ -123,7 +123,7 @@ trait DeployCommandHelper extends BaseCommand {
       } yield {
         val deploy = deployInfo.getOrElse(sys.error(s"Unable to find deployId $deployId"))
 
-        log.info(s" Deploy Mesos Deploy State: ${deploy.deployResult.deployState}")
+        log.info(s" Deploy Mesos Deploy State: ${log.importantColor(deploy.deployResult.deployState)}")
 
         val tasks = activeTasks
           .filter(_.taskId.deployId == deployId)

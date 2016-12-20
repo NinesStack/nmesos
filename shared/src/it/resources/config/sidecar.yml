@@ -1,5 +1,5 @@
-## Config to deploy $name$ to Mesos using Singularity
-## This configuration should be located at github.com/Nitro/detonator/mesos-services/
+## Config to deploy Sidecar to Mesos using Singularity
+## This configuration should be located at https://github.com/Nitro/mesos-deploy-configs/configs
 
 nmesos_version: '0.0.1' ## Min nmesos required to execute this config
 

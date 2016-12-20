@@ -98,7 +98,7 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
            |Applying config! ---------------------------------------------------------------
            | No Mesos service found with id: '${ExpectedRequestId}'
            | Created new Mesos service with Id: ${ExpectedRequestId}, instances: 1, state: ACTIVE
-           | Deploying version 'hubspot/singularity-test-service:latest:latest'
+           | Deploying version 'hubspot/singularity-test-service:latest'
            | Deploy applied:
            |   * requestId: ${ExpectedRequestId}
            |   * deployId:  latest_${HashExampleService}
@@ -172,7 +172,7 @@ trait ReleaseCommandFixtures extends Specification {
   }
 
 
-  val HashExampleService = "a39297e"
+  val HashExampleService = "2a71c1a"
 
   def buildConfig(serviceName: String) = {
     val yamlFile = new File(getClass.getResource(s"/config/$serviceName.yml").toURI)

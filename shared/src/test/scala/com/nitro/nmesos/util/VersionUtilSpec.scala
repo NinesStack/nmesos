@@ -16,7 +16,7 @@ class VersionUtilSpec extends Specification {
 
     "extract the version of a yaml file" in {
       val Yaml =
-        """## Config to deploy $name$ to Mesos using Singularity
+        """## Config to deploy exampleServer to Mesos using Singularity
           |##
           |
           |nmesos_version: '2.0.3' ## Min nmesos required to execute this config
