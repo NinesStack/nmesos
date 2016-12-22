@@ -29,16 +29,8 @@ common:
 
     env_vars:
       NEW_RELIC_LICENSE_KEY: "xxxxx"
-      JAVA_OPTS: >
-        -Xmx64m
-        -Dcom.sun.management.jmxremote
-        -Dcom.sun.management.jmxremote=true
-        -Dcom.sun.management.jmxremote.port=9990
-        -Dcom.sun.management.jmxremote.rmi.port=9990
-        -Djava.rmi.server.hostname={{ inventory_hostname }}
-        -Djava.net.preferIPv4Stack=true
-        -Dcom.sun.management.jmxremote.authenticate=false
-        -Dcom.sun.management.jmxremote.ssl=false"
+      JAVA_OPTS: -Xmx64m
+
 
     extraDockerConf:
       network: HOST

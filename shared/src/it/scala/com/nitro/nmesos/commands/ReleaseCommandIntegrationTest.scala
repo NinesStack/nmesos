@@ -63,7 +63,7 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
           |           * image:     hubspot/singularity-test-service:latest
           |           * instances: 1
           |           * resources: [cpus: 0.1, memory: 128.0Mb]
-          |           * ports:   8080
+          |           * ports:     8080
           |--------------------------------------------------------------------------------""".stripMargin
 
       compareOutput(ExpectedOutput, logger)
@@ -105,7 +105,7 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
            |   * image:     hubspot/singularity-test-service:latest
            |   * instances: 1
            |   * resources: [cpus: 0.1, memory: 128.0Mb]
-           |   * ports:   8080
+           |   * ports:     8080
            |--------------------------------------------------------------------------------
            |
            |
@@ -113,9 +113,7 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
            | Deploy progress at $SingularityUrl/request/${ExpectedRequestId}/deploy/latest_${HashExampleService}
            | Deploy Mesos Deploy State: SUCCEEDED
            |   * TaskId: ${ExpectedRequestId}-latest_5791cbd-1480516012328-1-localhost-DEFAULT
-           |     - http://localhost:31583  -> 8080
-           |   * TaskId: ${ExpectedRequestId}-latest_5791cbd-1480515994307-2-localhost-DEFAULT
-           |     - http://localhost:31655  -> 8080
+           |     - localhost:31583  -> 8080
            |--------------------------------------------------------------------------------""".stripMargin
 
       compareOutput(ExpectedOutput, logger)
@@ -172,7 +170,7 @@ trait ReleaseCommandFixtures extends Specification {
   }
 
 
-  val HashExampleService = "2a71c1a"
+  val HashExampleService = "7970c4d"
 
   def buildConfig(serviceName: String) = {
     val yamlFile = new File(getClass.getResource(s"/config/$serviceName.yml").toURI)
@@ -199,7 +197,7 @@ trait ReleaseCommandFixtures extends Specification {
 
   def compareOutput(expectedOutput: String, logger: DummyLogger) = {
     def isLineToIgnore(line: String): Boolean = {
-      line.startsWith(" Config File:") || line.startsWith("   * TaskId:") || line.startsWith("     - http://localhost:")
+      line.startsWith(" Config File:") || line.contains("TaskId:") || line.contains("localhost:")
     }
 
 

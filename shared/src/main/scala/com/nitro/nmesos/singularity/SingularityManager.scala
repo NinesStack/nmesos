@@ -5,7 +5,7 @@ import com.nitro.nmesos.singularity.ModelConversions.DeployId
 import com.nitro.nmesos.singularity.model._
 import com.nitro.nmesos.util.{ HttpClientHelper, InfoLogger, Logger }
 import scala.util.{ Success, Try }
-
+import com.nitro.nmesos.util.Conversions._
 /**
  * Can build Dryrun (readonly) or Real Singularity Manager (read-write).
  */
@@ -39,15 +39,23 @@ trait SingularityManager extends HttpClientHelper {
     get[SingularityDeployHistory](s"$apiUrl/api/history/request/$requestId/deploy/$deployId")
   }
 
-  def getSingularityTaskHistory(requestId: String): Try[Seq[SingularityTaskIdHistory]] = {
-    get[Seq[SingularityTaskIdHistory]](s"$apiUrl/api/history/tasks?requestId=$requestId")
-      .map(_.getOrElse(Seq.empty))
-  }
+  def getSingularityTaskHistory(requestId: String, deployId: DeployId): Try[Seq[SingularityTaskIdHistory]] = {
+    get[Seq[SingularityTaskIdHistory]](s"$apiUrl/api/history/request/$requestId/tasks?requestId=$requestId&deployId=$deployId")
+  }.map(_.getOrElse(Seq.empty))
 
-  def getSingularityTaskHistory(request: SingularityRequest): Try[Seq[SingularityTaskIdHistory]] = {
-    for {
-      all <- getSingularityTaskHistory(request.id)
-    } yield all.take(request.instances * 2) // Take at least the previous deploy history.
+  /**
+   * Undocumented api to fetch stdout/stderr logs:
+   * https://github.com/HubSpot/Singularity/issues/1309
+   *
+   * @param path stdout or stderr
+   */
+  private val DefaultLength = 50000
+
+  def getLogs(taskId: String, path: String): Try[Seq[String]] = for {
+    logOp <- get[SingularityLog](s"$apiUrl/api/sandbox/$taskId/read?path=$path&length=$DefaultLength&offset=0")
+    log <- logOp.toTry("Logs not found")
+  } yield {
+    log.data.split("\n")
   }
 
   def getSingularityActiveTasks(): Try[Seq[SingularityTask]] = {
@@ -55,7 +63,7 @@ trait SingularityManager extends HttpClientHelper {
       .map(_.getOrElse(Seq.empty))
   }
 
-  def getActiveTask(request: SingularityRequest): Try[Seq[SingularityTask]] = {
+  def getActiveTasks(request: SingularityRequest): Try[Seq[SingularityTask]] = {
     for {
       allTasks <- getSingularityActiveTasks()
     } yield {

@@ -55,3 +55,10 @@ cd nmesos-cli-0.0.5 && chmod u+x nmesos
 
 
 
+## Release a new version
+
+```
+// publish shared lib
+sbt "++2.10.6 nmesos-shared/publishLocal"  "++2.12.1 nmesos-shared/publishLocal"
+sbt "++2.10.6 nmesos-shared/publish"  "++2.12.1 nmesos-shared/publish" "++2.10.6 sbt-plugin/publish"
+```

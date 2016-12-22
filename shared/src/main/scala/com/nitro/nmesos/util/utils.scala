@@ -3,6 +3,7 @@ package com.nitro.nmesos.util
 import com.nitro.nmesos.BuildInfo
 import org.joda.time.DateTime
 
+import scala.annotation.tailrec
 import scala.util.{ Failure, Success, Try }
 
 // Scala conversions boilerplate .
@@ -81,4 +82,22 @@ object SequenceUtil {
   val SequenceBaseTime = new DateTime(2016, 12, 1, 0, 0)
 
   def sequenceId(): Long = (DateTime.now.getMillis / 1000) - (SequenceBaseTime.getMillis / 1000)
+}
+
+object WaitUtil {
+
+  val DefaultWait = 1000
+  // Wait for condition or failure.
+  @tailrec
+  def waitUntil(body: => Try[Boolean]): Unit = {
+    body match {
+      case Success(isValid) =>
+        if (!isValid) {
+          Thread.sleep(DefaultWait)
+          waitUntil(body)
+        }
+      case Failure(_) => // Continue
+    }
+  }
+
 }
