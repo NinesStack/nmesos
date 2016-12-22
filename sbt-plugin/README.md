@@ -17,7 +17,7 @@ Setup
 For sbt 0.13.6+ add sbt-nmesos as a dependency in `project\plugins.sbt`:
 
 ```scala
-addSbtPlugin("com.nitro" % "sbt-nmesos" % "0.1-SNAPSHOT")
+addSbtPlugin("com.gonitro" % "sbt-nmesos" % "0.0.8")
 ```
 
 # Usage
@@ -39,6 +39,6 @@ Publish locally first with:
 Remote publish:
 
 `sbt "++2.10.6 nmesos-shared/publish" `
-`sbt v++2.10.6 sbt-plugin/publish" `
+`sbt "++2.10.6 sbt-plugin/publish" `
 
 Note: This is a cross scala version project (2.10 and 2.12). The sbt plugin needs to use Scala 2.10.

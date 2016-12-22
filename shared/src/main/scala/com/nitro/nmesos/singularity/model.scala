@@ -115,7 +115,7 @@ object model {
 
   case class SingularityDeployHistory(
     deploy: SingularityDeploy,
-    deployResult: SingularityDeployResult
+    deployResult: Option[SingularityDeployResult] = None
   )
 
   case class SingularityPendingDeploy(

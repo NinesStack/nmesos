@@ -63,7 +63,7 @@ trait SingularityManager extends HttpClientHelper {
       .map(_.getOrElse(Seq.empty))
   }
 
-  def getActiveTask(request: SingularityRequest): Try[Seq[SingularityTask]] = {
+  def getActiveTasks(request: SingularityRequest): Try[Seq[SingularityTask]] = {
     for {
       allTasks <- getSingularityActiveTasks()
     } yield {

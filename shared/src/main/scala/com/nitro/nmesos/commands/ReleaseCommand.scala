@@ -5,8 +5,10 @@ import com.nitro.nmesos.singularity.model._
 
 import scala.util.{ Failure, Success, Try }
 import com.nitro.nmesos.singularity.ModelConversions._
-import com.nitro.nmesos.util.Logger
+import com.nitro.nmesos.util.{ Logger, WaitUtil }
 import com.nitro.nmesos.util.Conversions._
+
+import scala.annotation.tailrec
 
 /**
  * Command to deploy a service to Mesos.
@@ -120,26 +122,37 @@ trait DeployCommandHelper extends BaseCommand {
 
       log.showAnimated(fetchMessage)
 
+      // hack, need to wait until Singularity move the deploy result to History.
+      WaitUtil.waitUntil {
+        log.debug(s"Waiting for the deploy result...")
+        for {
+          deployInfo <- manager.getSingularityDeployHistory(request.id, deployId)
+        } yield {
+          deployInfo.flatMap(_.deployResult).isDefined
+        }
+      }
+
       ///////////////////////////////////////////////////////
       // Fetch Active task and inactive(history) task in Singularity for this request.
       // Show relevant information
       for {
         deployInfo <- manager.getSingularityDeployHistory(request.id, deployId)
-        activeTasks <- manager.getActiveTask(request)
+        activeTasks <- manager.getActiveTasks(request)
       } yield {
         val deploy = deployInfo.getOrElse(sys.error(s"Unable to find deployId $deployId"))
+        val deployResult = deploy.deployResult.getOrElse(sys.error(s"Missing deploy result."))
 
-        val message = deploy.deployResult.message.map(msg => s" - $msg").getOrElse("")
-        log.info(s""" Deploy Mesos Deploy State: ${log.importantColor(deploy.deployResult.deployState)}$message""")
+        val message = deployResult.message.map(msg => s" - $msg").getOrElse("")
+        log.info(s""" Deploy Mesos Deploy State: ${log.importantColor(deployResult.deployState)}$message""")
 
-        deploy.deployResult.deployFailures.sortBy(_.taskId.instanceNo).foreach { failure =>
+        deployResult.deployFailures.sortBy(_.taskId.instanceNo).foreach { failure =>
           log.println(s"   * TaskId: ${log.infoColor(failure.taskId.id)}")
           log.println(s"      - Reason:  ${log.importantColor(failure.reason)}")
           failure.message.foreach(msg => log.println(s"      - Message: $msg"))
           log.println(s"      - Host:    ${failure.taskId.host}")
         }
 
-        val failureTasksId = deploy.deployResult.deployFailures.map(_.taskId.id)
+        val failureTasksId = deployResult.deployFailures.map(_.taskId.id)
 
         val successfulTasks = activeTasks
           .filter(_.taskId.deployId == deployId)
@@ -160,9 +173,11 @@ trait DeployCommandHelper extends BaseCommand {
   // fetch and print logs for all the task in a given deployId
   def showLogs(request: SingularityRequest, deployId: DeployId): Try[Unit] = {
     for {
+      activeTask <- manager.getActiveTasks(request)
       tasks <- manager.getSingularityTaskHistory(request.id, deployId)
     } yield {
-      tasks.foreach(task => showLog(task.taskId))
+      val taskOption = tasks.map(_.taskId) ++ activeTask.map(_.taskId).headOption // show logs only for the first task
+      taskOption.foreach(taskId => showLog(taskId))
     }
   }.recover {
     case ex => // Ignore error while fetching logs.
