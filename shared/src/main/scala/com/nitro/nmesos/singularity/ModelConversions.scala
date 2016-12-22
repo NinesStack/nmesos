@@ -128,7 +128,7 @@ object ModelConversions {
     s"image:     ${deploy.containerInfo.docker.image}",
     s"instances: ${request.instances}",
     s"resources: [cpus: ${deploy.resources.cpus}, memory: ${deploy.resources.memoryMb}Mb]",
-    s"""ports:   ${deploy.containerInfo.docker.portMappings.map(_.containerPort).mkString(",")}"""
+    s"""ports:     ${deploy.containerInfo.docker.portMappings.map(_.containerPort).mkString(",")}"""
   )
 
 }

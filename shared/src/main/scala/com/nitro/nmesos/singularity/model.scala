@@ -98,7 +98,15 @@ object model {
   )
 
   case class SingularityDeployResult(
-    deployState: String
+    deployState: String,
+    message: Option[String] = None,
+    deployFailures: Seq[SingularityDeployFailure] = Seq.empty
+  )
+
+  case class SingularityDeployFailure(
+    reason: String,
+    taskId: SingularityTaskId,
+    message: Option[String] = None
   )
 
   case class SingularityScaleUpResult(
@@ -169,4 +177,8 @@ object model {
     hostname: String
   )
 
+  case class SingularityLog(
+    data: String,
+    offset: Int
+  )
 }
