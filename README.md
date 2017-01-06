@@ -1,8 +1,8 @@
-![NMesos Logo][docs/nmesos_logo.png]
+![NMesos Logo](docs/nmesos_logo.png)
 
 # Nmesos 
 
-Nmesos is a tool (CLI tool and sbt plugin) that leverages Singularity 
+Nmesos is a tool (CLI tool and sbt plugin) that leverages Singularityd
 to deploy new services into Mesos.
 
 ## Features
