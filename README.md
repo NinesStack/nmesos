@@ -2,12 +2,15 @@
 
 # Nmesos 
 
-Nmesos is a tool (CLI tool and sbt plugin) that leverages Singularityd
-to deploy new services into Mesos.
+Nmesos is a command line tool that leverages [Singularity](https://github.com/HubSpot/Singularity) to deploy new services to [Apache Mesos](http://mesos.apache.org/).
+
+![Terminal output](docs/nmesos-cli-example.gif)
+
 
 ## Features
 
- - Service config in Yaml format.
+ - Service configuration in Yaml format.
+ - Dryrun mode
  - Auto update (scale up instances and resources if needed)
  - [CLI tool](cli/)
  - [Integration with SBT](sbt-plugin/)(optional)
@@ -18,6 +21,8 @@ to deploy new services into Mesos.
 
 The following command will read [example-project.yml](sbt-plugin/example-project/example-project.yml)
 and try to release the latest tag in the dev environment.
+
+To release a service difined in `./example-service.yml`:
 
 ```
 nmesos release example-service --environment dev --tag latest
@@ -47,20 +52,29 @@ Alternatively, you can also download and run it with:
 
 ```
 
-curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.0.5/nmesos-cli-0.0.5.tgz | tar -xz
-cd nmesos-cli-0.0.5 && chmod u+x nmesos
+curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.0.8/nmesos-cli-0.0.8.tgz | tar -xz
+cd nmesos-cli-0.0.8 && chmod u+x nmesos
 ````
 
-## Usage
 
-./nmesos release example-service --environment dev --tag latest
-
-
-
-## Release a new version
-
+## Other Comands
 ```
-// publish shared lib
-sbt "++2.10.6 nmesos-shared/publishLocal"  "++2.12.1 nmesos-shared/publishLocal"
-sbt "++2.10.6 nmesos-shared/publish"  "++2.12.1 nmesos-shared/publish" "++2.10.6 sbt-plugin/publish"
+nmesos release [options] service-name
+ Release the a new version of the service.
+ Usage:  nmesos release example-service --environment dev --tag 0.0.1
+  service-name             Name of the service to release
+  -e, --environment <value>
+                           The environment to use
+  -t, --tag <value>        Tag/Version to release
+  -f, --force              Force action
+  -n, --dryrun <value>     Is this a dry run?
+
+
+nmesos scale [options] service-name
+ Update the Environment.
+ Usage: nmesos scale service_name --environment dev
+  service-name             Name of the service to scale
+  -e, --environment <value>
+                           The environment to use
+  -n, --dry-run <value>    Is this a dry run?
 ```
