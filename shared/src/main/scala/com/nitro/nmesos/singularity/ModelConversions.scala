@@ -119,15 +119,16 @@ object ModelConversions {
     id = toSingularityRequestId(config),
     requestType = "SERVICE",
     instances = config.environment.resources.instances,
-    slavePlacement = config.environment.singularity.slavePlacement.getOrElse("OPTIMISTIC")
+    slavePlacement = config.environment.singularity.slavePlacement.getOrElse("OPTIMISTIC"),
+    requiredRole = config.environment.singularity.requiredRole
   )
 
   def describeDeploy(request: SingularityRequest, deploy: SingularityDeploy): Seq[String] = Seq(
     s"requestId: ${request.id}",
     s"deployId:  ${deploy.id}",
     s"image:     ${deploy.containerInfo.docker.image}",
-    s"instances: ${request.instances}",
-    s"resources: [cpus: ${deploy.resources.cpus}, memory: ${deploy.resources.memoryMb}Mb]",
+    s"instances: ${request.instances}, slavePlacement: ${request.slavePlacement}",
+    s"""resources: [cpus: ${deploy.resources.cpus}, memory: ${deploy.resources.memoryMb}Mb, role: ${request.requiredRole.getOrElse("*")}]""",
     s"""ports:     ${deploy.containerInfo.docker.portMappings.map(_.containerPort).mkString(",")}"""
   )
 

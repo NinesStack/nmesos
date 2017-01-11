@@ -69,7 +69,8 @@ object model {
     id: String,
     requestType: String,
     instances: Int,
-    slavePlacement: String
+    slavePlacement: String,
+    requiredRole: Option[String] = None
   )
 
   case class SingularityDeployRequest(
