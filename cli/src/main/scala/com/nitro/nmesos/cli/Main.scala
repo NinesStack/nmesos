@@ -14,7 +14,7 @@ object CliManager {
   import java.io.File
   import com.nitro.nmesos.cli.model._
   import com.nitro.nmesos.commands.{ CommandError, CommandSuccess }
-  import com.nitro.nmesos.util.{ InfoLogger, Logger, VerboseLogger }
+  import com.nitro.nmesos.util.{ Logger, CustomLogger }
   import com.nitro.nmesos.commands.ReleaseCommand
   import com.nitro.nmesos.config.ConfigReader
   import com.nitro.nmesos.config.ConfigReader.{ ConfigError, ValidConfig }
@@ -33,7 +33,7 @@ object CliManager {
    * Process the CLI input command and verify configuration.
    */
   def processCmd(cmd: Cmd) = {
-    val log = if (cmd.verbose) VerboseLogger else InfoLogger
+    val log = CustomLogger(verbose = cmd.verbose, ansiEnabled = cmd.isFormatted)
 
     val yamlFile = toFile(cmd)
 
