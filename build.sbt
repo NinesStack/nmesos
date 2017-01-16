@@ -1,9 +1,9 @@
 name in ThisBuild := "nmesos"
 organization in ThisBuild := "com.gonitro"
-version in ThisBuild := "0.0.10"
+version in ThisBuild := "0.0.11"
 
 lazy val cli = Project("nmesos-cli", file("cli"))
-  .dependsOn(shared_2_12)
+  .dependsOn(shared)
   .settings(
     scalaVersion := "2.12.1",
     libraryDependencies ++= Seq(
@@ -37,10 +37,6 @@ lazy val shared = Project("nmesos-shared", file("shared"))
 
 lazy val shared_2_10 = shared.settings(
   scalaVersion := "2.10.6"
-)
-
-lazy val shared_2_12 = shared.settings(
-  scalaVersion := "2.12.1"
 )
 
 

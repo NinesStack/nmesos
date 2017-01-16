@@ -3,7 +3,6 @@ package com.nitro.nmesos.config
 import com.nitro.nmesos.util.InfoLogger
 import com.nitro.nmesos.config.YamlParser._
 import com.nitro.nmesos.config.model.ExecutorConf
-import com.nitro.nmesos.util.VerboseLogger
 import org.specs2.mutable.Specification
 
 import scala.io.Source
@@ -31,11 +30,11 @@ class YmlSpec extends Specification with YmlTestFixtures {
     }
 
     "return a valid config from a valid Yaml file" in {
-      YamlParser.parse(YamlExampleValid, VerboseLogger) should beAnInstanceOf[ValidYaml]
+      YamlParser.parse(YamlExampleValid, InfoLogger) should beAnInstanceOf[ValidYaml]
     }
 
     "Parse the executor configuration in a valid Yaml file" in {
-      val conf = YamlParser.parse(YamlExampleExecutorEnvs, VerboseLogger)
+      val conf = YamlParser.parse(YamlExampleExecutorEnvs, InfoLogger)
       conf should beAnInstanceOf[ValidYaml]
 
       val ExpectedConf = Some(ExecutorConf(

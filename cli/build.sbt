@@ -3,7 +3,7 @@
 scalaVersion := "2.12.1"
 organization := "nitro"
 
-val cli = Seq(
+val cli = Seq[String](
   "#!/usr/bin/env sh",
   """exec java -Djava.compiler=NONE -noverify -jar "$0" "$@""""
 )
@@ -11,6 +11,7 @@ val cli = Seq(
 mainClass in assembly := Some("com.nitro.nmesos.cli.Main")
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(cli))
 assemblyJarName in assembly := "nmesos"
+
 
 
 enablePlugins(UniversalPlugin)

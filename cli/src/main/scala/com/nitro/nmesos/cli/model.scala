@@ -8,6 +8,7 @@ object model {
   case class Cmd(
     isDryrun: Boolean,
     verbose: Boolean,
+    isFormatted: Boolean,
     serviceName: String,
     environment: String,
     tag: String,
@@ -18,6 +19,7 @@ object model {
   object DefaultValues {
     val IsDryRun = true
     val Verbose = false
+    val IsFormatted = true
   }
 
   sealed trait Action

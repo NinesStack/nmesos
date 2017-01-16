@@ -17,6 +17,7 @@ object CliParser {
       action = NilAction,
       isDryrun = DefaultValues.IsDryRun,
       verbose = DefaultValues.Verbose,
+      isFormatted = DefaultValues.IsFormatted,
       serviceName = "",
       environment = "",
       tag = "",
@@ -32,6 +33,11 @@ object CliParser {
       .abbr("v")
       .action((_, c) => c.copy(verbose = true))
       .text("More verbose output")
+
+    opt[Unit]("noformat")
+      .optional()
+      .action((_, c) => c.copy(isFormatted = false))
+      .text("Disable ansi codes in the output")
 
     help("help")
       .abbr("h")
@@ -95,7 +101,7 @@ object CliParser {
           .required()
           .action((input, params) => params.copy(environment = input)),
 
-        opt[Boolean]("dry-run")
+        opt[Boolean]("dryrun")
           .abbr("n")
           .text("Is this a dry run?")
           .optional()

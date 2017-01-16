@@ -51,8 +51,9 @@ brew uninstall nmesos-cli
 Alternatively, you can also download and run it with:
 
 ```
-
-curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.0.8/nmesos-cli-0.0.8.tgz | tar -xz
+curl -z nmesos-cli-0.0.8.tgz https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.0.8/nmesos-cli-0.0.8.tgz
+tar -xz nmesos-cli-0.0.8.tgz
+curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.0.11/nmesos-cli-0.0.11.tgz | tar -xz
 cd nmesos-cli-0.0.8 && chmod u+x nmesos
 ````
 

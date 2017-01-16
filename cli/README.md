@@ -12,8 +12,8 @@ Requirements
 ## Release cli
 
 ```
-sbt it:test
-sbt nmesos-cli/assembly nmesos-cli/universal:packageZipTarball nmesos-cli/universal:publish
+sbt "nmesos-shared/test" "nmesos-shared/it:test"
+sbt "++2.12.1 nmesos-shared/publishLocal"  "++2.12.1 nmesos-cli/assembly" nmesos-cli/universal:packageZipTarball nmesos-cli/universal:publish
 ```
 
 ## Release a brew update

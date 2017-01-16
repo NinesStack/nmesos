@@ -5,7 +5,7 @@ import scala.annotation.tailrec
 /**
  * Basic terminal output for the CLI app.
  */
-trait Logger extends AnsiLogger with Annimations {
+trait Logger extends AnsiLogger with Animations {
 
   def error(msg: => Any): Unit = println(errorColor(msg))
 
@@ -28,21 +28,15 @@ trait Logger extends AnsiLogger with Annimations {
 }
 
 /**
- * Default terminal output with verbose disabled and ansi colors enabled.
+ * Default terminal output with verbose disabled and ansi colors disabled.
  */
-object InfoLogger extends Logger {
-  val ansiEnabled = true
-
-  def debug(msg: => Any) = {}
-}
+object InfoLogger extends CustomLogger(ansiEnabled = false, verbose = false)
 
 /**
  * Terminal output with verbose enabled and ansi colors enabled.
  */
-object VerboseLogger extends Logger {
-  val ansiEnabled = true
-
-  def debug(msg: => Any): Unit = println(s" [debug] $msg")
+case class CustomLogger(ansiEnabled: Boolean, verbose: Boolean) extends Logger {
+  def debug(msg: => Any): Unit = if (verbose) println(s" [debug] $msg") else {}
 }
 
 trait AnsiLogger {
@@ -81,7 +75,7 @@ trait AnsiLogger {
   }
 }
 
-trait Annimations extends AnsiLogger {
+trait Animations extends AnsiLogger {
 
   private val Sleep = 300
   private val frames = "|/-\\".toCharArray
