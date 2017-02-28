@@ -65,7 +65,7 @@ object CliManager {
 
     cmdResult match {
       case CommandSuccess =>
-        val warningDryRun = if (cmd.isDryrun) log.importantColor("[dryrun true]") else ""
+        val warningDryRun = if (cmd.isDryrun) log.importantColor("[dryrun true] use --dryrun false") else ""
         log.info(s"Done, without errors! $warningDryRun")
 
       case CommandError(error) =>

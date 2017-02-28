@@ -73,10 +73,10 @@ object ModelConversions {
   }
 
   /**
-   * Singularity Id can not contain any of the following characters @, -, \, /, *, ?, %,  , [, ], #, $
+   * Singularity Id can contain only "a-zA-Z0-9_"
    */
   def normalizeId(id: String): String = {
-    id.replaceAll("[@ \\- \\\\  \\/ * ? % \\[ \\] #$ ]", "_")
+    id.replaceAll("[^a-zA-Z0-9_]", "_")
   }
 
   type RequestId = String
