@@ -78,7 +78,7 @@ object CliManager {
   def showConfigError(cmd: Cmd, configError: ConfigError, log: Logger): Unit = {
     log.logBlock("Invalid config") {
       log.info(
-        s""" Service Name: ${cmd.serviceName}
+        s""" Service Name: ${sanitizeServiceName(cmd.serviceName)}
            | Config File: ${configError.yamlFile.getAbsolutePath}
              """.stripMargin
       )
@@ -88,9 +88,13 @@ object CliManager {
 
   def toFile(cmd: Cmd): File = new File(s"${cmd.serviceName}.yml")
 
+  def sanitizeServiceName(serviceName: String) = {
+    serviceName.split(File.separatorChar).last
+  }
+
   // Cli command config to shared config model
   def toServiceConfig(cmd: Cmd, config: ValidConfig) = CmdConfig(
-    serviceName = cmd.serviceName,
+    serviceName = sanitizeServiceName(cmd.serviceName),
     force = cmd.force,
     tag = cmd.tag,
     environment = config.environment,
