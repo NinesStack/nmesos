@@ -1,6 +1,6 @@
 package com.nitro.nmesos.cli
 
-import com.nitro.nmesos.commands.{ CommandResult, ScaleCommand }
+import com.nitro.nmesos.commands.{ CheckCommand, CommandResult, ScaleCommand }
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -57,6 +57,9 @@ object CliManager {
       case ScaleAction =>
         val serviceConfig = toServiceConfig(cmd, config)
         ScaleCommand(serviceConfig, log, isDryrun = cmd.isDryrun).run()
+      case CheckAction =>
+        val serviceConfig = toServiceConfig(cmd, config)
+        CheckCommand(serviceConfig, log, isDryrun = cmd.isDryrun).run()
       case other =>
         // nothing to do.
         log.error(s"Action '$other' not implemented yet :( ")
@@ -64,14 +67,12 @@ object CliManager {
     }
 
     cmdResult match {
-      case CommandSuccess =>
-        val warningDryRun = if (cmd.isDryrun) log.importantColor("[dryrun true] use --dryrun false") else ""
-        log.info(s"Done, without errors! $warningDryRun")
+      case CommandSuccess(msg) =>
+        log.info(msg)
 
       case CommandError(error) =>
         log.error(error)
-        sys.exit(1)
-
+        exitWithError()
     }
   }
 
@@ -84,6 +85,7 @@ object CliManager {
       )
       log.error(configError.msg)
     }
+    exitWithError()
   }
 
   def toFile(cmd: Cmd): File = new File(s"${cmd.serviceName}.yml")
@@ -102,4 +104,6 @@ object CliManager {
     fileHash = config.fileHash,
     file = config.file
   )
+
+  def exitWithError() = sys.exit(1)
 }

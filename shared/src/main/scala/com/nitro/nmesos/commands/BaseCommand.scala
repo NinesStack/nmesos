@@ -9,9 +9,7 @@ import com.nitro.nmesos.util.Logger
 import scala.util.{ Failure, Success, Try }
 
 sealed trait CommandResult
-
-case object CommandSuccess extends CommandResult
-
+case class CommandSuccess(msg: String) extends CommandResult
 case class CommandError(msg: String) extends CommandResult
 
 trait BaseCommand {
@@ -89,5 +87,7 @@ trait BaseCommand {
         Success(local)
     }
   }
+
+  def dryWarning = if (isDryrun) log.importantColor(" [dryrun true] use --dryrun false") else ""
 
 }
