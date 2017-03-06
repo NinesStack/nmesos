@@ -39,32 +39,43 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       val command = ReleaseCommand(serviceConfig, logger, isDryrun = true)
       val result = command.run()
 
-      result must be equalTo CommandSuccess
+      result must be equalTo CommandSuccess("Successfully deployed to 1 instances. [dryrun true] use --dryrun false")
 
       val ExpectedOutput =
         s"""Deploying Config ---------------------------------------------------------------
-          | Service Name: example-service
-          | Config File:  /config/example-service.yml
-          | environment:  dev
-          | dry-run:      true
-          | force:        false
-          | image:        hubspot/singularity-test-service:latest
-          | api:          $SingularityUrl
-          |--------------------------------------------------------------------------------
-          |
-          |
-          |Applying config! ---------------------------------------------------------------
-          | No Mesos service found with id: 'dev_example_service'
-          | [dryrun] Need to create a new Mesos service with id: dev_example_service, instances: 1
-          | [dryrun] Need to deploy image 'hubspot/singularity-test-service:latest'
-          | [dryrun] Deploy to apply:
-          |           * requestId: dev_example_service
-          |           * deployId:  latest_${HashExampleService}
-          |           * image:     hubspot/singularity-test-service:latest
-          |           * instances: 1
-          |           * resources: [cpus: 0.1, memory: 128.0Mb]
-          |           * ports:     8080
-          |--------------------------------------------------------------------------------""".stripMargin
+           | Service Name: example-service
+           | Config File:  /config/example-service.yml
+           | environment:  dev
+           | dry-run:      true
+           | force:        false
+           | image:        hubspot/singularity-test-service:latest
+           | api:          $SingularityUrl
+           |--------------------------------------------------------------------------------
+           |
+           |
+           |Verifying ----------------------------------------------------------------------
+           | -  Resources - Num Instances: [OK]
+           | -  Resources - Memory Instances: [OK]
+           | -  Container - Ports: [OK]
+           | -  Container - Labels: [OK]
+           | -  Container - Environment vars: [OK]
+           | -  Container - Network: [OK]
+           | -  Singularity - Healthcheck: [OK]
+           |--------------------------------------------------------------------------------
+           |
+           |
+           |Applying config! ---------------------------------------------------------------
+           | No Mesos service found with id: 'dev_example_service'
+           | [dryrun] Need to create a new Mesos service with id: dev_example_service, instances: 1
+           | [dryrun] Need to deploy image 'hubspot/singularity-test-service:latest'
+           | [dryrun] Deploy to apply:
+           |           * requestId: dev_example_service
+           |           * deployId:  latest_${HashExampleService}
+           |           * image:     hubspot/singularity-test-service:latest
+           |           * instances: 1
+           |           * resources: [cpus: 0.1, memory: 128.0Mb]
+           |           * ports:     8080
+           |--------------------------------------------------------------------------------""".stripMargin
 
       compareOutput(ExpectedOutput, logger)
     }
@@ -79,7 +90,7 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       val command = ReleaseCommand(serviceConfig, logger, isDryrun = false)
       val result = command.run()
 
-      result must be equalTo CommandSuccess
+      result must be equalTo CommandSuccess("Successfully deployed to 1 instances.")
 
       val ExpectedRequestId = ModelConversions.toSingularityRequestId(serviceConfig)
 
@@ -92,6 +103,17 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
            | force:        false
            | image:        hubspot/singularity-test-service:latest
            | api:          $SingularityUrl
+           |--------------------------------------------------------------------------------
+           |
+           |
+           |Verifying ----------------------------------------------------------------------
+           | -  Resources - Num Instances: [OK]
+           | -  Resources - Memory Instances: [OK]
+           | -  Container - Ports: [OK]
+           | -  Container - Labels: [OK]
+           | -  Container - Environment vars: [OK]
+           | -  Container - Network: [OK]
+           | -  Singularity - Healthcheck: [OK]
            |--------------------------------------------------------------------------------
            |
            |
@@ -144,7 +166,7 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       val command = ReleaseCommand(serviceConfig, InfoLogger, isDryrun = false)
       val result = command.run()
 
-      result must be equalTo CommandSuccess
+      result must be equalTo CommandSuccess("Successfully deployed to 1 instances.")
     }
 
 

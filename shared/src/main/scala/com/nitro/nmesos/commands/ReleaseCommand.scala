@@ -1,5 +1,6 @@
 package com.nitro.nmesos.commands
 
+import com.nitro.nmesos.config.{Fail, Validations}
 import com.nitro.nmesos.config.model.CmdConfig
 import com.nitro.nmesos.singularity.model._
 
@@ -26,6 +27,8 @@ case class ReleaseCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean
 
     val localRequest = toSingularityRequest(localConfig)
 
+    val isValid = verifyCommand()
+
     ///////////////////////////////////////////////////////
     // Applying Configuration and Deploy if needed
     // - Check previous request
@@ -34,6 +37,7 @@ case class ReleaseCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean
     // - deploy if needed
     val tryDeployId: Try[DeployId] = log.logBlock("Applying config!") {
       for {
+        _ <- isValid
         remoteRequest <- getRemoteRequest(localRequest)
         updatedRequest <- updateSingularityRequestIfNeeded(remoteRequest, localRequest)
 
@@ -53,7 +57,7 @@ case class ReleaseCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean
 
     tryShowDeployStatus match {
       case Success(true) =>
-        CommandSuccess
+        CommandSuccess(s"Successfully deployed to ${localRequest.instances} instances.$dryWarning")
       case Success(false) =>
         CommandError(s"Unable to deploy")
       case Failure(ex) =>
@@ -63,6 +67,13 @@ case class ReleaseCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean
 }
 
 trait DeployCommandHelper extends BaseCommand {
+
+  def verifyCommand(): Try[Unit] = log.logBlock("Verifying") {
+    val checks = Validations.checkAll(localConfig)
+    val errors = checks.collect { case f: Fail => f }
+    Validations.logResult(checks, log)
+    if (errors.isEmpty) Success(()) else Failure(sys.error(s"Invalid Config"))
+  }
 
   /**
    * Compare remote deploy running and desired deploy, deploying a new Singularity Deploy if needed.

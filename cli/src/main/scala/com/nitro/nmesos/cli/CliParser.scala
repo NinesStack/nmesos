@@ -109,6 +109,24 @@ object CliParser {
 
       )
 
+    cmd("check")
+      .text(" Check the environment conf without running it.\n Usage: nmesos check service_name --environment dev")
+      .required()
+      .action((_, params) => params.copy(action = CheckAction))
+      .children(
+
+        arg[String]("service-name")
+          .text("Name of the service to scale")
+          .required()
+          .action((input, params) => params.copy(serviceName = input)),
+
+        opt[String]("environment")
+          .abbr("e")
+          .text("The environment to use")
+          .required()
+          .action((input, params) => params.copy(environment = input))
+      )
+
     checkConfig { cmd =>
       val availableCommands = commands.map(_.fullName).mkString("|")
       if (cmd.action != NilAction) success else failure(s"A command is required. $availableCommands\n")

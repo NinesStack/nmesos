@@ -26,5 +26,6 @@ object model {
   case object NilAction extends Action
   case object ReleaseAction extends Action
   case object ScaleAction extends Action
+  case object CheckAction extends Action
 
 }

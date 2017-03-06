@@ -35,7 +35,7 @@ case class ScaleCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean) 
 
     tryScale match {
       case Success(_) =>
-        CommandSuccess
+        CommandSuccess(s"Successfully scaled to ${localRequest.instances} instances.$dryWarning")
       case Failure(ex) =>
         CommandError(s"Unable to deploy - ${ex.getMessage}")
     }
