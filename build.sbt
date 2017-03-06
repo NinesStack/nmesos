@@ -1,6 +1,6 @@
 name in ThisBuild := "nmesos"
 organization in ThisBuild := "com.gonitro"
-version in ThisBuild := "0.0.12"
+version in ThisBuild := "0.0.13"
 
 lazy val cli = Project("nmesos-cli", file("cli"))
   .dependsOn(shared)
@@ -29,6 +29,7 @@ lazy val shared = Project("nmesos-shared", file("shared"))
     crossScalaVersions := Seq("2.12.1", "2.10.6"),
     parallelExecution in Test := false,
     libraryDependencies ++= Seq(
+      "org.typelevel" %% "cats-core" % "0.9.0",
       "net.jcazevedo" %% "moultingyaml" % "0.3.1",
       "com.lihaoyi" %% "upickle" % "0.4.4",
       "org.scalaj" %% "scalaj-http" % "2.3.0",
@@ -39,4 +40,8 @@ lazy val shared_2_10 = shared.settings(
   scalaVersion := "2.10.6"
 )
 
+
+// import cats.syntax.either._
+//
+//,
 
