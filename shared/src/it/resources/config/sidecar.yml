@@ -1,18 +1,19 @@
 ## Config to deploy Sidecar to Mesos using Singularity
 ## This configuration should be located at https://github.com/Nitro/mesos-deploy-configs/configs
 
-nmesos_version: '0.0.1' ## Min nmesos required to execute this config
+nmesos_version: '0.0.12' ## Min nmesos required to execute this config
 
 common:
 
   resources:
-    instances: 1 # Number of instances to deploy
+    instances: 1 # Initial number of instances (This will auto scale up and down to SPREAD_ALL_SLAVES)
     cpus: 0.1
-    memoryMb: 64
+    memoryMb: 50
 
   container:
     network: HOST            # Optional parameter the default is Bridge
     image:  gonitro/sidecar  # Docker repo/image without the tag
+    #forcePullImage: true                    # Optional to force pull (default false)
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock   #  (HOST:CONTAINER) with default rw or (HOST:CONTAINER:rw)
@@ -32,11 +33,10 @@ common:
     deployInstanceCountPerStep: 1   # Number of instances deployed at once.
     autoAdvanceDeploySteps: true    # false to have Canary deployments.
     deployStepWaitTimeMs: 1000      # Time to wait between deployments
-    slavePlacement: SEPARATE        # Optional parameter, default is OPTIMISTIC
+    slavePlacement: "SPREAD_ALL_SLAVES" # Ignore num instances and auto scale up/down to all nodes
+    requiredRole: "OPS"            # Only use reserved resources with this role
 
 environments:
   dev:
-    mesos:
-      url: "http://test"
     singularity:
       url: "http://192.168.99.100:7099/singularity"

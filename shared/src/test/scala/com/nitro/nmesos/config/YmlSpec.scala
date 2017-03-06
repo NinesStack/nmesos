@@ -44,7 +44,11 @@ class YmlSpec extends Specification with YmlTestFixtures {
           "EXECUTOR_SIDECAR_BACKOFF" -> "20m"
         ))
       ))
-      conf.asInstanceOf[ValidYaml].config.environments("dev").executor should be equalTo (ExpectedConf)
+      val modelConfig = conf.asInstanceOf[ValidYaml].config
+      modelConfig.environments("dev").executor should be equalTo (ExpectedConf)
+
+      modelConfig.environments("dev").singularity.requiredRole should be equalTo (Some("OPS"))
+      modelConfig.environments("dev").singularity.slavePlacement should be equalTo (Some("SPREAD_ALL_SLAVES"))
     }
 
   }

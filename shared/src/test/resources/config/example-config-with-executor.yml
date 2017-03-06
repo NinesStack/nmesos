@@ -42,6 +42,8 @@ common:
     autoAdvanceDeploySteps: true    # false to have Canary deployments.
     deployStepWaitTimeMs: 1000      # Time to wait between deployments
     healthcheckUri: "/hello"  # Used for singularity to determine if a deploy was success
+    slavePlacement: "SPREAD_ALL_SLAVES"
+    requiredRole: "OPS"
 
 ## Optional configuration to define environments variables to be passed to the Mesos executor
   executor:

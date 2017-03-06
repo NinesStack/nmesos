@@ -55,6 +55,7 @@ object model {
     deployStepWaitTimeMs: Option[Int],
     autoAdvanceDeploySteps: Boolean,
     healthcheckUri: Option[String],
+    requiredRole: Option[String],
     slavePlacement: Option[String]
   )
 
