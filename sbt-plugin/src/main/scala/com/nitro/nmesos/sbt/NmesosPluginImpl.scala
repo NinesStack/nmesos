@@ -68,9 +68,8 @@ object NmesosPluginImpl {
     val cmdResult = ReleaseCommand(serviceConfig, log, isDryrun = args.isDryrun).run()
 
     cmdResult match {
-      case CommandSuccess =>
-        val warningDryRun = if (args.isDryrun) log.importantColor("[dryrun true]") else ""
-        log.info(s"Done, without errors! $warningDryRun")
+      case CommandSuccess(msg) =>
+        log.info(msg)
 
       case CommandError(error) =>
         log.error(error)

@@ -1,10 +1,12 @@
 package com.nitro.nmesos.cli
 
+import com.nitro.nmesos.BuildInfo
 import com.nitro.nmesos.commands.{ CheckCommand, CommandResult, ScaleCommand }
 
 object Main {
   def main(args: Array[String]): Unit = {
-    println(s"Nitro Mesos Deploy tool")
+    println("NMesos Deploy tool")
+    println(s"version: ${BuildInfo.version}")
     CliManager.process(args)
   }
 }

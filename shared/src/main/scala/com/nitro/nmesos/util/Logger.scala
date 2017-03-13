@@ -8,11 +8,8 @@ import scala.annotation.tailrec
 trait Logger extends AnsiLogger with Animations {
 
   def error(msg: => Any): Unit = println(errorColor(msg))
-
   def info(msg: => Any): Unit = println(infoColor(msg))
-
   def println(msg: => Any): Unit = Console.println(msg)
-
   def debug(msg: => Any): Unit
 
   private val SeparatorLine = "-" * 80

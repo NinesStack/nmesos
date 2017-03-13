@@ -70,7 +70,6 @@ nmesos release [options] service-name
   -f, --force              Force action
   -n, --dryrun <value>     Is this a dry run?
 
-
 nmesos scale [options] service-name
  Update the Environment.
  Usage: nmesos scale service_name --environment dev
@@ -78,4 +77,10 @@ nmesos scale [options] service-name
   -e, --environment <value>
                            The environment to use
   -n, --dry-run <value>    Is this a dry run?
+
+nmesos check [options] service-name
+ Check the environment conf without running it.
+ Usage: nmesos check service_name --environment dev
+  service-name              Name of the service to verify
+  -e, --environment <value> The environment to verify
 ```

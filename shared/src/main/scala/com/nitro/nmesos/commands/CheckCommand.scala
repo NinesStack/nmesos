@@ -2,7 +2,7 @@ package com.nitro.nmesos.commands
 
 import com.nitro.nmesos.config.model.CmdConfig
 import com.nitro.nmesos.util.Logger
-import com.nitro.nmesos.config.{Fail, Validations, Warning}
+import com.nitro.nmesos.config.{ Fail, Validations, Warning }
 
 /**
  * Verify the configuration without any external call.

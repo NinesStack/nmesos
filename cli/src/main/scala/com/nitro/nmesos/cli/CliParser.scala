@@ -109,6 +109,8 @@ object CliParser {
 
       )
 
+    note("\n")
+
     cmd("check")
       .text(" Check the environment conf without running it.\n Usage: nmesos check service_name --environment dev")
       .required()
@@ -116,13 +118,13 @@ object CliParser {
       .children(
 
         arg[String]("service-name")
-          .text("Name of the service to scale")
+          .text("Name of the service to verify")
           .required()
           .action((input, params) => params.copy(serviceName = input)),
 
         opt[String]("environment")
           .abbr("e")
-          .text("The environment to use")
+          .text("The environment to verify")
           .required()
           .action((input, params) => params.copy(environment = input))
       )
