@@ -1,6 +1,6 @@
 package com.nitro.nmesos.commands
 
-import com.nitro.nmesos.config.{Fail, Validations}
+import com.nitro.nmesos.config.{ Fail, Validations }
 import com.nitro.nmesos.config.model.CmdConfig
 import com.nitro.nmesos.singularity.model._
 

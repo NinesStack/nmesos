@@ -18,7 +18,7 @@ trait HttpClientHelper {
   protected def get[A: Reader](url: String): Try[Option[A]] = Try {
     logRequest("GET", url)
 
-    val response = send(Http(url))
+    val response = send(HttpClient(url))
 
     if (response.isSuccess) {
       Some(parseBody[A](url, response))
@@ -34,7 +34,7 @@ trait HttpClientHelper {
     logRequest("POST", url, Some(json))
 
     val response = send(
-      Http(url)
+      HttpClient(url)
         .header("content-type", "application/json")
         .postData(json)
     )
@@ -51,7 +51,7 @@ trait HttpClientHelper {
     logRequest("PUT", url, Some(json))
 
     val response = send(
-      Http(url)
+      HttpClient(url)
         .header("content-type", "application/json")
         .put(json)
     )
@@ -145,4 +145,13 @@ object CustomPicklers {
     }
   }
 
+}
+
+object HttpClient extends BaseHttp(userAgent = s"nmesos") {
+
+  lazy val user = Option(System.getProperty("user.name")).getOrElse("unknown")
+
+  override def apply(url: String) = super.apply(url)
+    .header("content-type", "application/json")
+    .header("X-Username", user)
 }

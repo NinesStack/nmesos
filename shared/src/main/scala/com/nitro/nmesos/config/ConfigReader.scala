@@ -54,6 +54,7 @@ object ConfigReader {
           s"""
              |A newer version of nmesos is required.
              |Installed: ${BuildInfo.version}, required: ${version.mkString(".")}
+             |Instructions at https://github.com/Nitro/nmesos/blob/master/README.md
           """.stripMargin)
       case Success((yamlContent, version)) =>
         YamlParser.parse(yamlContent, logger)

@@ -63,9 +63,9 @@ trait ValidationHelper {
   }
 
   def logResult(checks: Seq[Validation], log: Logger) = checks.foreach {
-    case Ok(name) => log.println(s""" -  $name: ${log.importantColor("[OK]")}""")
-    case Warning(name, msg) => log.println(s""" -  $name: ${log.importantColor("[Warning]")} $msg""")
-    case Fail(name, msg) => log.println(s""" -  $name: ${log.importantColor("[Failure]")} $msg""")
+    case Ok(name) => log.println(s""" - ${log.infoColor("[OK]")}: $name""")
+    case Warning(name, msg) => log.println(s""" - ${log.errorColor("[Warning]")}: $name - $msg""")
+    case Fail(name, msg) => log.println(s""" - ${log.errorColor("[Failure]")}: $name - $msg""")
   }
 
 }
