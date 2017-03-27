@@ -33,13 +33,14 @@ object model {
   )
 
   case class Resources(
-    instances: Int,
     cpus: Double,
-    memoryMb: Int
+    memoryMb: Int,
+    instances: Option[Int]
   )
 
   case class Container(
     image: String,
+    command: Option[String],
     forcePullImage: Option[Boolean],
     ports: Option[Seq[Int]],
     labels: Option[Map[String, String]],
@@ -51,9 +52,10 @@ object model {
 
   case class SingularityConf(
     url: String,
-    deployInstanceCountPerStep: Int,
+    schedule: Option[String],
+    deployInstanceCountPerStep: Option[Int],
     deployStepWaitTimeMs: Option[Int],
-    autoAdvanceDeploySteps: Boolean,
+    autoAdvanceDeploySteps: Option[Boolean],
     healthcheckUri: Option[String],
     requiredRole: Option[String],
     slavePlacement: Option[String]

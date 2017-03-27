@@ -23,7 +23,9 @@ trait SingularityManager extends HttpClientHelper {
 
   def createSingularityRequest(newRequest: SingularityRequest): Try[SingularityRequestParent]
 
-  def scaleSingularityRequest(previous: SingularityRequest, request: SingularityRequest): Try[SingularityScaleUpResult]
+  def scaleSingularityRequest(previous: SingularityRequest, request: SingularityRequest): Try[SingularityUpdateResult]
+
+  def updateSingularityRequest(previous: SingularityRequest, request: SingularityRequest): Try[SingularityUpdateResult]
 
   def deploySingularityDeploy(currentRequest: SingularityRequest, newDeploy: SingularityDeploy, message: String): Try[SingularityRequestParent]
 
@@ -95,13 +97,26 @@ case class DryrunSingularityManager(conf: SingularityConf, log: Logger) extends 
   val apiUrl: String = conf.url
 
   def createSingularityRequest(newRequest: SingularityRequest) = {
-    log.info(s" [dryrun] Need to create a new Mesos service with id: ${newRequest.id}, instances: ${newRequest.instances}")
+    if (newRequest.schedule.isDefined) {
+      log.info(s" [dryrun] Need to schedule a new Mesos Job with id: ${newRequest.id}")
+    } else {
+      log.info(s" [dryrun] Need to create a new Mesos service with id: ${newRequest.id}, instances: ${newRequest.instances.getOrElse("0")}")
+    }
     Success(SingularityRequestParent(request = newRequest, state = "ACTIVE"))
   }
 
   def scaleSingularityRequest(previous: SingularityRequest, request: SingularityRequest) = {
     log.info(s" [dryrun] Need to scale from ${previous.instances} to ${request.instances} instances")
-    Success(SingularityScaleUpResult(state = "ACTIVE"))
+    Success(SingularityUpdateResult(state = "ACTIVE"))
+  }
+
+  def updateSingularityRequest(previous: SingularityRequest, request: SingularityRequest) = {
+    log.info(s" [dryrun] Need to update ${request.id}")
+    if (previous.schedule != request.schedule) {
+      log.info(s""" [dryrun] Need to reschedule '${previous.schedule.getOrElse("")}' to '${previous.schedule.getOrElse("")}'""")
+    }
+
+    Success(SingularityUpdateResult(state = "ACTIVE"))
   }
 
   def deploySingularityDeploy(currentRequest: SingularityRequest, newDeploy: SingularityDeploy, message: String): Try[SingularityRequestParent] = {
@@ -130,8 +145,10 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger) extends Si
     val response = post[SingularityRequest, SingularityRequestParent](s"$apiUrl/api/requests", newRequest)
 
     response.foreach {
-      case response =>
-        log.info(s" Created new Mesos service with Id: ${newRequest.id}, instances: ${newRequest.instances}, state: ${response.state}")
+      case response if (newRequest.schedule.isEmpty) =>
+        log.info(s""" Created new Mesos service with Id: ${newRequest.id}, instances: ${newRequest.instances.getOrElse("0")}, state: ${response.state}""")
+      case response if (newRequest.schedule.isDefined) =>
+        log.info(s""" Scheduled new Mesos job with Id: ${newRequest.id}, state: ${response.state}""")
     }
 
     response
@@ -142,11 +159,25 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger) extends Si
     log.info(message)
     val scaleRequest = SingularityScaleRequest(message, request.instances)
 
-    val response = put[SingularityScaleRequest, SingularityScaleUpResult](s"$apiUrl/api/requests/request/${request.id}/scale", scaleRequest)
+    val response = put[SingularityScaleRequest, SingularityUpdateResult](s"$apiUrl/api/requests/request/${request.id}/scale", scaleRequest)
 
     response.foreach {
       case response =>
         log.info(s" ${request.id} scaled, instances: ${request.instances}, state: ${response.state}")
+    }
+
+    response
+  }
+
+  def updateSingularityRequest(previous: SingularityRequest, request: SingularityRequest) = {
+    val message = s""" Rescheduling '${request.id}' cron from '${previous.schedule.getOrElse("")}' to '${request.schedule.getOrElse("")}'"""
+    log.info(message)
+
+    val response = post[SingularityRequest, SingularityUpdateResult](s"$apiUrl/api/requests", request)
+
+    response.foreach {
+      case response =>
+        log.info(s""" ${request.id} rescheduled, cron: '${previous.schedule.getOrElse("")}' , state: ${response.state}""")
     }
 
     response

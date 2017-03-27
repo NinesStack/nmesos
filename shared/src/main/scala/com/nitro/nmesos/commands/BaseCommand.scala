@@ -74,12 +74,16 @@ trait BaseCommand {
 
     remoteOpt match {
       case None =>
-        log.info(s" No Mesos service found with id: '${local.id}'")
+        log.info(s" No Mesos config found with id: '${local.id}'")
         manager.createSingularityRequest(local).map(_ => local)
 
       case Some(remote) if (remote.instances != local.instances) =>
         // Remote Singularity request exist but need to be updated.
         manager.scaleSingularityRequest(remote, local).map(_ => local)
+
+      case Some(remote) if (remote != local) =>
+        // Remote Singularity request exist but need to be updated.
+        manager.updateSingularityRequest(remote, local).map(_ => local)
 
       case Some(other) =>
         // Remote Singularity Request is up to date, nothing to do here!

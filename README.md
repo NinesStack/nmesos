@@ -2,7 +2,8 @@
 
 # Nmesos 
 
-Nmesos is a command line tool that leverages [Singularity](https://github.com/HubSpot/Singularity) to deploy new services to [Apache Mesos](http://mesos.apache.org/).
+Nmesos is a command line tool that leverages [Singularity](https://github.com/HubSpot/Singularity) API to deploy 
+services and schedule jobs in a [Apache Mesos](http://mesos.apache.org/) cluster.
 
 ![Terminal output](docs/nmesos-cli-example.gif)
 
@@ -11,22 +12,22 @@ Nmesos is a command line tool that leverages [Singularity](https://github.com/Hu
 
  - Service configuration in Yaml format.
  - Dryrun mode
- - Auto update (scale up instances and resources if needed)
+ - Auto detect changes between yaml and Singularity request (scale up instances and resources if needed)
  - [CLI tool](cli/)
  - [Integration with SBT](sbt-plugin/)(optional)
+ - Scheduled jobs
  
 # Usage
 
 ### Release a service
-
-The following command will read [example-project.yml](sbt-plugin/example-project/example-project.yml)
+The following command will read [example-service.yml](docs/examples/example-service.yml)
 and try to release the latest tag in the dev environment.
-
-To release a service difined in `./example-service.yml`:
 
 ```
 nmesos release example-service --environment dev --tag latest
 ```
+
+To know more about the yml format check the [yml examples](docs/examples)
 
 # Getting Started with the CLI tool
 

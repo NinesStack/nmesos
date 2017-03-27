@@ -1,5 +1,4 @@
-## Config to deploy Sidecar to Mesos using Singularity
-## This configuration should be located at https://github.com/Nitro/mesos-deploy-configs/configs
+## Example config for integration testing
 
 nmesos_version: '0.0.12' ## Min nmesos required to execute this config
 

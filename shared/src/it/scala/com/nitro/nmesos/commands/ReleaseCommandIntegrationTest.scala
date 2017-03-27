@@ -3,12 +3,10 @@ package com.nitro.nmesos.commands
 import java.io.File
 
 import com.nitro.nmesos.singularity.ModelConversions
-import com.nitro.nmesos.util.Logger
-
+import com.nitro.nmesos.util.{CustomLogger, InfoLogger, Logger}
 import com.nitro.nmesos.config.ConfigReader
 import com.nitro.nmesos.config.ConfigReader.ValidConfig
 import com.nitro.nmesos.config.model.CmdConfig
-import com.nitro.nmesos.util.InfoLogger
 import org.specs2.mutable.Specification
 
 /**
@@ -54,27 +52,27 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
            |
            |
            |Verifying ----------------------------------------------------------------------
-           | -  Resources - Num Instances: [OK]
-           | -  Resources - Memory Instances: [OK]
-           | -  Container - Ports: [OK]
-           | -  Container - Labels: [OK]
-           | -  Container - Environment vars: [OK]
-           | -  Container - Network: [OK]
-           | -  Singularity - Healthcheck: [OK]
+           | - [OK]: Container - Environment vars
+           | - [OK]: Container - Labels
+           | - [OK]: Container - Network
+           | - [OK]: Container - Ports
+           | - [OK]: Resources - Memory Instances
+           | - [OK]: Resources - Num Instances
+           | - [OK]: Singularity - Healthcheck
            |--------------------------------------------------------------------------------
            |
            |
            |Applying config! ---------------------------------------------------------------
-           | No Mesos service found with id: 'dev_example_service'
+           | No Mesos config found with id: 'dev_example_service'
            | [dryrun] Need to create a new Mesos service with id: dev_example_service, instances: 1
            | [dryrun] Need to deploy image 'hubspot/singularity-test-service:latest'
            | [dryrun] Deploy to apply:
-           |           * requestId: dev_example_service
            |           * deployId:  latest_${HashExampleService}
            |           * image:     hubspot/singularity-test-service:latest
-           |           * instances: 1
-           |           * resources: [cpus: 0.1, memory: 128.0Mb]
+           |           * instances: 1, slavePlacement: OPTIMISTIC
            |           * ports:     8080
+           |           * requestId: dev_example_service
+           |           * resources: [cpus: 0.1, memory: 128.0Mb, role: *]
            |--------------------------------------------------------------------------------""".stripMargin
 
       compareOutput(ExpectedOutput, logger)
@@ -84,7 +82,7 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
     "deploy a example service for the first time with an expected log" in {
 
 
-      val serviceConfig = buildConfig("example-service").copy(serviceName = serviceNameInThisTest)
+      val serviceConfig = buildConfig("example-service").copy(serviceName = ServiceNameInThisTest)
 
       val logger = new DummyLogger
       val command = ReleaseCommand(serviceConfig, logger, isDryrun = false)
@@ -96,7 +94,7 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
 
       val ExpectedOutput =
         s"""Deploying Config ---------------------------------------------------------------
-           | Service Name: ${serviceNameInThisTest}
+           | Service Name: ${ServiceNameInThisTest}
            | Config File:  /config/example-service.yml
            | environment:  dev
            | dry-run:      false
@@ -107,27 +105,27 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
            |
            |
            |Verifying ----------------------------------------------------------------------
-           | -  Resources - Num Instances: [OK]
-           | -  Resources - Memory Instances: [OK]
-           | -  Container - Ports: [OK]
-           | -  Container - Labels: [OK]
-           | -  Container - Environment vars: [OK]
-           | -  Container - Network: [OK]
-           | -  Singularity - Healthcheck: [OK]
+           | - [OK]: Container - Environment vars
+           | - [OK]: Container - Labels
+           | - [OK]: Container - Network
+           | - [OK]: Container - Ports
+           | - [OK]: Resources - Memory Instances
+           | - [OK]: Resources - Num Instances
+           | - [OK]: Singularity - Healthcheck
            |--------------------------------------------------------------------------------
            |
            |
            |Applying config! ---------------------------------------------------------------
-           | No Mesos service found with id: '${ExpectedRequestId}'
+           | No Mesos config found with id: '${ExpectedRequestId}'
            | Created new Mesos service with Id: ${ExpectedRequestId}, instances: 1, state: ACTIVE
            | Deploying version 'hubspot/singularity-test-service:latest'
            | Deploy applied:
-           |   * requestId: ${ExpectedRequestId}
            |   * deployId:  latest_${HashExampleService}
            |   * image:     hubspot/singularity-test-service:latest
-           |   * instances: 1
-           |   * resources: [cpus: 0.1, memory: 128.0Mb]
+           |   * instances: 1, slavePlacement: OPTIMISTIC
            |   * ports:     8080
+           |   * requestId: ${ExpectedRequestId}
+           |   * resources: [cpus: 0.1, memory: 128.0Mb, role: *]
            |--------------------------------------------------------------------------------
            |
            |
@@ -145,7 +143,7 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
     "Ask for '--force' when deploying an existing service with the same version." in {
 
       // create a new service (in case it doesn't exist already
-      val serviceConfig = buildConfig("example-service").copy(serviceName = serviceNameInThisTest)
+      val serviceConfig = buildConfig("example-service").copy(serviceName = ServiceNameInThisTest)
       val command = ReleaseCommand(serviceConfig, InfoLogger, isDryrun = false)
       val result = command.run()
 
@@ -169,6 +167,62 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       result must be equalTo CommandSuccess("Successfully deployed to 1 instances.")
     }
 
+    "deploy a job for the first time with an expected log" in {
+
+
+      val serviceConfig = buildConfig("example-job").copy(serviceName = JobNameInThisTest) //.copy(force = true)//.
+
+      val logger =  new DummyLogger
+      val command = ReleaseCommand(serviceConfig, logger, isDryrun = false)
+      val result = command.run()
+
+      result must be equalTo CommandSuccess("Successfully scheduled - cron: '*/5 * * * *'.")
+
+      val ExpectedRequestId = ModelConversions.toSingularityRequestId(serviceConfig)
+
+      val ExpectedOutput =
+        s"""Deploying Config ---------------------------------------------------------------
+           | Service Name: ${JobNameInThisTest}
+           | Config File:  /config/example-service.yml
+           | environment:  dev
+           | dry-run:      false
+           | force:        false
+           | image:        busybox:latest
+           | api:          $SingularityUrl
+           |--------------------------------------------------------------------------------
+           |
+           |
+           |Verifying ----------------------------------------------------------------------
+           | - [OK]: Container - Environment vars
+           | - [OK]: Container - Labels
+           | - [OK]: Resources - Memory Instances
+           | - [OK]: Resources - Num Instances
+           | - [OK]: Singularity - Job cron
+           |--------------------------------------------------------------------------------
+           |
+           |
+           |Applying config! ---------------------------------------------------------------
+           | No Mesos config found with id: '${ExpectedRequestId}'
+           | Scheduled new Mesos job with Id: ${ExpectedRequestId}, state: ACTIVE
+           | Deploying version 'busybox:latest'
+           | Deploy applied:
+           |   * deployId:  latest_${HashExampleJobConfigFile}
+           |   * image:     busybox:latest
+           |   * requestId: ${ExpectedRequestId}
+           |   * resources: [cpus: 0.1, memory: 64.0Mb, role: *]
+           |   * scheduled: */5 * * * *
+           |--------------------------------------------------------------------------------
+           |
+           |
+           |Mesos Tasks Info ---------------------------------------------------------------
+           | Deploy progress at $SingularityUrl/request/${ExpectedRequestId}/deploy/latest_${HashExampleJobConfigFile}
+           | Scheduled Mesos Job State: SUCCEEDED
+           |   * History: $SingularityUrl/request/${ExpectedRequestId}
+           |   * Cron:    '*/5 * * * *'
+           |--------------------------------------------------------------------------------""".stripMargin
+
+      compareOutput(ExpectedOutput, logger)
+    }
 
   }
 }
@@ -176,7 +230,8 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
 
 trait ReleaseCommandFixtures extends Specification {
 
-  val serviceNameInThisTest = s"integration-test-${System.currentTimeMillis}"
+  val JobNameInThisTest = s"integration-test-job-${System.currentTimeMillis}"
+  val ServiceNameInThisTest = s"integration-test-${System.currentTimeMillis}"
   val SingularityUrl = "http://192.168.99.100:7099/singularity"
 
   // Same conf with invalid api
@@ -192,7 +247,8 @@ trait ReleaseCommandFixtures extends Specification {
   }
 
 
-  val HashExampleService = "7970c4d"
+  val HashExampleService = "17d5246"
+  val HashExampleJobConfigFile = "8d4c0de"
 
   def buildConfig(serviceName: String) = {
     val yamlFile = new File(getClass.getResource(s"/config/$serviceName.yml").toURI)

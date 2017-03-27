@@ -11,8 +11,8 @@ object YamlParserHelper {
   // boilerplate to parse our custom case class
   object YamlCustomProtocol extends DefaultYamlProtocol {
     implicit val resourcesFormat = yamlFormat3(Resources)
-    implicit val containerFormat = yamlFormat8(Container)
-    implicit val singularityFormat = yamlFormat7(SingularityConf)
+    implicit val containerFormat = yamlFormat9(Container)
+    implicit val singularityFormat = yamlFormat8(SingularityConf)
     implicit val executorFormat = yamlFormat2(ExecutorConf)
     implicit val environmentFormat = yamlFormat4(Environment)
     implicit val configFormat = yamlFormat2(Config)

@@ -1,0 +1,29 @@
+## Example config for testing
+nmesos_version: '0.0.1' ## Min nmesos required to execute this config
+
+common:
+
+  resources:
+    instances: 2 # Number of instances to deploy
+    cpus: 0.1
+    memoryMb: 64
+  container:
+    image: busybox:latest
+    command: "echo test" ## pending
+    labels:
+      SidecarDiscover: "false"
+    env_vars:
+      NEW_RELIC_LICENSE_KEY: "xxxxx"
+
+  singularity:
+    #numRetriesOnFailure: 2   # default is 0
+    schedule: "*/5 * * * *"
+    # optional deployInstanceCountPerStep: 1   # Number of instances deployed at once.
+    # optional autoAdvanceDeploySteps: true    # false to have Canary deployments.
+    # optional deployStepWaitTimeMs: 1000      # Time to wait between deployments
+    # optional healthcheckUri: "/hello"  # Used for singularity to determine if a deploy was success
+
+environments:
+  dev:
+    singularity:
+      url: "http://192.168.99.100:7099/singularity"
