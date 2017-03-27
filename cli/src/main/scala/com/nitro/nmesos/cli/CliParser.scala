@@ -27,8 +27,6 @@ object CliParser {
   }
 
   private val cmdParser = new scopt.OptionParser[Cmd]("nmesos") {
-    head("nmesos", BuildInfo.version)
-
     opt[Unit]("verbose")
       .abbr("v")
       .action((_, c) => c.copy(verbose = true))

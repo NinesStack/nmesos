@@ -69,11 +69,17 @@ object VersionUtil {
   }
 
   // compare compatibility between semantic versions
-  private def isCompatible(required: Version, installed: Version): Boolean = {
-    required.zip(installed).foldLeft(true) {
-      case (stillCompatible, (required, installed)) =>
-        stillCompatible && required <= installed
+  def isCompatible(requiredVersion: Version, installedVersion: Version): Boolean = {
+    val zip = requiredVersion.zip(installedVersion)
+
+    def compareVersions(remaining: List[(Int, Int)]): Boolean = remaining match {
+      case Nil => true
+      case (required, installed) :: tail if (required > installed) => false
+      case (required, installed) :: tail if (required < installed) => true
+      case (required, installed) :: tail if (required == installed) => compareVersions(tail)
     }
+
+    compareVersions(zip)
   }
 
 }
