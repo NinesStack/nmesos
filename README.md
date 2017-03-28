@@ -24,6 +24,7 @@ The following command will read [example-service.yml](docs/examples/example-serv
 and try to release the latest tag in the dev environment.
 
 ```
+cd docs/examples
 nmesos release example-service --environment dev --tag latest
 ```
 
@@ -31,7 +32,14 @@ To know more about the yml format check the [yml examples](docs/examples)
 
 # Getting Started with the CLI tool
 
-Install Nmesos cli:
+Install Nmesos CLI manually:
+
+```
+curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.1.1/nmesos-cli-0.1.1.tgz | tar -xz
+cd nmesos-cli-0.1.0 && chmod u+x nmesos
+````
+
+Alternatively on MacOS, you can also install it with brew:
 
 ```
 brew tap nitro/nmesos  git@github.com:Nitro/nmesos.git
@@ -48,15 +56,6 @@ Uninstall Nmesos cli:
 ```
 brew uninstall nmesos-cli
 ```
-
-Alternatively, you can also download and run it with:
-
-```
-curl -z nmesos-cli-0.0.8.tgz https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.0.8/nmesos-cli-0.0.8.tgz
-tar -xz nmesos-cli-0.0.8.tgz
-curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.0.11/nmesos-cli-0.0.11.tgz | tar -xz
-cd nmesos-cli-0.0.8 && chmod u+x nmesos
-````
 
 
 ## Other Comands

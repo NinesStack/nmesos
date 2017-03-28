@@ -1,6 +1,6 @@
 name in ThisBuild := "nmesos"
 organization in ThisBuild := "com.gonitro"
-version in ThisBuild := "0.1.0"
+version in ThisBuild := "0.1.1"
 
 lazy val cli = Project("nmesos-cli", file("cli"))
   .dependsOn(shared)
@@ -38,9 +38,3 @@ lazy val shared = Project("nmesos-shared", file("shared"))
 lazy val shared_2_10 = shared.settings(
   scalaVersion := "2.10.6"
 )
-
-
-// import cats.syntax.either._
-//
-//,
-

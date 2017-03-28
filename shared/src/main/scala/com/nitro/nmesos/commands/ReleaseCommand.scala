@@ -129,7 +129,7 @@ trait DeployCommandHelper extends BaseCommand {
         } yield {
           val count = pending.deployProgress.targetActiveInstances
           val status = pending.currentDeployState
-          s"""Waiting until the deploy is completed [deployId: '$deployId', status: $status, instances ${count}/${request.instances.getOrElse("0")}]""""
+          s"""Waiting until the deploy is completed [deployId: '$deployId', status: $status, instances ${count}/${request.instances.getOrElse("0")}]"""
         }
       }
 
