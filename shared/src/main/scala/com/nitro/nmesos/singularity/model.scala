@@ -57,9 +57,11 @@ object model {
     id: String,
     resources: SingularityResources,
     containerInfo: SingularityContainerInfo,
-    deployInstanceCountPerStep: Int,
-    deployStepWaitTimeMs: Int,
-    autoAdvanceDeploySteps: Boolean,
+    command: Option[String] = None,
+    shell: Option[Boolean] = None,
+    deployInstanceCountPerStep: Option[Int] = None,
+    deployStepWaitTimeMs: Option[Int] = None,
+    autoAdvanceDeploySteps: Option[Boolean] = None,
     customExecutorCmd: Option[String] = None,
     env: Map[String, String] = Map.empty,
     healthcheckUri: Option[String] = None
@@ -68,8 +70,9 @@ object model {
   case class SingularityRequest(
     id: String,
     requestType: String,
-    instances: Int,
     slavePlacement: String,
+    instances: Option[Int] = None,
+    schedule: Option[String] = None,
     requiredRole: Option[String] = None
   )
 
@@ -81,7 +84,7 @@ object model {
 
   case class SingularityScaleRequest(
     message: String,
-    instances: Int,
+    instances: Option[Int] = None,
     skipHealthchecks: Boolean = true //If set to true, healthchecks will be skipped while scaling this request (only)
   )
 
@@ -110,7 +113,7 @@ object model {
     message: Option[String] = None
   )
 
-  case class SingularityScaleUpResult(
+  case class SingularityUpdateResult(
     state: String
   )
 

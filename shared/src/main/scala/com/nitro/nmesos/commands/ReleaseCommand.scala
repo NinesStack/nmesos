@@ -56,8 +56,10 @@ case class ReleaseCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean
     }
 
     tryShowDeployStatus match {
-      case Success(true) =>
-        CommandSuccess(s"Successfully deployed to ${localRequest.instances} instances.$dryWarning")
+      case Success(true) if (localRequest.schedule.isEmpty) =>
+        CommandSuccess(s"""Successfully deployed to ${localRequest.instances.getOrElse("")} instances.$dryWarning""")
+      case Success(true) if (localRequest.schedule.isDefined) =>
+        CommandSuccess(s"""Successfully scheduled - cron: '${localRequest.schedule.getOrElse("")}'.$dryWarning""")
       case Success(false) =>
         CommandError(s"Unable to deploy")
       case Failure(ex) =>
@@ -72,7 +74,7 @@ trait DeployCommandHelper extends BaseCommand {
     val checks = Validations.checkAll(localConfig)
     val errors = checks.collect { case f: Fail => f }
     Validations.logResult(checks, log)
-    if (errors.isEmpty) Success(()) else Failure(sys.error(s"Invalid Config"))
+    if (errors.isEmpty) Success(()) else Failure(new Exception(s"Invalid Config"))
   }
 
   /**
@@ -117,17 +119,17 @@ trait DeployCommandHelper extends BaseCommand {
     log.logBlock("Mesos Tasks Info") {
       log.info(s" Deploy progress at ${localConfig.environment.singularity.url}/request/${request.id}/deploy/$deployId")
 
+      val managerWithoutLogger = manager.withDisabledDebugLog()
+
       ///////////////////////////////////////////////////////
       // Wait until the pending task are executed.
       def fetchMessage() = {
-        val managerWithoutLogger = manager.withDisabledDebugLog()
         for {
           pending <- managerWithoutLogger.getSingularityPendingDeploy(request.id, deployId).getOrElse(None)
         } yield {
           val count = pending.deployProgress.targetActiveInstances
           val status = pending.currentDeployState
-          s"Waiting until the deploy is completed [deployId: '$deployId', status: $status, instances ${count}/${request.instances}]"
-
+          s"""Waiting until the deploy is completed [deployId: '$deployId', status: $status, instances ${count}/${request.instances.getOrElse("0")}]""""
         }
       }
 
@@ -148,35 +150,50 @@ trait DeployCommandHelper extends BaseCommand {
       // Show relevant information
       for {
         deployInfo <- manager.getSingularityDeployHistory(request.id, deployId)
-        activeTasks <- manager.getActiveTasks(request)
+        activeTasks <- managerWithoutLogger.getActiveTasks(request)
       } yield {
         val deploy = deployInfo.getOrElse(sys.error(s"Unable to find deployId $deployId"))
         val deployResult = deploy.deployResult.getOrElse(sys.error(s"Missing deploy result."))
 
-        val message = deployResult.message.map(msg => s" - $msg").getOrElse("")
-        log.info(s""" Deploy Mesos Deploy State: ${log.importantColor(deployResult.deployState)}$message""")
-
-        deployResult.deployFailures.sortBy(_.taskId.instanceNo).foreach { failure =>
-          log.println(s"   * TaskId: ${log.infoColor(failure.taskId.id)}")
-          log.println(s"      - Reason:  ${log.importantColor(failure.reason)}")
-          failure.message.foreach(msg => log.println(s"      - Message: $msg"))
-          log.println(s"      - Host:    ${failure.taskId.host}")
+        localConfig.environment.singularity.schedule match {
+          case None =>
+            // Service task
+            val failureTasksId = deployResult.deployFailures.map(_.taskId.id)
+            val successfulTasks = activeTasks
+              .filter(_.taskId.deployId == deployId)
+              .filterNot(task => failureTasksId.contains(task.taskId.id))
+            logTaskInfo(deployResult, successfulTasks)
+          case Some(schedule) =>
+            // job task
+            logJobInfo(request, deployResult, schedule)
         }
 
-        val failureTasksId = deployResult.deployFailures.map(_.taskId.id)
+        deployResult.deployState.equalsIgnoreCase("SUCCEEDED")
+      }
+    }
+  }
 
-        val successfulTasks = activeTasks
-          .filter(_.taskId.deployId == deployId)
-          .filterNot(task => failureTasksId.contains(task.taskId.id))
+  private def logJobInfo(request: SingularityRequest, deployResult: SingularityDeployResult, schedule: String) = {
+    log.println(s""" Scheduled Mesos Job State: ${log.importantColor(deployResult.deployState)}""")
+    log.println(s"   * History: ${localConfig.environment.singularity.url}/request/${request.id}")
+    log.println(s"   * Cron:    '$schedule'")
+  }
 
-        successfulTasks.foreach { task =>
-          log.println(s"""   * TaskId: ${log.infoColor(task.taskId.id)}""")
-          task.mesosTask.container.docker.portMappings.foreach { port =>
-            log.println(s"""     - ${task.offer.hostname}:${port.hostPort}  -> ${port.containerPort}""")
-          }
-        }
-        // The operation is successful if number of active task is equal requested task
-        successfulTasks.size == request.instances
+  private def logTaskInfo(deployResult: SingularityDeployResult, successfulTasks: Seq[SingularityTask]) = {
+    val message = deployResult.message.map(msg => s" - $msg").getOrElse("")
+    log.println(s""" Deploy Mesos Deploy State: ${log.importantColor(deployResult.deployState)}$message""")
+
+    deployResult.deployFailures.sortBy(_.taskId.instanceNo).foreach { failure =>
+      log.println(s"   * TaskId: ${log.infoColor(failure.taskId.id)}")
+      log.println(s"      - Reason:  ${log.importantColor(failure.reason)}")
+      failure.message.foreach(msg => log.println(s"      - Message: $msg"))
+      log.println(s"      - Host:    ${failure.taskId.host}")
+    }
+
+    successfulTasks.foreach { task =>
+      log.println(s"""   * TaskId: ${log.infoColor(task.taskId.id)}""")
+      task.mesosTask.container.docker.portMappings.foreach { port =>
+        log.println(s"""     - ${task.offer.hostname}:${port.hostPort}  -> ${port.containerPort}""")
       }
     }
   }

@@ -33,6 +33,11 @@ class YmlSpec extends Specification with YmlTestFixtures {
       YamlParser.parse(YamlExampleValid, InfoLogger) should beAnInstanceOf[ValidYaml]
     }
 
+    "return a valid config from a valid Yaml with optional singularity config missing" in {
+      val temp = YamlParser.parse(YamlJobExampleValid, InfoLogger).asInstanceOf[ValidYaml].config
+      YamlParser.parse(YamlJobExampleValid, InfoLogger) should beAnInstanceOf[ValidYaml]
+    }
+
     "Parse the executor configuration in a valid Yaml file" in {
       val conf = YamlParser.parse(YamlExampleExecutorEnvs, InfoLogger)
       conf should beAnInstanceOf[ValidYaml]
@@ -115,4 +120,6 @@ trait YmlTestFixtures {
   def YamlExampleValid = Source.fromURL(getClass.getResource("/config/example-config.yml")).mkString
 
   def YamlExampleExecutorEnvs = Source.fromURL(getClass.getResource("/config/example-config-with-executor.yml")).mkString
+
+  def YamlJobExampleValid = Source.fromURL(getClass.getResource("/config/example-without-optional-config.yml")).mkString
 }

@@ -1,6 +1,4 @@
-## Config to deploy $name$ to Mesos using Singularity
-## This configuration should be located at https://github.com/Nitro/mesos-deploy-configs/configs
-
+## Example config for testing
 nmesos_version: '0.0.1' ## Min nmesos required to execute this config
 
 common:
@@ -54,7 +52,5 @@ common:
 
 environments:
   dev:
-    mesos:
-      url: "http://test"
     singularity:
       url: "http://test"

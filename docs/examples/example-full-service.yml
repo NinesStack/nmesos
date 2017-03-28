@@ -1,18 +1,16 @@
 ## Example config for integration testing
-nmesos_version: '0.0.1' ## Min nmesos required to execute this config
+nmesos_version: '0.1.0' ## Min nmesos required to execute this config
 
 common:
 
   resources:
-    instances: 1 # Number of instances to deploy
-    cpus: 0.1
     memoryMb: 128
 
   container:
-
     image: hubspot/singularity-test-service # Docker repo/image without the tag
-    #forcePullImage: true                    # Optional to force pull (default false)
-
+    forcePullImage: true                    # Optional to force pull (default false)
+    #command: "echo test job"                # Custom command
+    #network: HOST            # Optional parameter the default is Bridge
     ports:
       - 8080 # Exposed port by the container (Mesos will auto assign a external port)
 
@@ -21,27 +19,24 @@ common:
 
     labels:
       ServiceName: "exampleServer"
-      ## Sidecar config
-      HealthCheck: "HttpGet"
-      HealthCheckArgs: "http://{{ host }}:{{ tcp 8080 }}/hello"
 
     env_vars:
       NEW_RELIC_LICENSE_KEY: "xxxxx"
       JAVA_OPTS: -Xmx64m
 
-    #network: HOST
-    #dockerParameters:
+    #dockerParameters: # Aditional Docker conf for (cap-add, log-driver,...)
     #  cap-add: NET_ADMIN
 
-
-
   singularity:
+    #schedule: "*/5 * * * *" # mark the Singularity Request type as SCHEDULED and set the Cron
     deployInstanceCountPerStep: 1   # Number of instances deployed at once.
     autoAdvanceDeploySteps: true    # false to have Canary deployments.
     deployStepWaitTimeMs: 1000      # Time to wait between deployments
     healthcheckUri: "/hello"        # Used for singularity to determine if a deploy was success
+    #slavePlacement: "SPREAD_ALL_SLAVES" # Ignore num instances and auto scale up/down to all nodes
+    #requiredRole: "OPS"            # Only use reserved resources with this role
 
-## Optional configuration to define environments variables to be passed to the Mesos executor
+# Optional configuration to define environments variables to be passed to the Mesos executor
 #  executor:
 #    customExecutorCmd: "/opt/mesos/executor.sh"   # Optional custom Mesos Executor.
 #    env_vars:
@@ -50,5 +45,14 @@ common:
 
 environments:
   dev:
+    resources:
+      instances: 1 # Number of instances to deploy
+      cpus: 0.1
     singularity:
       url: "http://192.168.99.100:7099/singularity"
+  prod:
+    resources:
+      instances: 5
+      cpus: 1
+    singularity:
+      url: "http://prod-singularity/singularity"

@@ -1,6 +1,6 @@
 package com.nitro.nmesos.config
 
-import com.nitro.nmesos.config.model.{ CmdConfig, Container, Resources, SingularityConf }
+import com.nitro.nmesos.config.model._
 import com.nitro.nmesos.util.Logger
 
 // Basic model validations
@@ -9,40 +9,53 @@ object Validations extends ValidationHelper {
   def checkAll(localConfig: CmdConfig): Seq[Validation] = Seq(
     checkResources(localConfig.environment.resources),
     checkContainer(localConfig.environment.container),
-    checkSingularityConf(localConfig.environment.singularity)
-  ).flatten
+    if (localConfig.environment.singularity.schedule.isDefined) {
+      checkJob(localConfig.environment)
+    } else {
+      checkService(localConfig.environment)
+    }
+  ).flatten.sortBy(_.name)
 
   private def checkResources(resources: Resources): Seq[Validation] = Seq(
-    check("Resources - Num Instances", "Must be > 0") {
-      resources.instances > 0
-    },
     check("Resources - Memory Instances", "Must be > 0") {
       resources.memoryMb > 0
     }
   )
 
-  private def checkContainer(container: Container): Seq[Validation] = Seq(
-    checkWarning("Container - Ports", "No ports defined") {
-      !container.ports.toSet.flatten.isEmpty
+  private def checkService(env: Environment): Seq[Validation] = Seq(
+    check("Resources - Num Instances", "Must be > 0") {
+      env.resources.instances.exists(_ > 0)
     },
+    checkWarning("Container - Ports", "No ports defined") {
+      !env.container.ports.toSet.flatten.isEmpty
+    },
+    check("Container - Network", "Unsupported network") {
+      env.container.network match {
+        case None => true
+        case Some("HOST") | Some("BRIDGE") => true
+        case _ => false
+      }
+    },
+    checkWarning("Singularity - Healthcheck", "No healthcheck defined") {
+      env.singularity.healthcheckUri.exists(_.trim.nonEmpty)
+    }
+  )
+
+  private def checkJob(env: Environment): Seq[Validation] = Seq(
+    check("Resources - Num Instances", "Must be = 0") {
+      env.resources.instances.isEmpty
+    },
+    check("Singularity - Job cron", "Missing") {
+      env.singularity.schedule.isDefined
+    }
+  )
+
+  private def checkContainer(container: Container): Seq[Validation] = Seq(
     checkWarning("Container - Labels", "No labels defined") {
       !container.labels.toSet.flatten.isEmpty
     },
     checkWarning("Container - Environment vars", "No env vars defined") {
       !container.env_vars.toSet.flatten.isEmpty
-    },
-    check("Container - Network", "Unsupported network") {
-      container.network match {
-        case None => true
-        case Some("HOST") | Some("BRIDGE") => true
-        case _ => false
-      }
-    }
-  )
-
-  private def checkSingularityConf(singularityConf: SingularityConf): Seq[Validation] = Seq(
-    checkWarning("Singularity - Healthcheck", "No healthcheck defined") {
-      singularityConf.healthcheckUri.exists(_.trim.nonEmpty)
     }
   )
 
@@ -70,7 +83,9 @@ trait ValidationHelper {
 
 }
 
-sealed trait Validation
+sealed trait Validation {
+  def name: String
+}
 case class Ok(name: String) extends Validation
 case class Warning(name: String, error: String) extends Validation
 case class Fail(name: String, error: String) extends Validation

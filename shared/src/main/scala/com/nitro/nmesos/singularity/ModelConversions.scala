@@ -85,6 +85,10 @@ object ModelConversions {
     normalizeId(s"${config.environmentName}-${config.serviceName}")
   }
 
+  def toRequestType(config: CmdConfig): String = {
+    if (config.environment.singularity.schedule.isDefined) "SCHEDULED" else "SERVICE"
+  }
+
   type DeployId = String
 
   /**
@@ -109,27 +113,39 @@ object ModelConversions {
     containerInfo = toSingularityContainerInfo(config),
     healthcheckUri = config.environment.singularity.healthcheckUri,
     deployInstanceCountPerStep = config.environment.singularity.deployInstanceCountPerStep,
-    deployStepWaitTimeMs = config.environment.singularity.deployStepWaitTimeMs.getOrElse(0),
+    deployStepWaitTimeMs = config.environment.singularity.deployStepWaitTimeMs,
     customExecutorCmd = config.environment.executor.flatMap(_.customExecutorCmd),
     env = config.environment.executor.flatMap(_.env_vars).getOrElse(Map.empty),
-    autoAdvanceDeploySteps = config.environment.singularity.autoAdvanceDeploySteps
+    autoAdvanceDeploySteps = config.environment.singularity.autoAdvanceDeploySteps,
+    command = config.environment.container.command,
+    shell = config.environment.container.command.map(_ => true)
   )
 
   def toSingularityRequest(config: CmdConfig) = SingularityRequest(
     id = toSingularityRequestId(config),
-    requestType = "SERVICE",
+    requestType = toRequestType(config),
     instances = config.environment.resources.instances,
     slavePlacement = config.environment.singularity.slavePlacement.getOrElse("OPTIMISTIC"),
+    schedule = config.environment.singularity.schedule,
     requiredRole = config.environment.singularity.requiredRole
   )
 
-  def describeDeploy(request: SingularityRequest, deploy: SingularityDeploy): Seq[String] = Seq(
-    s"requestId: ${request.id}",
-    s"deployId:  ${deploy.id}",
-    s"image:     ${deploy.containerInfo.docker.image}",
-    s"instances: ${request.instances}, slavePlacement: ${request.slavePlacement}",
-    s"""resources: [cpus: ${deploy.resources.cpus}, memory: ${deploy.resources.memoryMb}Mb, role: ${request.requiredRole.getOrElse("*")}]""",
-    s"""ports:     ${deploy.containerInfo.docker.portMappings.map(_.containerPort).mkString(",")}"""
-  )
+  def describeDeploy(request: SingularityRequest, deploy: SingularityDeploy): Seq[String] = {
+    val common = Seq(
+      s"requestId: ${request.id}",
+      s"deployId:  ${deploy.id}",
+      s"image:     ${deploy.containerInfo.docker.image}",
+      s"""resources: [cpus: ${deploy.resources.cpus}, memory: ${deploy.resources.memoryMb}Mb, role: ${request.requiredRole.getOrElse("*")}]"""
+
+    )
+    if (request.schedule.isDefined) {
+      common ++ request.schedule.map(cron => s"scheduled: $cron").toSeq
+    } else {
+      common ++ Seq(
+        s"instances: ${request.instances.getOrElse("0")}, slavePlacement: ${request.slavePlacement}",
+        s"""ports:     ${deploy.containerInfo.docker.portMappings.map(_.containerPort).mkString(",")}""".trim
+      )
+    }
+  }.sorted
 
 }
