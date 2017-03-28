@@ -26,5 +26,13 @@ class VersionUtilSpec extends Specification {
       VersionUtil.tryExtractFromYaml(Yaml) must be equalTo Success(List(2, 0, 3))
 
     }
+
+    "Verify compatible versions" in {
+      VersionUtil.isCompatible(requiredVersion = List(0, 0, 1), installedVersion = List(0, 1, 0)) must beTrue
+      VersionUtil.isCompatible(requiredVersion = List(0, 0, 1), installedVersion = List(0, 0, 1)) must beTrue
+      VersionUtil.isCompatible(requiredVersion = List(0, 0, 2), installedVersion = List(0, 0, 1)) must beFalse
+      VersionUtil.isCompatible(requiredVersion = List(0, 1, 0), installedVersion = List(0, 1, 0)) must beTrue
+      VersionUtil.isCompatible(requiredVersion = List(1, 1, 0), installedVersion = List(1, 1, 10)) must beTrue
+    }
   }
 }
