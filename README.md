@@ -35,7 +35,7 @@ To know more about the yml format check the [yml examples](docs/examples)
 Install Nmesos CLI manually:
 
 ```
-curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.1.1/nmesos-cli-0.1.1.tgz | tar -xz
+curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.1.2/nmesos-cli-0.1.2.tgz | tar -xz
 cd nmesos-cli-0.1.0 && chmod u+x nmesos
 ````
 

@@ -37,7 +37,7 @@ object CliManager {
   def processCmd(cmd: Cmd) = {
     val log = CustomLogger(verbose = cmd.verbose, ansiEnabled = cmd.isFormatted)
 
-    val yamlFile = toFile(cmd)
+    val yamlFile = toFile(cmd, log)
 
     ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
       case error: ConfigError =>
@@ -90,7 +90,17 @@ object CliManager {
     exitWithError()
   }
 
-  def toFile(cmd: Cmd): File = new File(s"${cmd.serviceName}.yml")
+  val ConfigRepositoryEnvName = "NMESOS_CONFIG_REPOSITORY"
+
+  def toFile(cmd: Cmd, log: Logger): File = {
+    sys.env.get(ConfigRepositoryEnvName) match {
+      case None =>
+        new File(s"${cmd.serviceName}.yml")
+      case Some(path) =>
+        log.println(s"$ConfigRepositoryEnvName: $path")
+        new File(s"${path}${File.separator}${cmd.serviceName}.yml")
+    }
+  }
 
   def sanitizeServiceName(serviceName: String) = {
     serviceName.split(File.separatorChar).last
