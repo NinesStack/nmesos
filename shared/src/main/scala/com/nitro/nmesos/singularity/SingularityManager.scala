@@ -106,7 +106,7 @@ case class DryrunSingularityManager(conf: SingularityConf, log: Logger) extends 
   }
 
   def scaleSingularityRequest(previous: SingularityRequest, request: SingularityRequest) = {
-    log.info(s" [dryrun] Need to scale from ${previous.instances} to ${request.instances} instances")
+    log.info(s""" [dryrun] Need to scale from ${previous.instances.getOrElse("0")} to ${request.instances.getOrElse("0")} instances""")
     Success(SingularityUpdateResult(state = "ACTIVE"))
   }
 
@@ -155,7 +155,7 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger) extends Si
   }
 
   def scaleSingularityRequest(previous: SingularityRequest, request: SingularityRequest) = {
-    val message = s" Scaling '${request.id}' from ${previous.instances} to ${request.instances} instances"
+    val message = s""" Scaling '${request.id}' from ${previous.instances.getOrElse("0")} to ${request.instances.getOrElse("0")} instances"""
     log.info(message)
     val scaleRequest = SingularityScaleRequest(message, request.instances)
 
@@ -163,7 +163,7 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger) extends Si
 
     response.foreach {
       case response =>
-        log.info(s" ${request.id} scaled, instances: ${request.instances}, state: ${response.state}")
+        log.info(s" ${request.id} scaled, instances: ${request.instances.getOrElse("0")}, state: ${response.state}")
     }
 
     response
