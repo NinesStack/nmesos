@@ -142,7 +142,7 @@ object ModelConversions {
       common ++ request.schedule.map(cron => s"scheduled: $cron").toSeq
     } else {
       common ++ Seq(
-        s"instances: ${request.instances.getOrElse("0")}, slavePlacement: ${request.slavePlacement}",
+        s"instances: ${request.instances.getOrElse("*")}, slavePlacement: ${request.slavePlacement}",
         s"""ports:     ${deploy.containerInfo.docker.portMappings.map(_.containerPort).mkString(",")}""".trim
       )
     }

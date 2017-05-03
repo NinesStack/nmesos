@@ -24,10 +24,10 @@ object Validations extends ValidationHelper {
 
   private def checkService(env: Environment): Seq[Validation] = Seq(
     check("Resources - Num Instances", "Must be > 0") {
-      env.resources.instances.exists(_ > 0)
+      env.singularity.slavePlacement.exists(_ == "SPREAD_ALL_SLAVES") || env.resources.instances.exists(_ > 0)
     },
     checkWarning("Container - Ports", "No ports defined") {
-      !env.container.ports.toSet.flatten.isEmpty
+      env.container.network.exists(_ == "HOST") || !env.container.ports.toSet.flatten.isEmpty
     },
     check("Container - Network", "Unsupported network") {
       env.container.network match {

@@ -28,7 +28,7 @@ case class ScaleCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean) 
     val tryScale: Try[String] = log.logBlock("Applying Scale Config!") {
       for {
         remoteRequest <- getRemoteRequest(localRequest)
-        updatedRequest <- updateSingularityRequestIfNeeded(remoteRequest, localRequest)
+        updatedRequest <- scaleSingularityRequestIfNeeded(remoteRequest, localRequest)
         _ <- scaleDeployIfNeeded(localRequest)
       } yield updatedRequest.id
     }

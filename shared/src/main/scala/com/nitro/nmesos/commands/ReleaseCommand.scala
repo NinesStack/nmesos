@@ -101,7 +101,7 @@ trait DeployCommandHelper extends BaseCommand {
 
           log.info(s" There is already a deploy with id $defaultId , forcing deploy with new id '$deployId'")
           val newImage = localDeploy.containerInfo.docker.image
-          val message = s"Redeploy of $deployId forced. Image: $newImage"
+          val message = s" Redeploy of $deployId forced. Image: $newImage"
 
           manager.deploySingularityDeploy(local, localDeploy, message).map(_ => localDeploy.id)
 
@@ -129,7 +129,7 @@ trait DeployCommandHelper extends BaseCommand {
         } yield {
           val count = pending.deployProgress.targetActiveInstances
           val status = pending.currentDeployState
-          s"""Waiting until the deploy is completed [deployId: '$deployId', status: $status, instances ${count}/${request.instances.getOrElse("0")}]"""
+          s"""Waiting until the deploy is completed [deployId: '$deployId', status: $status, instances ${count}/${request.instances.getOrElse("*")}]"""
         }
       }
 

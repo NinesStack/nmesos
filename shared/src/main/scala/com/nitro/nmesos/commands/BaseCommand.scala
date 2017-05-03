@@ -3,7 +3,7 @@ package com.nitro.nmesos.commands
 import com.nitro.nmesos.config.model.CmdConfig
 import com.nitro.nmesos.singularity.SingularityManager
 import com.nitro.nmesos.singularity.model.SingularityRequestParent.SingularityActiveDeployResponse
-import com.nitro.nmesos.singularity.model.{ SingularityRequest, SingularityResources }
+import com.nitro.nmesos.singularity.model.{ SingularityRequest, SingularityResources, SingularityUpdateResult }
 import com.nitro.nmesos.util.Logger
 
 import scala.util.{ Failure, Success, Try }
@@ -69,21 +69,41 @@ trait BaseCommand {
    * Create or update the Singularity request based on the diff between local and remote.
    */
   def updateSingularityRequestIfNeeded(remoteOpt: Option[SingularityRequest], local: SingularityRequest) = {
-
     log.debug("Comparing remote and local configuration...")
-
     remoteOpt match {
       case None =>
         log.info(s" No Mesos config found with id: '${local.id}'")
         manager.createSingularityRequest(local).map(_ => local)
 
-      case Some(remote) if (remote.instances != local.instances) =>
-        // Remote Singularity request exist but need to be updated.
-        manager.scaleSingularityRequest(remote, local).map(_ => local)
-
       case Some(remote) if (remote != local) =>
         // Remote Singularity request exist but need to be updated.
         manager.updateSingularityRequest(remote, local).map(_ => local)
+
+      case Some(other) =>
+        // Remote Singularity Request is up to date, nothing to do here!
+        Success(log.info(s" The request configuration for '${localConfig.serviceName}' is up to date! [requestId: ${other.id}]"))
+        Success(local)
+    }
+  }
+
+  /**
+   * Scale the resources of the Singularity request based on the diff between local and remote.
+   * Note: Only the number of instances will be updated.
+   */
+  def scaleSingularityRequestIfNeeded(remoteOpt: Option[SingularityRequest], local: SingularityRequest): Try[SingularityRequest] = {
+
+    log.debug("Comparing remote and local configuration...")
+
+    remoteOpt match {
+      case None =>
+        Failure(new Exception(s" No Mesos config found with id: '${local.id}'"))
+
+      case Some(SingularityRequest(_, _, "SPREAD_ALL_SLAVES", _, _, _)) =>
+        Failure(new Exception(s" Unable to scale to a fix number of instances. Using auto-scale [slavePlacement: SPREAD_ALL_SLAVES]"))
+
+      case Some(remote) if (remote.instances != local.instances) =>
+        // Remote Singularity request exist but num instances need to be scaled
+        manager.scaleSingularityRequest(remote, local).map(_ => local)
 
       case Some(other) =>
         // Remote Singularity Request is up to date, nothing to do here!
