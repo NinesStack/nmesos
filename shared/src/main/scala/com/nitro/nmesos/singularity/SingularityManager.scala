@@ -170,17 +170,11 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger) extends Si
   }
 
   def updateSingularityRequest(previous: SingularityRequest, request: SingularityRequest) = {
-    val message = s""" Rescheduling '${request.id}' cron from '${previous.schedule.getOrElse("")}' to '${request.schedule.getOrElse("")}'"""
-    log.info(message)
-
-    val response = post[SingularityRequest, SingularityUpdateResult](s"$apiUrl/api/requests", request)
-
-    response.foreach {
-      case response =>
-        log.info(s""" ${request.id} rescheduled, cron: '${previous.schedule.getOrElse("")}' , state: ${response.state}""")
+    log.info(s" Need to update ${request.id}")
+    if (previous.schedule != request.schedule) {
+      log.info(s""" Rescheduling '${request.id}' cron from '${previous.schedule.getOrElse("")}' to '${request.schedule.getOrElse("")}'""")
     }
-
-    response
+    post[SingularityRequest, SingularityUpdateResult](s"$apiUrl/api/requests", request)
   }
 
   def deploySingularityDeploy(currentRequest: SingularityRequest, newDeploy: SingularityDeploy, message: String) = {
