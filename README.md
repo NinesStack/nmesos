@@ -28,6 +28,45 @@ cd docs/examples
 nmesos release example-service --environment dev --tag latest
 ```
 
+### Config Yml file
+
+```
+nmesos_version: '0.1.0'
+common:
+  resources:
+    memoryMb: 128
+  
+  container:
+    image: hubspot/singularity-test-service
+    ports:
+      - 8080
+    labels:
+      ServiceName: "exampleServer"
+    env_vars:
+      NEW_RELIC_LICENSE_KEY: "xxxxx"      
+  
+  singularity:
+    healthcheckUri: "/hello"
+
+environments:
+  dev:
+    resources:
+      instances: 1 
+      cpus: 0.1
+    singularity:
+      url: "http://192.168.99.100:7099/singularity"
+
+  prod:
+    resources:
+      instances: 3 
+      cpus: 1
+    container:  
+      env_vars:  
+        JAVA_OPTS: "-Xmx1024m"
+    singularity:
+      url: "http://prod-singularity/singularity"      
+```
+
 To know more about the yml format check the [yml examples](docs/examples)
 
 # Getting Started with the CLI tool
