@@ -112,6 +112,7 @@ object ModelConversions {
     resources = toSingularityResources(config.environment),
     containerInfo = toSingularityContainerInfo(config),
     healthcheckUri = config.environment.singularity.healthcheckUri,
+    healthcheckPortIndex = config.environment.singularity.healthcheckPortIndex,
     deployInstanceCountPerStep = config.environment.singularity.deployInstanceCountPerStep,
     deployStepWaitTimeMs = config.environment.singularity.deployStepWaitTimeMs,
     customExecutorCmd = config.environment.executor.flatMap(_.customExecutorCmd),

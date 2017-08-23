@@ -12,7 +12,7 @@ object YamlParserHelper {
   object YamlCustomProtocol extends DefaultYamlProtocol {
     implicit val resourcesFormat = yamlFormat3(Resources)
     implicit val containerFormat = yamlFormat9(Container)
-    implicit val singularityFormat = yamlFormat8(SingularityConf)
+    implicit val singularityFormat = yamlFormat9(SingularityConf)
     implicit val executorFormat = yamlFormat2(ExecutorConf)
     implicit val environmentFormat = yamlFormat4(Environment)
     implicit val configFormat = yamlFormat2(Config)
