@@ -64,7 +64,8 @@ object model {
     autoAdvanceDeploySteps: Option[Boolean] = None,
     customExecutorCmd: Option[String] = None,
     env: Map[String, String] = Map.empty,
-    healthcheckUri: Option[String] = None
+    healthcheckUri: Option[String] = None,
+    healthcheckPortIndex: Option[Int] = None
   )
 
   case class SingularityRequest(

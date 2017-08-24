@@ -58,6 +58,7 @@ object model {
     autoAdvanceDeploySteps: Option[Boolean],
     healthcheckUri: Option[String],
     requiredRole: Option[String],
+    healthcheckPortIndex: Option[Int],
     slavePlacement: Option[String]
   )
 
