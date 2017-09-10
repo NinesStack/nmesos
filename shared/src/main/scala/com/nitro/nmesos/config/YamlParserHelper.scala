@@ -1,7 +1,7 @@
 package com.nitro.nmesos.config
 
 import com.nitro.nmesos.config.model._
-import net.jcazevedo.moultingyaml.{ DefaultYamlProtocol, YamlArray, YamlBoolean, YamlDate, YamlNull, YamlNumber, YamlObject, YamlSet, YamlString, YamlValue }
+import net.jcazevedo.moultingyaml.{ DefaultYamlProtocol, YamlArray, YamlBoolean, YamlDate, YamlFormat, YamlNull, YamlNumber, YamlObject, YamlSet, YamlString, YamlValue, deserializationError }
 
 import scala.annotation.tailrec
 
@@ -10,6 +10,17 @@ object YamlParserHelper {
 
   // boilerplate to parse our custom case class
   object YamlCustomProtocol extends DefaultYamlProtocol {
+    implicit val PortMapYamlFormat = new YamlFormat[PortMap] {
+      override def read(yaml: YamlValue): PortMap = {
+        val Array(containerPort, hostPort) = yaml.convertTo[String].split(":").map(_.toInt)
+        PortMap(containerPort, hostPort)
+      }
+
+      override def write(obj: PortMap): YamlValue = {
+        YamlString(obj.containerPort.toString + ":" + obj.hostPort.toString)
+      }
+    }
+
     implicit val resourcesFormat = yamlFormat3(Resources)
     implicit val containerFormat = yamlFormat9(Container)
     implicit val singularityFormat = yamlFormat9(SingularityConf)
