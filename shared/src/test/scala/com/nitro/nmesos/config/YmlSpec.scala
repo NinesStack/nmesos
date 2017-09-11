@@ -34,7 +34,6 @@ class YmlSpec extends Specification with YmlTestFixtures {
     }
 
     "return a valid config from a valid Yaml with optional singularity config missing" in {
-      val temp = YamlParser.parse(YamlJobExampleValid, InfoLogger).asInstanceOf[ValidYaml].config
       YamlParser.parse(YamlJobExampleValid, InfoLogger) should beAnInstanceOf[ValidYaml]
     }
 
