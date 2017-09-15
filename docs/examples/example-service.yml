@@ -15,7 +15,10 @@ common:
 
     ports:
       - 8080       # Exposed port by the container (Mesos will auto assign a external port)
-      - 9000:12000 # Require Mesos to assign a specific port (<container_port>:<host_port>)
+      - 9000:12000 # Require Mesos to assign a specific fixed port (<container_port>:<host_port>)
+                   # Note: you may notice that Singularity automatically allocates an extra
+                   #       external port for each requested fixed port. This seems to be a
+                   #       bug in Singularity.
 
     volumes:
       - /tmp/foo:/tmp/foo  #  (HOST:CONTAINER) with default rw or (HOST:CONTAINER:rw)
