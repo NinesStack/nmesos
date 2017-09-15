@@ -2,7 +2,9 @@ package com.nitro.nmesos.config
 
 import com.nitro.nmesos.util.InfoLogger
 import com.nitro.nmesos.config.YamlParser._
+import com.nitro.nmesos.config.YamlParserHelper.YamlCustomProtocol._
 import com.nitro.nmesos.config.model.{ ExecutorConf, PortMap }
+import net.jcazevedo.moultingyaml._
 import org.specs2.mutable.Specification
 
 import scala.io.Source
@@ -16,17 +18,17 @@ class YmlSpec extends Specification with YmlTestFixtures {
 
     "fail while reading an invalid YML file" in {
       val ExpectedMessage = "Invalid yaml file at line 9, column: 1\n     WTF!\n     ^"
-      YamlParser.parse(YamlInvalid, InfoLogger) should be equalTo InvalidYaml(ExpectedMessage)
+      YamlParser.parse(YamlInvalidRandom, InfoLogger) should be equalTo InvalidYaml(ExpectedMessage)
     }
 
     "fail while reading a valid YML file without version" in {
       val ExpectedMessage = "Parser error for field nmesos_version: YamlObject is missing required member 'nmesos_version'"
-      YamlParser.parse(YamlWithoutVersion, InfoLogger) should be equalTo InvalidYaml(ExpectedMessage)
+      YamlParser.parse(YamlInvalidWithoutVersion, InfoLogger) should be equalTo InvalidYaml(ExpectedMessage)
     }
 
     "fail while reading a valid YML file without all the required config parameters" in {
       val ExpectedMessage = "Parser error for field nmesos_version: YamlObject is missing required member 'nmesos_version'"
-      YamlParser.parse(YamlWithIncompleteConf, InfoLogger) should be equalTo InvalidYaml(ExpectedMessage)
+      YamlParser.parse(YamlInvalidWithIncompleteConf, InfoLogger) should be equalTo InvalidYaml(ExpectedMessage)
     }
 
     "return a valid config from a valid Yaml file" in {
@@ -64,6 +66,8 @@ class YmlSpec extends Specification with YmlTestFixtures {
         case Some(hostPort) => portMap must beEqualTo(PortMap(9000, Option(12000)))
         case None => portMap.containerPort must beEqualTo(8080)
       }))
+
+      conf.toYaml.prettyPrint must beEqualTo(ExpectedYamlExamplePortConfig)
     }
 
     "fail while parsing an invalid port specification" in {
@@ -79,62 +83,28 @@ class YmlSpec extends Specification with YmlTestFixtures {
 }
 
 trait YmlTestFixtures {
-
-  val YamlInvalid =
-    """
-      |common: &common
-      |  image: gonitro/test
-      |
-      |  resources:
-      |    instances: 2 # Number of instances to deploy
-      |    cpus: 0.5
-      |    memoryMb: 2048
-      |    diskMb: 0
-      | WTF!
-      |
+  val ExpectedYamlExamplePortConfig =
+    """|nmesos_version: 0.0.1
       |environments:
       |  dev:
-      |    <<: *common
-      |
-    """.stripMargin
+      |    resources:
+      |      cpus: 0.1
+      |      memoryMb: 64
+      |      instances: 2
+      |    container:
+      |      image: hubspot/singularity-test-service
+      |      ports:
+      |      - 9000:12000
+      |      - 8080
+      |    singularity:
+      |      url: http://192.168.99.100:7099/singularity
+      |""".stripMargin
 
-  val YamlWithoutVersion =
-    """
-      |
-      |common: &common
-      |  image: gonitro/test
-      |
-      |  resources:
-      |    instances: 2 # Number of instances to deploy
-      |    cpus: 0.5
-      |    memoryMb: 2048
-      |    diskMb: 0
-      |
-      |environments:
-      |  dev:
-      |    <<: *common
-      |
-    """.stripMargin
+  def YamlInvalidRandom = Source.fromURL(getClass.getResource("/config/invalid-random.yml")).mkString
 
-  val YamlWithIncompleteConf =
-    """
-      |
-      |common: &common
-      |  image: gonitro/test
-      |
-      |  resources:
-      |    instances: 2 # Number of instances to deploy
-      |    cpus: 0.5
-      |    memoryMb: 2048
-      |    diskMb: 0
-      |
-      |environments:
-      |  dev:
-      |    <<: *common
-      |
-      |  prod:
-      |    # image and all other required parameters are missing here
-    """.stripMargin
+  def YamlInvalidWithoutVersion = Source.fromURL(getClass.getResource("/config/invalid-without-version.yml")).mkString
+
+  def YamlInvalidWithIncompleteConf = Source.fromURL(getClass.getResource("/config/invalid-with-incomplete-conf.yml")).mkString
 
   def YamlExampleValid = Source.fromURL(getClass.getResource("/config/example-config.yml")).mkString
 

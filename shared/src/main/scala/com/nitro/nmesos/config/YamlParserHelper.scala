@@ -19,11 +19,11 @@ object YamlParserHelper {
           case _ => deserializationError("Failed to deserialize port map specification")
         }
         case _ => deserializationError("Failed to deserialize port specification")
-
       }
 
-      override def write(obj: PortMap): YamlValue = {
-        YamlString(s"${obj.containerPort}:${obj.hostPort}")
+      override def write(portMap: PortMap): YamlValue = portMap.hostPort match {
+        case Some(hostPort) => YamlString(s"${portMap.containerPort}:${hostPort}")
+        case None => YamlNumber(portMap.containerPort)
       }
     }
 
