@@ -17,7 +17,7 @@ object YamlParserHelper {
       }
 
       override def write(obj: PortMap): YamlValue = {
-        YamlString(obj.containerPort.toString + ":" + obj.hostPort.toString)
+        YamlString(s"${obj.containerPort}:${obj.hostPort}")
       }
     }
 
