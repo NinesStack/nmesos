@@ -26,8 +26,18 @@ object Validations extends ValidationHelper {
     check("Resources - Num Instances", "Must be > 0") {
       env.singularity.slavePlacement.exists(_ == "SPREAD_ALL_SLAVES") || env.resources.instances.exists(_ > 0)
     },
-    checkWarning("Container - Ports", "No ports defined") {
+    checkWarning("Container - Ports", "Should be defined in HOST mode") {
       env.container.network.exists(_ == "HOST") || !env.container.ports.toSet.flatten.isEmpty
+    },
+    check("Container - Port values", "Must be >= 0 and <= 65535") {
+      env.container.ports match {
+        case Some(ports) => ports.map(portMap => portMap.hostPort match {
+          case Some(hostPort) => 0 <= portMap.containerPort && portMap.containerPort <= 65535 &&
+            0 <= hostPort && hostPort <= 65535
+          case None => 0 <= portMap.containerPort && portMap.containerPort <= 65535
+        }).reduce(_ && _)
+        case _ => true
+      }
     },
     check("Container - Network", "Unsupported network") {
       env.container.network match {
