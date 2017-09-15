@@ -31,20 +31,20 @@ object ModelConversions {
     }
 
     val portMappings = containerPorts.zipWithIndex.map {
-      case (port, index) =>
-        port match {
-          case Left(dynamicPort) => SingularityDockerPortMapping(
-            containerPort = dynamicPort,
+      case (portMap, index) =>
+        portMap.hostPort match {
+          case Some(hostPort) => SingularityDockerPortMapping(
+            containerPort = portMap.containerPort,
+            containerPortType = "LITERAL",
+            hostPort = hostPort,
+            hostPortType = "LITERAL",
+            protocol = "tcp"
+          )
+          case None => SingularityDockerPortMapping(
+            containerPort = portMap.containerPort,
             containerPortType = "LITERAL",
             hostPort = index, // When using Literal Host (PORT0, PORT1, PORT2)
             hostPortType = "FROM_OFFER",
-            protocol = "tcp"
-          )
-          case Right(portMap) => SingularityDockerPortMapping(
-            containerPort = portMap.containerPort,
-            containerPortType = "LITERAL",
-            hostPort = portMap.hostPort,
-            hostPortType = "LITERAL",
             protocol = "tcp"
           )
         }

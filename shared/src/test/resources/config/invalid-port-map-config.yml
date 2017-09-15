@@ -11,8 +11,7 @@ common:
     image: hubspot/singularity-test-service # Docker repo/image without the tag
 
     ports:
-      - 9000:12000
-      - 8080
+      - 9000:12000:23000
 
 environments:
   dev:

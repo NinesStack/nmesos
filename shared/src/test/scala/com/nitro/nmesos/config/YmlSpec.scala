@@ -37,7 +37,7 @@ class YmlSpec extends Specification with YmlTestFixtures {
       YamlParser.parse(YamlJobExampleValid, InfoLogger) should beAnInstanceOf[ValidYaml]
     }
 
-    "Parse the executor configuration in a valid Yaml file" in {
+    "parse the executor configuration in a valid Yaml file" in {
       val conf = YamlParser.parse(YamlExampleExecutorEnvs, InfoLogger)
       conf should beAnInstanceOf[ValidYaml]
 
@@ -55,15 +55,25 @@ class YmlSpec extends Specification with YmlTestFixtures {
       modelConfig.environments("dev").singularity.slavePlacement should be equalTo (Some("SPREAD_ALL_SLAVES"))
     }
 
-    "Parse the port config from a valid Yaml file" in {
+    "parse the port config from a valid Yaml file" in {
       val parsedYaml = YamlParser.parse(YamlExamplePortConfig, InfoLogger)
       parsedYaml should beAnInstanceOf[ValidYaml]
 
       val conf = parsedYaml.asInstanceOf[ValidYaml].config
-      conf.environments("dev").container.ports must beSome.which(_.map(element => element match {
-        case Left(port) => port must beEqualTo(8080)
-        case Right(portMap) => portMap must beEqualTo(PortMap(9000, 12000))
+      conf.environments("dev").container.ports must beSome.which(_.map(portMap => portMap.hostPort match {
+        case Some(hostPort) => portMap must beEqualTo(PortMap(9000, Option(12000)))
+        case None => portMap.containerPort must beEqualTo(8080)
       }))
+    }
+
+    "fail while parsing an invalid port specification" in {
+      val ExpectedMessage = "Parser error for field environments/container/ports: Failed to deserialize port specification"
+      YamlParser.parse(YamlInvalidPortConfig, InfoLogger) should be equalTo InvalidYaml(ExpectedMessage)
+    }
+
+    "fail while parsing an invalid port specification" in {
+      val ExpectedMessage = "Parser error for field environments/container/ports: Failed to deserialize port map specification"
+      YamlParser.parse(YamlInvalidPortMapConfig, InfoLogger) should be equalTo InvalidYaml(ExpectedMessage)
     }
   }
 }
@@ -133,4 +143,8 @@ trait YmlTestFixtures {
   def YamlJobExampleValid = Source.fromURL(getClass.getResource("/config/example-without-optional-config.yml")).mkString
 
   def YamlExamplePortConfig = Source.fromURL(getClass.getResource("/config/example-port-config.yml")).mkString
+
+  def YamlInvalidPortConfig = Source.fromURL(getClass.getResource("/config/invalid-port-config.yml")).mkString
+
+  def YamlInvalidPortMapConfig = Source.fromURL(getClass.getResource("/config/invalid-port-map-config.yml")).mkString
 }

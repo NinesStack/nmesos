@@ -40,14 +40,14 @@ object model {
 
   case class PortMap(
     containerPort: Int,
-    hostPort: Int
+    hostPort: Option[Int]
   )
 
   case class Container(
     image: String,
     command: Option[String],
     forcePullImage: Option[Boolean],
-    ports: Option[Seq[Either[Int, PortMap]]],
+    ports: Option[Seq[PortMap]],
     labels: Option[Map[String, String]],
     env_vars: Option[Map[String, String]],
     volumes: Option[Seq[String]],
