@@ -1,7 +1,7 @@
 package com.nitro.nmesos.config
 
 import com.nitro.nmesos.config.model._
-import net.jcazevedo.moultingyaml.{ DefaultYamlProtocol, YamlArray, YamlBoolean, YamlDate, YamlNull, YamlNumber, YamlObject, YamlSet, YamlString, YamlValue }
+import net.jcazevedo.moultingyaml.{ DefaultYamlProtocol, YamlArray, YamlBoolean, YamlDate, YamlFormat, YamlNull, YamlNumber, YamlObject, YamlSet, YamlString, YamlValue, deserializationError }
 
 import scala.annotation.tailrec
 
@@ -10,6 +10,23 @@ object YamlParserHelper {
 
   // boilerplate to parse our custom case class
   object YamlCustomProtocol extends DefaultYamlProtocol {
+    implicit val PortMapYamlFormat = new YamlFormat[PortMap] {
+      override def read(yaml: YamlValue): PortMap = yaml match {
+        case YamlNumber(_) => PortMap(yaml.convertTo[Int], None)
+        case YamlString(_) => yaml.convertTo[String].split(":").map(_.toInt).toList match {
+          case containerPort :: Nil => PortMap(containerPort, None)
+          case containerPort :: hostPort :: Nil => PortMap(containerPort, Some(hostPort))
+          case _ => deserializationError("Failed to deserialize port map specification")
+        }
+        case _ => deserializationError("Failed to deserialize port specification")
+      }
+
+      override def write(portMap: PortMap): YamlValue = portMap.hostPort match {
+        case Some(hostPort) => YamlString(s"${portMap.containerPort}:${hostPort}")
+        case None => YamlNumber(portMap.containerPort)
+      }
+    }
+
     implicit val resourcesFormat = yamlFormat3(Resources)
     implicit val containerFormat = yamlFormat9(Container)
     implicit val singularityFormat = yamlFormat9(SingularityConf)

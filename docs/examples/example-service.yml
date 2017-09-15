@@ -14,7 +14,8 @@ common:
     #forcePullImage: true                    # Optional to force pull (default false)
 
     ports:
-      - 8080 # Exposed port by the container (Mesos will auto assign a external port)
+      - 8080       # Exposed port by the container (Mesos will auto assign a external port)
+      - 9000:12000 # Require Mesos to assign a specific port (<container_port>:<host_port>)
 
     volumes:
       - /tmp/foo:/tmp/foo  #  (HOST:CONTAINER) with default rw or (HOST:CONTAINER:rw)
@@ -31,6 +32,9 @@ common:
     autoAdvanceDeploySteps: true    # false to have Canary deployments.
     deployStepWaitTimeMs: 1000      # Time to wait between deployments
     healthcheckUri: "/hello"        # Used for singularity to determine if a deploy was success
+    healthcheckPortIndex: 1         # (Optional) Specify the zero-based index of the exposed port
+                                    #   which should be used for the health check. Otherwise,
+                                    #   Singularity will use the first available one
 
 environments:
   dev:

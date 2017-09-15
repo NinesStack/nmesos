@@ -26,8 +26,11 @@ object Validations extends ValidationHelper {
     check("Resources - Num Instances", "Must be > 0") {
       env.singularity.slavePlacement.exists(_ == "SPREAD_ALL_SLAVES") || env.resources.instances.exists(_ > 0)
     },
-    checkWarning("Container - Ports", "No ports defined") {
+    checkWarning("Container - Ports", "Should be defined in HOST mode") {
       env.container.network.exists(_ == "HOST") || !env.container.ports.toSet.flatten.isEmpty
+    },
+    check("Container - Port values", "Must be >= 0 and <= 65535") {
+      env.container.ports.toSeq.flatten.forall(isValidPort)
     },
     check("Container - Network", "Unsupported network") {
       env.container.network match {
@@ -80,6 +83,10 @@ trait ValidationHelper {
     case Warning(name, msg) => log.println(s""" - ${log.errorColor("[Warning]")}: $name - $msg""")
     case Fail(name, msg) => log.println(s""" - ${log.errorColor("[Failure]")}: $name - $msg""")
   }
+
+  def isValidPort(port: PortMap): Boolean = isValidPort(port.containerPort) && port.hostPort.map(isValidPort).getOrElse(true)
+
+  def isValidPort(port: Int): Boolean = 0 <= port && port <= 65535
 
 }
 

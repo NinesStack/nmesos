@@ -1,0 +1,19 @@
+## Example config for testing
+nmesos_version: '0.0.1' ## Min nmesos required to execute this config
+
+common:
+  resources:
+    instances: 2 # Number of instances to deploy
+    cpus: 0.1
+    memoryMb: 64
+
+  container:
+    image: hubspot/singularity-test-service # Docker repo/image without the tag
+
+    ports:
+      - 9000:12000:23000
+
+environments:
+  dev:
+    singularity:
+      url: "http://192.168.99.100:7099/singularity"
