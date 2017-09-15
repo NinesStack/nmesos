@@ -30,14 +30,7 @@ object Validations extends ValidationHelper {
       env.container.network.exists(_ == "HOST") || !env.container.ports.toSet.flatten.isEmpty
     },
     check("Container - Port values", "Must be >= 0 and <= 65535") {
-      env.container.ports match {
-        case Some(ports) => ports.map(portMap => portMap.hostPort match {
-          case Some(hostPort) => 0 <= portMap.containerPort && portMap.containerPort <= 65535 &&
-            0 <= hostPort && hostPort <= 65535
-          case None => 0 <= portMap.containerPort && portMap.containerPort <= 65535
-        }).reduce(_ && _)
-        case _ => true
-      }
+      env.container.ports.toSeq.flatten.forall(isValidPort)
     },
     check("Container - Network", "Unsupported network") {
       env.container.network match {
@@ -90,6 +83,10 @@ trait ValidationHelper {
     case Warning(name, msg) => log.println(s""" - ${log.errorColor("[Warning]")}: $name - $msg""")
     case Fail(name, msg) => log.println(s""" - ${log.errorColor("[Failure]")}: $name - $msg""")
   }
+
+  def isValidPort(port: PortMap): Boolean = isValidPort(port.containerPort) && port.hostPort.map(isValidPort).getOrElse(true)
+
+  def isValidPort(port: Int): Boolean = 0 <= port && port <= 65535
 
 }
 
