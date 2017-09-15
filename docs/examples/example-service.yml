@@ -14,8 +14,8 @@ common:
     #forcePullImage: true                    # Optional to force pull (default false)
 
     ports:
-      - 8080      # Exposed port by the container (Mesos will auto assign a external port)
-      - 9000:1200 # Require Mesos to assign a specific port (<container_port>:<host_port>)
+      - 8080       # Exposed port by the container (Mesos will auto assign a external port)
+      - 9000:12000 # Require Mesos to assign a specific port (<container_port>:<host_port>)
 
     volumes:
       - /tmp/foo:/tmp/foo  #  (HOST:CONTAINER) with default rw or (HOST:CONTAINER:rw)
