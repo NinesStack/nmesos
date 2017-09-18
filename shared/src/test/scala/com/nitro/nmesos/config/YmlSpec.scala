@@ -51,10 +51,10 @@ class YmlSpec extends Specification with YmlTestFixtures {
         ))
       ))
       val modelConfig = conf.asInstanceOf[ValidYaml].config
-      modelConfig.environments("dev").executor should be equalTo (ExpectedConf)
+      modelConfig.environments("dev").executor should be equalTo ExpectedConf
 
-      modelConfig.environments("dev").singularity.requiredRole should be equalTo (Some("OPS"))
-      modelConfig.environments("dev").singularity.slavePlacement should be equalTo (Some("SPREAD_ALL_SLAVES"))
+      modelConfig.environments("dev").singularity.requiredRole should be equalTo Some("OPS")
+      modelConfig.environments("dev").singularity.slavePlacement should be equalTo Some("SPREAD_ALL_SLAVES")
     }
 
     "parse the port config from a valid Yaml file" in {
@@ -63,21 +63,33 @@ class YmlSpec extends Specification with YmlTestFixtures {
 
       val conf = parsedYaml.asInstanceOf[ValidYaml].config
       conf.environments("dev").container.ports must beSome.which(_.map(portMap => portMap.hostPort match {
-        case Some(hostPort) => portMap must beEqualTo(PortMap(9000, Option(12000)))
-        case None => portMap.containerPort must beEqualTo(8080)
+        case Some(hostPort) => portMap should be equalTo PortMap(9000, Option(12000), Nil)
+        case None => portMap.protocols match {
+          case Nil => portMap.containerPort should be equalTo 8080
+          case protocolA :: protocolB :: Nil => {
+            portMap.containerPort should be equalTo 6060
+            protocolA mustEqual "udp"
+            protocolB mustEqual "tcp"
+          }
+        }
       }))
+    }
 
-      conf.toYaml.prettyPrint must beEqualTo(ExpectedYamlExamplePortConfig)
+    "parse the port config from a valid Yaml file and re-serialize it to Yaml" in {
+      val parsedYaml = YamlParser.parse(YamlExamplePortConfigAllVariations, InfoLogger)
+      parsedYaml should beAnInstanceOf[ValidYaml]
+
+      parsedYaml.asInstanceOf[ValidYaml].config.toYaml.prettyPrint mustEqual ExpectedYamlExamplePortConfig
     }
 
     "fail while parsing an invalid port specification" in {
-      val ExpectedMessage = "Parser error for field environments/container/ports: Failed to deserialize port specification"
-      YamlParser.parse(YamlInvalidPortConfig, InfoLogger) should be equalTo InvalidYaml(ExpectedMessage)
+      val ExpectedMessage = "Parser error for field environments/container/ports: Failed to deserialize the port specification"
+      YamlParser.parse(YamlInvalidPortConfig, InfoLogger) mustEqual InvalidYaml(ExpectedMessage)
     }
 
     "fail while parsing an invalid port specification" in {
-      val ExpectedMessage = "Parser error for field environments/container/ports: Failed to deserialize port map specification"
-      YamlParser.parse(YamlInvalidPortMapConfig, InfoLogger) should be equalTo InvalidYaml(ExpectedMessage)
+      val ExpectedMessage = "Parser error for field environments/container/ports: Failed to deserialize the port map specification"
+      YamlParser.parse(YamlInvalidPortMapConfig, InfoLogger) mustEqual InvalidYaml(ExpectedMessage)
     }
   }
 }
@@ -94,8 +106,12 @@ trait YmlTestFixtures {
       |    container:
       |      image: hubspot/singularity-test-service
       |      ports:
-      |      - 9000:12000
       |      - 8080
+      |      - 8081/udp
+      |      - 8082/tcp.udp
+      |      - 9000:12000
+      |      - 9001:12001/udp
+      |      - 9002:12002/tcp,udp
       |    singularity:
       |      url: http://192.168.99.100:7099/singularity
       |""".stripMargin
@@ -113,6 +129,8 @@ trait YmlTestFixtures {
   def YamlJobExampleValid = Source.fromURL(getClass.getResource("/config/example-without-optional-config.yml")).mkString
 
   def YamlExamplePortConfig = Source.fromURL(getClass.getResource("/config/example-port-config.yml")).mkString
+
+  def YamlExamplePortConfigAllVariations = Source.fromURL(getClass.getResource("/config/example-port-config-all-variations.yml")).mkString
 
   def YamlInvalidPortConfig = Source.fromURL(getClass.getResource("/config/invalid-port-config.yml")).mkString
 

@@ -1,6 +1,6 @@
 package com.nitro.nmesos.singularity
 
-import com.nitro.nmesos.config.model.{ CmdConfig, Environment }
+import com.nitro.nmesos.config.model.{ CmdConfig, Environment, PortMap }
 import com.nitro.nmesos.singularity.model._
 import com.nitro.nmesos.util.SequenceUtil
 import org.joda.time.DateTime
@@ -22,32 +22,40 @@ object ModelConversions {
     s"${config.environment.container.image}:${tag}"
   }
 
+  def getSingularityPortMapping(containerPort: Int, hostPort: Option[Int], protocol: String, index: Int) = {
+    hostPort match {
+      case Some(hostPort) => SingularityDockerPortMapping(
+        containerPort = containerPort,
+        containerPortType = "LITERAL",
+        hostPort = hostPort,
+        hostPortType = "LITERAL",
+        protocol = protocol
+      )
+      case None => SingularityDockerPortMapping(
+        containerPort = containerPort,
+        containerPortType = "LITERAL",
+        hostPort = index, // When using Literal Host (PORT0, PORT1, PORT2)
+        hostPortType = "FROM_OFFER",
+        protocol = protocol
+      )
+    }
+  }
+
   def toSingularityContainerInfo(config: CmdConfig): SingularityContainerInfo = {
     val network = config.environment.container.network.getOrElse("BRIDGE")
     val containerPorts = config.environment.container.ports.getOrElse(Seq.empty)
 
-    if (network != "BRIDGE" && !containerPorts.isEmpty) {
+    if (network != "BRIDGE" && containerPorts.nonEmpty) {
       sys.error("Port mappings are only supported for bridge network")
     }
 
     val portMappings = containerPorts.zipWithIndex.map {
-      case (portMap, index) =>
-        portMap.hostPort match {
-          case Some(hostPort) => SingularityDockerPortMapping(
-            containerPort = portMap.containerPort,
-            containerPortType = "LITERAL",
-            hostPort = hostPort,
-            hostPortType = "LITERAL",
-            protocol = "tcp"
-          )
-          case None => SingularityDockerPortMapping(
-            containerPort = portMap.containerPort,
-            containerPortType = "LITERAL",
-            hostPort = index, // When using Literal Host (PORT0, PORT1, PORT2)
-            hostPortType = "FROM_OFFER",
-            protocol = "tcp"
-          )
-        }
+      case (portMap, index) => if (portMap.protocols.isEmpty) {
+        // Default to using TCP
+        getSingularityPortMapping(portMap.containerPort, portMap.hostPort, "tcp", index)
+      } else {
+        getSingularityPortMapping(portMap.containerPort, portMap.hostPort, portMap.protocols.mkString(","), index)
+      }
     }
 
     val labels = config.environment.container.labels
