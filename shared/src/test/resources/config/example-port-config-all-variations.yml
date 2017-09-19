@@ -13,7 +13,7 @@ common:
     ports:
       - 8080
       - 8081/udp
-      - 8082/tcp.udp
+      - 8082/tcp,udp
       - 9000:12000
       - 9001:12001/udp
       - 9002:12002/tcp,udp

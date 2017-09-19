@@ -63,13 +63,12 @@ class YmlSpec extends Specification with YmlTestFixtures {
 
       val conf = parsedYaml.asInstanceOf[ValidYaml].config
       conf.environments("dev").container.ports must beSome.which(_.map(portMap => portMap.hostPort match {
-        case Some(hostPort) => portMap should be equalTo PortMap(9000, Option(12000), Nil)
+        case Some(hostPort) => portMap should be equalTo PortMap(9000, Option(12000), None)
         case None => portMap.protocols match {
-          case Nil => portMap.containerPort should be equalTo 8080
-          case protocolA :: protocolB :: Nil => {
+          case None => portMap.containerPort should be equalTo 8080
+          case Some(protocols) => {
             portMap.containerPort should be equalTo 6060
-            protocolA mustEqual "udp"
-            protocolB mustEqual "tcp"
+            protocols mustEqual "udp,tcp"
           }
         }
       }))
@@ -108,7 +107,7 @@ trait YmlTestFixtures {
       |      ports:
       |      - 8080
       |      - 8081/udp
-      |      - 8082/tcp.udp
+      |      - 8082/tcp,udp
       |      - 9000:12000
       |      - 9001:12001/udp
       |      - 9002:12002/tcp,udp
