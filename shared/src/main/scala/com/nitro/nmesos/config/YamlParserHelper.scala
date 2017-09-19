@@ -7,23 +7,40 @@ import scala.annotation.tailrec
 
 // Yaml parser Boilerplate
 object YamlParserHelper {
+  def parsePortMap(portMap: String, protocols: Option[String]): PortMap = {
+    val (containerPort, hostPort) = portMap.split(":").map(_.toInt).toList match {
+      case containerPort :: Nil => (containerPort, None)
+      case containerPort :: hostPort :: Nil => (containerPort, Some(hostPort))
+      case _ => deserializationError("Failed to deserialize the port map specification")
+    }
+
+    PortMap(containerPort, hostPort, protocols)
+  }
 
   // boilerplate to parse our custom case class
   object YamlCustomProtocol extends DefaultYamlProtocol {
     implicit val PortMapYamlFormat = new YamlFormat[PortMap] {
       override def read(yaml: YamlValue): PortMap = yaml match {
-        case YamlNumber(_) => PortMap(yaml.convertTo[Int], None)
-        case YamlString(_) => yaml.convertTo[String].split(":").map(_.toInt).toList match {
-          case containerPort :: Nil => PortMap(containerPort, None)
-          case containerPort :: hostPort :: Nil => PortMap(containerPort, Some(hostPort))
-          case _ => deserializationError("Failed to deserialize port map specification")
+        case YamlNumber(_) => PortMap(yaml.convertTo[Int], None, None)
+        case YamlString(_) => yaml.convertTo[String].split("/").toList match {
+          case portMap :: Nil => parsePortMap(portMap, None)
+          case portMap :: protocols :: Nil => parsePortMap(portMap, Option(protocols))
+          case _ => deserializationError("Failed to deserialize the port map specification")
         }
-        case _ => deserializationError("Failed to deserialize port specification")
+        case _ => deserializationError("Failed to deserialize the port specification")
       }
 
-      override def write(portMap: PortMap): YamlValue = portMap.hostPort match {
-        case Some(hostPort) => YamlString(s"${portMap.containerPort}:${hostPort}")
-        case None => YamlNumber(portMap.containerPort)
+      override def write(portMap: PortMap): YamlValue = {
+        portMap.protocols match {
+          case None => portMap.hostPort match {
+            case Some(hostPort) => YamlString(s"${portMap.containerPort}:${hostPort}")
+            case None => YamlNumber(portMap.containerPort)
+          }
+          case Some(protocols) => portMap.hostPort match {
+            case Some(hostPort) => YamlString(s"${portMap.containerPort}:${hostPort}/${protocols}")
+            case None => YamlString(s"${portMap.containerPort}/${protocols}")
+          }
+        }
       }
     }
 

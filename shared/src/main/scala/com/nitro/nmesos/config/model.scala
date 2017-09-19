@@ -40,7 +40,8 @@ object model {
 
   case class PortMap(
     containerPort: Int,
-    hostPort: Option[Int]
+    hostPort: Option[Int],
+    protocols: Option[String]
   )
 
   case class Container(
