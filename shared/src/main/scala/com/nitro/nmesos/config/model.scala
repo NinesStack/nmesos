@@ -65,7 +65,10 @@ object model {
     healthcheckUri: Option[String],
     requiredRole: Option[String],
     healthcheckPortIndex: Option[Int],
-    slavePlacement: Option[String]
+    slavePlacement: Option[String],
+    healthcheckMaxRetries: Option[Int],
+    healthcheckTimeoutSeconds: Option[Int],
+    healthcheckIntervalSeconds: Option[Int]
   )
 
   case class ExecutorConf(
