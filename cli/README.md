@@ -18,5 +18,8 @@ sbt clean "++2.12.1 nmesos-shared/publishLocal"  "++2.12.1 nmesos-cli/assembly" 
 
 ## Release a brew update
 
-Update the Formula `nmesos-cli.rb` with the new public url 
-and push the changes to the Master branch.
+Update the Formula `nmesos-cli.rb`
+1. with the new public url
+2. with the new sha256
+    `shasum -a 256 nmesos-cli-X.Y.Z.tgz`
+3. push the changes to the `master` branch
