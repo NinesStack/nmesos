@@ -3,7 +3,7 @@ package com.nitro.nmesos.config
 import com.nitro.nmesos.util.InfoLogger
 import com.nitro.nmesos.config.YamlParser._
 import com.nitro.nmesos.config.YamlParserHelper.YamlCustomProtocol._
-import com.nitro.nmesos.config.model.{ ExecutorConf, PortMap }
+import com.nitro.nmesos.config.model.{ ExecutorConf, PortMap, SingularityConf }
 import net.jcazevedo.moultingyaml._
 import org.specs2.mutable.Specification
 
@@ -55,6 +55,11 @@ class YmlSpec extends Specification with YmlTestFixtures {
 
       modelConfig.environments("dev").singularity.requiredRole should be equalTo Some("OPS")
       modelConfig.environments("dev").singularity.slavePlacement should be equalTo Some("SPREAD_ALL_SLAVES")
+    }
+
+    "parse the mesos slaves attributes in a valid Yaml file" in {
+      val conf = YamlParser.parse(YamlMesosAttributeConfig, InfoLogger)
+      conf should beAnInstanceOf[ValidYaml]
     }
 
     "parse the port config from a valid Yaml file" in {
@@ -134,4 +139,6 @@ trait YmlTestFixtures {
   def YamlInvalidPortConfig = Source.fromURL(getClass.getResource("/config/invalid-port-config.yml")).mkString
 
   def YamlInvalidPortMapConfig = Source.fromURL(getClass.getResource("/config/invalid-port-map-config.yml")).mkString
+
+  def YamlMesosAttributeConfig = Source.fromURL(getClass.getResource("/config/example-mesos-attribute-config.yml")).mkString
 }
