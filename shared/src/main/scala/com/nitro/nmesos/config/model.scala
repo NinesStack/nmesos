@@ -65,6 +65,7 @@ object model {
     healthcheckUri: Option[String],
     requiredRole: Option[String],
     healthcheckPortIndex: Option[Int],
+    requiredAttributes: Option[Map[String, String]],
     slavePlacement: Option[String]
   )
 

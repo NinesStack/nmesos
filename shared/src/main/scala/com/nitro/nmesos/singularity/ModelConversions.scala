@@ -145,6 +145,7 @@ object ModelConversions {
     instances = config.environment.resources.instances,
     slavePlacement = config.environment.singularity.slavePlacement.getOrElse("OPTIMISTIC"),
     schedule = config.environment.singularity.schedule,
+    requiredSlaveAttributes = config.environment.singularity.requiredAttributes.getOrElse(Map.empty),
     requiredRole = config.environment.singularity.requiredRole
   )
 
@@ -153,7 +154,12 @@ object ModelConversions {
       s"requestId: ${request.id}",
       s"deployId:  ${deploy.id}",
       s"image:     ${deploy.containerInfo.docker.image}",
-      s"""resources: [cpus: ${deploy.resources.cpus}, memory: ${deploy.resources.memoryMb}Mb, role: ${request.requiredRole.getOrElse("*")}]"""
+      s"""resources:
+         | cpus: ${deploy.resources.cpus}
+         | memory: ${deploy.resources.memoryMb}Mb
+         | role: ${request.requiredRole.getOrElse("*")}
+         | attributes: ${request.requiredSlaveAttributes}
+         |""".stripMargin
 
     )
     if (request.schedule.isDefined) {
