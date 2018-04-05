@@ -38,3 +38,8 @@ lazy val shared = Project("nmesos-shared", file("shared"))
 lazy val shared_2_10 = shared.settings(
   scalaVersion := "2.10.6"
 )
+
+lazy val root =
+  project.in(file("."))
+    .dependsOn(cli)
+    .settings(scalaVersion := "2.12.1")
