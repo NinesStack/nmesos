@@ -123,6 +123,17 @@ object CliParser {
           .required()
           .action((input, params) => params.copy(environment = input)))
 
+    cmd("verify")
+      .text(" Verify a complete Singularity server by comparing the expected Singularity state with the Mesos state and docker state\n Usage: nmesos verify --singularity http://url/singularity")
+      .required()
+      .action((_, params) => params.copy(action = VerifyAction))
+      .children(
+        opt[String]("singularity")
+          .abbr("s")
+          .text("The environment to verify")
+          .required()
+          .action((input, params) => params.copy(singularity = input)))
+
     checkConfig { cmd =>
       val availableCommands = commands.map(_.fullName).mkString("|")
       if (cmd.action != NilAction) success else failure(s"A command is required. $availableCommands\n")

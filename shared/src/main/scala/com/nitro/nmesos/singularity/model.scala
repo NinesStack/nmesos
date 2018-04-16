@@ -90,8 +90,8 @@ object model {
   case class SingularityRequestParent(
     request: SingularityRequest,
     state: String,
-    activeDeploy: Option[SingularityActiveDeployResponse] = None
-  )
+    taskIds: Option[SingularityTaskIdsByStatus] = None,
+    activeDeploy: Option[SingularityActiveDeployResponse] = None)
 
   case class SingularityDeployResult(
     deployState: String,
@@ -125,6 +125,7 @@ object model {
   case class SingularityTaskId(
     requestId: String,
     host: String,
+    sanitizedHost: String,
     deployId: String,
     id: String,
     instanceNo: Int)
@@ -161,4 +162,7 @@ object model {
   case class SingularityLog(
     data: String,
     offset: Int)
+
+  case class SingularityTaskIdsByStatus(
+    healthy: Seq[SingularityTaskId])
 }

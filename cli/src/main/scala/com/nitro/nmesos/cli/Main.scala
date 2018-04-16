@@ -1,7 +1,8 @@
 package com.nitro.nmesos.cli
 
 import com.nitro.nmesos.BuildInfo
-import com.nitro.nmesos.commands.{ CheckCommand, CommandResult, ScaleCommand }
+import com.nitro.nmesos.cli.model.VerifyAction
+import com.nitro.nmesos.commands.{ CheckCommand, CommandResult, ScaleCommand, VerifyEnvCommand }
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -37,6 +38,15 @@ object CliManager {
   def processCmd(cmd: Cmd) = {
     val log = CustomLogger(verbose = cmd.verbose, ansiEnabled = cmd.isFormatted)
 
+    cmd.action match {
+      case VerifyAction =>
+        VerifyEnvCommand(cmd.singularity, log).run()
+      case _ =>
+        processYmlCommand(cmd, log)
+    }
+  }
+
+  def processYmlCommand(cmd: Cmd, log: Logger) = {
     val yamlFile = toFile(cmd, log)
 
     ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
@@ -62,6 +72,7 @@ object CliManager {
       case CheckAction =>
         val serviceConfig = toServiceConfig(cmd, config)
         CheckCommand(serviceConfig, log, isDryrun = cmd.isDryrun).run()
+
       case other =>
         // nothing to do.
         log.error(s"Action '$other' not implemented yet :( ")

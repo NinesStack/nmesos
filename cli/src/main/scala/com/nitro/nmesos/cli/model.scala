@@ -11,10 +11,10 @@ object model {
     isFormatted: Boolean,
     serviceName: String,
     environment: String,
+    singularity: String,
     tag: String,
     force: Boolean,
-    action: Action
-  )
+    action: Action)
 
   object DefaultValues {
     val IsDryRun = true
@@ -27,5 +27,6 @@ object model {
   case object ReleaseAction extends Action
   case object ScaleAction extends Action
   case object CheckAction extends Action
+  case object VerifyAction extends Action
 
 }

@@ -11,7 +11,7 @@ import com.nitro.nmesos.util.Conversions._
  */
 object SingularityManager {
   def apply(conf: SingularityConf, log: Logger, isDryrun: Boolean): SingularityManager = if (isDryrun) {
-    DryrunSingularityManager(conf, log)
+    DryrunSingularityManager(conf.url, log)
   } else {
     RealSingularityManager(conf, log)
   }
@@ -86,6 +86,11 @@ trait SingularityManager extends HttpClientHelper {
     }
   }
 
+  // Retrieve the list of active requests
+  def getSingularityActiveRequests(): Try[Seq[SingularityRequestParent]] = {
+    get[Seq[SingularityRequestParent]](s"$apiUrl/api/requests/active?includeFullRequestData=true").map(_.getOrElse(Seq.empty))
+  }
+
   def withDisabledDebugLog(): SingularityManager
 
 }
@@ -93,8 +98,7 @@ trait SingularityManager extends HttpClientHelper {
 /**
  * Singularity Manager in Dryrun mode.
  */
-case class DryrunSingularityManager(conf: SingularityConf, log: Logger) extends SingularityManager {
-  val apiUrl: String = conf.url
+case class DryrunSingularityManager(apiUrl: String, log: Logger) extends SingularityManager {
 
   def createSingularityRequest(newRequest: SingularityRequest) = {
     if (newRequest.schedule.isDefined) {

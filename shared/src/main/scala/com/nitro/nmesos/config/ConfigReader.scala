@@ -20,8 +20,7 @@ object ConfigReader {
     environment: Environment,
     environmentName: String,
     fileHash: String,
-    file: File
-  ) extends ConfigResult
+    file: File) extends ConfigResult
 
   /**
    * Read all the  Yaml configuration for an environment.
