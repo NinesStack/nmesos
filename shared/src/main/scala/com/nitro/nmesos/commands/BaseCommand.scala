@@ -12,7 +12,14 @@ sealed trait CommandResult
 case class CommandSuccess(msg: String) extends CommandResult
 case class CommandError(msg: String) extends CommandResult
 
-trait BaseCommand {
+trait Command {
+  /**
+   * Main entry point for all the commands.
+   */
+  def run(): CommandResult
+}
+
+trait BaseCommand extends Command {
   val localConfig: CmdConfig
   val log: Logger
   val isDryrun: Boolean
@@ -50,8 +57,7 @@ trait BaseCommand {
            | dry-run:      ${isDryrun}
            | force:        ${localConfig.force}
            | image:        ${localConfig.environment.container.image}:${localConfig.tag}
-           | api:          ${localConfig.environment.singularity.url}""".stripMargin
-      )
+           | api:          ${localConfig.environment.singularity.url}""".stripMargin)
     }
   }
 

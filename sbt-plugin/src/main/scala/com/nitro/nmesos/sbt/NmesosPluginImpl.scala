@@ -82,8 +82,7 @@ object NmesosPluginImpl {
       log.info(
         s""" Service Name: $serviceName
            | Config File: ${configError.yamlFile.getAbsolutePath}
-             """.stripMargin
-      )
+             """.stripMargin)
       log.error(configError.msg)
     }
     sys.error(configError.msg)
@@ -96,7 +95,6 @@ object NmesosPluginImpl {
     environment = config.environment,
     environmentName = config.environmentName,
     fileHash = config.fileHash,
-    file = config.file
-  )
+    file = config.file)
 
 }

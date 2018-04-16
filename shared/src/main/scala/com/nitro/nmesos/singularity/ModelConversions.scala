@@ -14,8 +14,7 @@ object ModelConversions {
     cpus = environment.resources.cpus,
     memoryMb = environment.resources.memoryMb,
     numPorts = environment.container.ports.map(_.size).getOrElse(0),
-    diskMb = 0
-  )
+    diskMb = 0)
 
   def imageWithTag(config: CmdConfig): String = {
     val tag = if (config.tag.isEmpty) "latest" else config.tag
@@ -29,15 +28,13 @@ object ModelConversions {
         containerPortType = "LITERAL",
         hostPort = hostPort,
         hostPortType = "LITERAL",
-        protocol = protocol
-      )
+        protocol = protocol)
       case None => SingularityDockerPortMapping(
         containerPort = containerPort,
         containerPortType = "LITERAL",
         hostPort = index, // When using Literal Host (PORT0, PORT1, PORT2)
         hostPortType = "FROM_OFFER",
-        protocol = protocol
-      )
+        protocol = protocol)
     }
   }
 
@@ -84,9 +81,7 @@ object ModelConversions {
         image = imageWithTag(config),
         portMappings = portMappings,
         forcePullImage = config.environment.container.forcePullImage.getOrElse(false),
-        dockerParameters = dockerParameters
-      )
-    )
+        dockerParameters = dockerParameters))
   }
 
   /**
@@ -136,8 +131,7 @@ object ModelConversions {
     env = config.environment.executor.flatMap(_.env_vars).getOrElse(Map.empty),
     autoAdvanceDeploySteps = config.environment.singularity.autoAdvanceDeploySteps,
     command = config.environment.container.command,
-    shell = config.environment.container.command.map(_ => true)
-  )
+    shell = config.environment.container.command.map(_ => true))
 
   def toSingularityRequest(config: CmdConfig) = SingularityRequest(
     id = toSingularityRequestId(config),
@@ -146,8 +140,7 @@ object ModelConversions {
     slavePlacement = config.environment.singularity.slavePlacement.getOrElse("OPTIMISTIC"),
     schedule = config.environment.singularity.schedule,
     requiredSlaveAttributes = config.environment.singularity.requiredAttributes.getOrElse(Map.empty),
-    requiredRole = config.environment.singularity.requiredRole
-  )
+    requiredRole = config.environment.singularity.requiredRole)
 
   def describeDeploy(request: SingularityRequest, deploy: SingularityDeploy): Seq[String] = {
     val common = Seq(
@@ -158,17 +151,14 @@ object ModelConversions {
          | cpus: ${deploy.resources.cpus}
          | memory: ${deploy.resources.memoryMb}Mb
          | role: ${request.requiredRole.getOrElse("*")}
-         | attributes: ${request.requiredSlaveAttributes}
-         |""".stripMargin
-
-    )
+         | attributes: ${request.requiredSlaveAttributes.mkString(",")}
+         |""".stripMargin)
     if (request.schedule.isDefined) {
       common ++ request.schedule.map(cron => s"scheduled: $cron").toSeq
     } else {
       common ++ Seq(
         s"instances: ${request.instances.getOrElse("*")}, slavePlacement: ${request.slavePlacement}",
-        s"""ports:     ${deploy.containerInfo.docker.portMappings.map(_.containerPort).mkString(",")}""".trim
-      )
+        s"""ports:     ${deploy.containerInfo.docker.portMappings.map(_.containerPort).mkString(",")}""".trim)
     }
   }.sorted
 

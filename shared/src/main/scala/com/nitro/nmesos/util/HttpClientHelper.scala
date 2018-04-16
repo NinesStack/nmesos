@@ -36,8 +36,7 @@ trait HttpClientHelper {
     val response = send(
       HttpClient(url)
         .header("content-type", "application/json")
-        .postData(json)
-    )
+        .postData(json))
 
     if (response.isSuccess) {
       parseBody[B](url, response)
@@ -53,8 +52,7 @@ trait HttpClientHelper {
     val response = send(
       HttpClient(url)
         .header("content-type", "application/json")
-        .put(json)
-    )
+        .put(json))
 
     if (response.isSuccess) {
       parseBody[B](url, response)

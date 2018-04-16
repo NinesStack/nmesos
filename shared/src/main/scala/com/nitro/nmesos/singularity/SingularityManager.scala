@@ -125,8 +125,7 @@ case class DryrunSingularityManager(conf: SingularityConf, log: Logger) extends 
     val detail = ModelConversions.describeDeploy(currentRequest, newDeploy)
     log.info(
       s""" [dryrun] Deploy to apply:
-         |${detail.mkString("           * ", "\n           * ", "")}""".stripMargin
-    )
+         |${detail.mkString("           * ", "\n           * ", "")}""".stripMargin)
 
     Success(SingularityRequestParent(currentRequest, state = "ACTIVE"))
   }
@@ -189,8 +188,7 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger) extends Si
       val detail = ModelConversions.describeDeploy(currentRequest, newDeploy)
       log.info(
         s""" Deploy applied:
-           |${detail.mkString("   * ", "\n   * ", "")}""".stripMargin
-      )
+           |${detail.mkString("   * ", "\n   * ", "")}""".stripMargin)
 
     }
 

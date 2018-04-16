@@ -3,6 +3,11 @@
 scalaVersion := "2.12.1"
 organization := "nitro"
 
+libraryDependencies ++= Seq(
+  "com.github.scopt" %% "scopt" % "3.5.0",
+  "org.specs2" %% "specs2-core" % "3.8.6" % "test"
+)
+
 val cli = Seq[String](
   "#!/usr/bin/env sh",
   """exec java -Djava.compiler=NONE -noverify -jar "$0" "$@""""

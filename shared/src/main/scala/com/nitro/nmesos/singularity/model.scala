@@ -16,41 +16,35 @@ object model {
     cpus: Double,
     memoryMb: Double,
     numPorts: Int,
-    diskMb: Int
-  )
+    diskMb: Int)
 
   case class SingularityDockerPortMapping(
     containerPort: Int,
     hostPortType: String,
     containerPortType: String,
     hostPort: Int,
-    protocol: String
-  )
+    protocol: String)
 
   case class SingularityDockerInfo(
     network: String,
     image: String,
     portMappings: Seq[SingularityDockerPortMapping],
     forcePullImage: Boolean,
-    dockerParameters: Seq[SingularityDockerParameter]
-  )
+    dockerParameters: Seq[SingularityDockerParameter])
 
   case class SingularityDockerParameter(
     key: String,
-    value: String
-  )
+    value: String)
 
   case class SingularityVolume(
     hostPath: String,
     containerPath: String,
-    mode: String
-  )
+    mode: String)
 
   case class SingularityContainerInfo(
     `type`: String,
     docker: SingularityDockerInfo,
-    volumes: Seq[SingularityVolume]
-  )
+    volumes: Seq[SingularityVolume])
 
   case class SingularityDeploy(
     requestId: String,
@@ -65,8 +59,7 @@ object model {
     customExecutorCmd: Option[String] = None,
     env: Map[String, String] = Map.empty,
     healthcheckUri: Option[String] = None,
-    healthcheckPortIndex: Option[Int] = None
-  )
+    healthcheckPortIndex: Option[Int] = None)
 
   case class SingularityRequest(
     id: String,
@@ -75,14 +68,12 @@ object model {
     instances: Option[Int] = None,
     schedule: Option[String] = None,
     requiredSlaveAttributes: Map[String, String] = Map.empty,
-    requiredRole: Option[String] = None
-  )
+    requiredRole: Option[String] = None)
 
   case class SingularityDeployRequest(
     deploy: SingularityDeploy,
     message: String,
-    unpauseOnSuccessfulDeploy: Boolean
-  )
+    unpauseOnSuccessfulDeploy: Boolean)
 
   case class SingularityScaleRequest(
     message: String,
@@ -93,8 +84,7 @@ object model {
   object SingularityRequestParent {
     case class SingularityActiveDeployResponse(
       id: DeployId,
-      resources: SingularityResources
-    )
+      resources: SingularityResources)
   }
 
   case class SingularityRequestParent(
@@ -106,85 +96,69 @@ object model {
   case class SingularityDeployResult(
     deployState: String,
     message: Option[String] = None,
-    deployFailures: Seq[SingularityDeployFailure] = Seq.empty
-  )
+    deployFailures: Seq[SingularityDeployFailure] = Seq.empty)
 
   case class SingularityDeployFailure(
     reason: String,
     taskId: SingularityTaskId,
-    message: Option[String] = None
-  )
+    message: Option[String] = None)
 
   case class SingularityUpdateResult(
-    state: String
-  )
+    state: String)
 
   case class SingularityDeployHistory(
     deploy: SingularityDeploy,
-    deployResult: Option[SingularityDeployResult] = None
-  )
+    deployResult: Option[SingularityDeployResult] = None)
 
   case class SingularityPendingDeploy(
     currentDeployState: String,
     deployMarker: SingularityDeployMarker,
-    deployProgress: SingularityDeployProgress
-  )
+    deployProgress: SingularityDeployProgress)
 
   case class SingularityDeployProgress(
-    targetActiveInstances: Int
-  )
+    targetActiveInstances: Int)
 
   case class SingularityDeployMarker(
     requestId: String,
-    deployId: String
-  )
+    deployId: String)
 
   case class SingularityTaskId(
     requestId: String,
     host: String,
     deployId: String,
     id: String,
-    instanceNo: Int
-  )
+    instanceNo: Int)
 
   case class SingularityTaskIdHistory(
     lastTaskState: String,
-    taskId: SingularityTaskId
-  )
+    taskId: SingularityTaskId)
 
   object SingularityTask {
 
     case class SingularityTasKDockerPortMapping(
       containerPort: Int,
-      hostPort: Int
-    )
+      hostPort: Int)
 
     case class SingularityTaskDockerInfo(
-      portMappings: Seq[SingularityTasKDockerPortMapping]
-    )
+      portMappings: Seq[SingularityTasKDockerPortMapping])
 
     case class SingularityTaskIContainerInfo(
-      docker: SingularityTaskDockerInfo
-    )
+      docker: SingularityTaskDockerInfo)
 
     case class SingularityTaskInfo(
-      container: SingularityTaskIContainerInfo
-    )
+      container: SingularityTaskIContainerInfo)
 
   }
 
   case class SingularityTask(
     taskId: SingularityTaskId,
     mesosTask: SingularityTaskInfo,
-    offer: Offer
-  )
+    offer: Offer)
 
   case class Offer(
-    hostname: String
-  )
+    hostname: String)
 
   case class SingularityLog(
     data: String,
-    offset: Int
-  )
+    offset: Int)
 }

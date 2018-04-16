@@ -13,14 +13,12 @@ object Validations extends ValidationHelper {
       checkJob(localConfig.environment)
     } else {
       checkService(localConfig.environment)
-    }
-  ).flatten.sortBy(_.name)
+    }).flatten.sortBy(_.name)
 
   private def checkResources(resources: Resources): Seq[Validation] = Seq(
     check("Resources - Memory Instances", "Must be > 0") {
       resources.memoryMb > 0
-    }
-  )
+    })
 
   private def checkService(env: Environment): Seq[Validation] = Seq(
     check("Resources - Num Instances", "Must be > 0") {
@@ -41,8 +39,7 @@ object Validations extends ValidationHelper {
     },
     checkWarning("Singularity - Healthcheck", "No healthcheck defined") {
       env.singularity.healthcheckUri.exists(_.trim.nonEmpty)
-    }
-  )
+    })
 
   private def checkJob(env: Environment): Seq[Validation] = Seq(
     check("Resources - Num Instances", "Must be = 0") {
@@ -50,8 +47,7 @@ object Validations extends ValidationHelper {
     },
     check("Singularity - Job cron", "Missing") {
       env.singularity.schedule.isDefined
-    }
-  )
+    })
 
   private def checkContainer(container: Container): Seq[Validation] = Seq(
     checkWarning("Container - Labels", "No labels defined") {
@@ -59,8 +55,7 @@ object Validations extends ValidationHelper {
     },
     checkWarning("Container - Environment vars", "No env vars defined") {
       !container.env_vars.toSet.flatten.isEmpty
-    }
-  )
+    })
 
 }
 

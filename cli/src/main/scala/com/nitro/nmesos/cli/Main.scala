@@ -83,8 +83,7 @@ object CliManager {
       log.info(
         s""" Service Name: ${sanitizeServiceName(cmd.serviceName)}
            | Config File: ${configError.yamlFile.getAbsolutePath}
-             """.stripMargin
-      )
+             """.stripMargin)
       log.error(configError.msg)
     }
     exitWithError()
@@ -114,8 +113,7 @@ object CliManager {
     environment = config.environment,
     environmentName = config.environmentName,
     fileHash = config.fileHash,
-    file = config.file
-  )
+    file = config.file)
 
   def exitWithError() = sys.exit(1)
 }

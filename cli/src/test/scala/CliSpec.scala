@@ -48,9 +48,9 @@ trait CliSpecFixtures {
     isFormatted = true,
     serviceName = "test",
     environment = "dev",
+    singularity = "",
     tag = "latest",
-    force = false
-  )
+    force = false)
 
   lazy val ValidYamlConfig = {
     val yml = new File(getClass.getResource("/config/example-config.yml").getFile)

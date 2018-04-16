@@ -19,10 +19,10 @@ object CliParser {
       verbose = DefaultValues.Verbose,
       isFormatted = DefaultValues.IsFormatted,
       serviceName = "",
+      singularity = "",
       environment = "",
       tag = "",
-      force = false
-    )
+      force = false)
     cmdParser.parse(args, nilCommand)
   }
 
@@ -77,8 +77,7 @@ object CliParser {
           .abbr("n")
           .text("Is this a dry run?")
           .optional()
-          .action((input, params) => params.copy(isDryrun = input))
-      )
+          .action((input, params) => params.copy(isDryrun = input)))
 
     note("\n")
 
@@ -103,9 +102,7 @@ object CliParser {
           .abbr("n")
           .text("Is this a dry run?")
           .optional()
-          .action((input, params) => params.copy(isDryrun = input))
-
-      )
+          .action((input, params) => params.copy(isDryrun = input)))
 
     note("\n")
 
@@ -124,8 +121,7 @@ object CliParser {
           .abbr("e")
           .text("The environment to verify")
           .required()
-          .action((input, params) => params.copy(environment = input))
-      )
+          .action((input, params) => params.copy(environment = input)))
 
     checkConfig { cmd =>
       val availableCommands = commands.map(_.fullName).mkString("|")

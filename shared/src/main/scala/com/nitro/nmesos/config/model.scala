@@ -17,32 +17,27 @@ object model {
     environmentName: EnvironmentName,
     environment: Environment,
     fileHash: String,
-    file: File
-  )
+    file: File)
 
   case class Config(
     nmesos_version: String,
-    environments: Map[EnvironmentName, Environment]
-  )
+    environments: Map[EnvironmentName, Environment])
 
   case class Environment(
     resources: Resources,
     container: Container,
     executor: Option[ExecutorConf],
-    singularity: SingularityConf
-  )
+    singularity: SingularityConf)
 
   case class Resources(
     cpus: Double,
     memoryMb: Int,
-    instances: Option[Int]
-  )
+    instances: Option[Int])
 
   case class PortMap(
     containerPort: Int,
     hostPort: Option[Int],
-    protocols: Option[String]
-  )
+    protocols: Option[String])
 
   case class Container(
     image: String,
@@ -53,8 +48,7 @@ object model {
     env_vars: Option[Map[String, String]],
     volumes: Option[Seq[String]],
     network: Option[String],
-    dockerParameters: Option[Map[String, String]]
-  )
+    dockerParameters: Option[Map[String, String]])
 
   case class SingularityConf(
     url: String,
@@ -66,11 +60,9 @@ object model {
     requiredRole: Option[String],
     healthcheckPortIndex: Option[Int],
     requiredAttributes: Option[Map[String, String]],
-    slavePlacement: Option[String]
-  )
+    slavePlacement: Option[String])
 
   case class ExecutorConf(
     customExecutorCmd: Option[String],
-    env_vars: Option[Map[String, String]]
-  )
+    env_vars: Option[Map[String, String]])
 }

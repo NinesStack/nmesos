@@ -69,8 +69,7 @@ trait ScaleCommandHelper extends BaseCommand {
           log.info(
             s""" Changes to apply:
                |   * memoryMb:  ${remoteResources.memoryMb}   -> ${localResource.memoryMb}
-               |   * cpus:      ${remoteResources.cpus}     -> ${localResource.cpus}""".stripMargin
-          )
+               |   * cpus:      ${remoteResources.cpus}     -> ${localResource.cpus}""".stripMargin)
 
           val localDeploy = toSingularityDeploy(localConfig, scaleDeployId(remoteDeployId))
           val message = s"Auto scaling deploy '$remoteDeployId' [memoryMb: ${remoteResources.memoryMb}->${localResource.memoryMb}, cpus:${remoteResources.cpus}->${localResource.cpus}]"
@@ -80,8 +79,7 @@ trait ScaleCommandHelper extends BaseCommand {
           log.info(
             s""" * memoryMb:  ${localResource.memoryMb}
                | * cpus:      ${localResource.cpus}
-               | """.stripMargin
-          )
+               | """.stripMargin)
           Success(())
         }
 
