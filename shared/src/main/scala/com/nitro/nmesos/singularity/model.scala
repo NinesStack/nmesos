@@ -59,7 +59,10 @@ object model {
     customExecutorCmd: Option[String] = None,
     env: Map[String, String] = Map.empty,
     healthcheckUri: Option[String] = None,
-    healthcheckPortIndex: Option[Int] = None)
+    healthcheckPortIndex: Option[Int] = None,
+    healthcheckMaxRetries: Option[Int] = None,
+    healthcheckTimeoutSeconds: Option[Int] = None,
+    healthcheckMaxTotalTimeoutSeconds: Option[Int] = None)
 
   case class SingularityRequest(
     id: String,

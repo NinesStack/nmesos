@@ -57,8 +57,11 @@ object model {
     deployStepWaitTimeMs: Option[Int],
     autoAdvanceDeploySteps: Option[Boolean],
     healthcheckUri: Option[String],
-    requiredRole: Option[String],
     healthcheckPortIndex: Option[Int],
+    healthcheckMaxRetries: Option[Int],
+    healthcheckTimeoutSeconds: Option[Int],
+    healthcheckMaxTotalTimeoutSeconds: Option[Int],
+    requiredRole: Option[String],
     requiredAttributes: Option[Map[String, String]],
     slavePlacement: Option[String])
 
