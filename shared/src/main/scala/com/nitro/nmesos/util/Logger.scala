@@ -45,6 +45,10 @@ trait AnsiLogger {
   val ResetColor = Console.RESET
   val SeparatorColor = Console.BLUE
   val ImportantColor = Console.RED
+
+  val Ok = s"$InfoColor\u2713$ResetColor"
+  val Fail = s"$ImportantColor\u2715$ResetColor"
+
   private val EraseLine = "\r\b"
 
   def importantColor(body: => Any) = {

@@ -85,10 +85,10 @@ object ModelConversions {
   }
 
   /**
-   * Singularity Id can contain only "a-zA-Z0-9_"
+   * Singularity Id can contain only "a-zA-Z0-9"
    */
   def normalizeId(id: String): String = {
-    id.replaceAll("[^a-zA-Z0-9_]", "_")
+    id.replaceAll("[^a-zA-Z0-9]", "_")
   }
 
   type RequestId = String
