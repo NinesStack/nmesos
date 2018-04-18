@@ -130,6 +130,7 @@ object ModelConversions {
     healthcheckMaxTotalTimeoutSeconds = config.environment.singularity.healthcheckMaxTotalTimeoutSeconds,
     deployInstanceCountPerStep = config.environment.singularity.deployInstanceCountPerStep,
     deployStepWaitTimeMs = config.environment.singularity.deployStepWaitTimeMs,
+    deployHealthTimeoutSeconds = config.environment.singularity.deployHealthTimeoutSeconds,
     customExecutorCmd = config.environment.executor.flatMap(_.customExecutorCmd),
     env = config.environment.executor.flatMap(_.env_vars).getOrElse(Map.empty),
     autoAdvanceDeploySteps = config.environment.singularity.autoAdvanceDeploySteps,

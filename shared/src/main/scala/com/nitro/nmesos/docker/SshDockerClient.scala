@@ -5,14 +5,14 @@ import com.nitro.nmesos.docker.model.Container
 import sys.process._
 
 /**
-  * Run Remote Docker commands through ssh to inspect the containers running.
-  */
+ * Run Remote Docker commands through ssh to inspect the containers running.
+ */
 object SshDockerClient {
 
   /**
-    * Docker ps and inspect all containers in the host.
-    */
-  def fetchContainers(host: String) : Seq[Container] = {
+   * Docker ps and inspect all containers in the host.
+   */
+  def fetchContainers(host: String): Seq[Container] = {
     val containers = parseOutput(dockerPs(host), host)
     fetchContainersEnv(host, containers)
   }
@@ -27,7 +27,6 @@ object SshDockerClient {
   private def dockerInspectEnv(host: String, containersId: Seq[String]) = {
     s"""ssh $host docker inspect ${containersId.mkString(" ")} --format '{{range .Config.Env }}{{ $$.ID}}:{{.}}~{{end}}~{{range  $$key, $$value := .Config.Labels}}{{ $$.ID}}:{{$$key}}={{$$value}}~{{end}}' """ !!
   }
-
 
   /**
    * For each container fetch the environment vars
@@ -52,8 +51,6 @@ object SshDockerClient {
     }
 
   }
-
-
 
   private def parseTaskId(inspectOutput: String) = {
     inspectOutput.split(" ").find(_.startsWith("TASK_ID=")).map(_.dropWhile(_ != '=').drop(1))

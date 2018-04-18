@@ -55,6 +55,7 @@ object model {
     schedule: Option[String],
     deployInstanceCountPerStep: Option[Int],
     deployStepWaitTimeMs: Option[Int],
+    deployHealthTimeoutSeconds: Option[Int],
     autoAdvanceDeploySteps: Option[Boolean],
     healthcheckUri: Option[String],
     healthcheckPortIndex: Option[Int],

@@ -55,6 +55,7 @@ object model {
     shell: Option[Boolean] = None,
     deployInstanceCountPerStep: Option[Int] = None,
     deployStepWaitTimeMs: Option[Int] = None,
+    deployHealthTimeoutSeconds: Option[Int] = None,
     autoAdvanceDeploySteps: Option[Boolean] = None,
     customExecutorCmd: Option[String] = None,
     env: Map[String, String] = Map.empty,
