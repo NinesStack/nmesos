@@ -1,6 +1,6 @@
 name in ThisBuild := "nmesos"
 organization in ThisBuild := "com.gonitro"
-version in ThisBuild := "0.2.1"
+version in ThisBuild := "0.2.2"
 scalaVersion in ThisBuild := "2.12.1"
 
 lazy val cli = Project("nmesos-cli", file("cli"))
