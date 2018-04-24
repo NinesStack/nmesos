@@ -19,13 +19,13 @@ object SshDockerClient {
 
   // Docker ps
   private def dockerPs(host: String) = {
-    s"""ssh $host  docker ps --format "{{.ID}}\\t{{.Image}}\\t{{.Names}}" """ !!
+    s"""ssh -oStrictHostKeyChecking=no $host  docker ps --format "{{.ID}}\\t{{.Image}}\\t{{.Names}}" """ !!
   }
 
   // Docker inspect
   // Fetch labels and environments var
   private def dockerInspectEnv(host: String, containersId: Seq[String]) = {
-    s"""ssh $host docker inspect ${containersId.mkString(" ")} --format '{{range .Config.Env }}{{ $$.ID}}:{{.}}~{{end}}~{{range  $$key, $$value := .Config.Labels}}{{ $$.ID}}:{{$$key}}={{$$value}}~{{end}}' """ !!
+    s"""ssh -oStrictHostKeyChecking=no $host docker inspect ${containersId.mkString(" ")} --format '{{range .Config.Env }}{{ $$.ID}}:{{.}}~{{end}}~{{range  $$key, $$value := .Config.Labels}}{{ $$.ID}}:{{$$key}}={{$$value}}~{{end}}' """ !!
   }
 
   /**

@@ -23,7 +23,7 @@ object SidecarUtils {
         } else {
           log.println(s""" ${log.Ok} Sidecar running at ${sidecarA.hostName} in sync with ${sidecarB.hostName} """)
         }
-        diff.nonEmpty
+        diff.isEmpty
     }.reduce(_ && _)
   }
 
@@ -34,7 +34,7 @@ object SidecarUtils {
 
     // fetch all Containers where SidecarDiscover!=false
     val containersByServiceName = info.containers
-      .filter(_.env.exists { case (key, value) => key == "SidecarDiscover" && value != "false" })
+      .filter(!_.env.exists { case (key, value) => key == "SidecarDiscover" && value == "false" })
       .groupBy(_.env.find { case (key, _) => key == "ServiceName" }.map(_._2).getOrElse("")) // group by serviceName
 
     // Fetch Sidecar info about by Service
