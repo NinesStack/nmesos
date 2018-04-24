@@ -40,7 +40,8 @@ object CliManager {
 
     cmd.action match {
       case VerifyAction =>
-        VerifyEnvCommand(cmd.singularity, log).run()
+        val result = VerifyEnvCommand(cmd.singularity, log).run()
+        exit(log, result)
       case _ =>
         processYmlCommand(cmd, log)
     }
@@ -79,14 +80,7 @@ object CliManager {
         sys.exit(1)
     }
 
-    cmdResult match {
-      case CommandSuccess(msg) =>
-        log.info(msg)
-
-      case CommandError(error) =>
-        log.error(error)
-        exitWithError()
-    }
+    exit(log, cmdResult)
   }
 
   def showConfigError(cmd: Cmd, configError: ConfigError, log: Logger): Unit = {
@@ -127,4 +121,15 @@ object CliManager {
     file = config.file)
 
   def exitWithError() = sys.exit(1)
+
+  private def exit(log: Logger, cmdResult: CommandResult): Unit = {
+    cmdResult match {
+      case CommandSuccess(msg) =>
+        log.info(msg)
+
+      case CommandError(error) =>
+        log.error(error)
+        exitWithError()
+    }
+  }
 }
