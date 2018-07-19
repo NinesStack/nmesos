@@ -92,7 +92,7 @@ trait VerifyContainers {
         .flatMap(_.healthy)
         .map(_.id)
 
-      val runningContainerTaskId = info.containers.map(_.taskId)
+      val runningContainerTaskId = info.containers.filter(_.name.startsWith("mesos-")).map(_.taskId)
       val orphans = runningContainerTaskId.diff(mesosTasksId)
 
       print(info, mesosTasksId, orphans)
