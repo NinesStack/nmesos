@@ -8,5 +8,6 @@ class NmesosCli < Formula
 
   def install
     bin.install 'nmesos'
+    bash_completion.install 'contrib/etc/bash_completion.d/nmesos'
   end
 end
