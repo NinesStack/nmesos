@@ -24,6 +24,7 @@ packageName in Universal := "nmesos-cli-" + version.value
 mappings in Universal in packageZipTarball := {
   Seq(
     file("README.md") -> "README.md",
+    file("contrib/etc/bash_completion.d/nmesos") -> "contrib/etc/bash_completion.d/nmesos",
     file((assemblyOutputPath in assembly).value.getPath) -> "nmesos"
   )
 }

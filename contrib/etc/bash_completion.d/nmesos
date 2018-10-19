@@ -1,0 +1,46 @@
+_nmesos() {
+    local cur prev commands global_opts opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    commands="release scale check verify"
+    global_opts="--verbose -v --noformat --help -h"
+
+    if [ $COMP_CWORD == 1 ] ; then
+        COMPREPLY=( $(compgen -W "${commands}" -- ${cur}) )
+        return 0
+    fi
+
+    if [[ ${cur} == -* ]] ; then
+        case "$prev" in
+            "release")
+                opts="--environment -e --tag -t --force -f --dryrun -n ${global_opts}"
+                COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+                return 0
+                ;;
+            "scale")
+                opts="--environment -e --dryrun -n ${global_opts}"
+                COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+                return 0
+                ;;
+            "check")
+                opts="--environment -e ${global_opts}"
+                COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+                return 0
+                ;;
+            "verify")
+                opts="--singularity -s ${global_opts}"
+                COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+                return 0
+                ;;
+            *)
+                opts="${global_opts}"
+                COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+                return 0
+                ;;
+        esac
+    fi
+}
+
+complete -F _nmesos nmesos
