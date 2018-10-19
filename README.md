@@ -96,6 +96,15 @@ Uninstall Nmesos cli:
 brew uninstall nmesos-cli
 ```
 
+## Bash Completion support
+
+If you want to install the support for the
+[bash-completion](contrib/etc/bash_completion.d/nmesos), you can use the brew
+option `--with-bash-completion` when installing:
+
+```
+brew install --with-bash-completion nmesos-cli
+```
 
 ## Other Comands
 ```
