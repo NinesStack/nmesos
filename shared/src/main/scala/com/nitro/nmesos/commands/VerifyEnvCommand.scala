@@ -24,9 +24,10 @@ case class VerifyEnvCommand(singularityUrl: String, log: Logger) extends Command
     val tryVerify = for {
       info <- fetchInfo()
     } yield {
-      verifyRequests(info) &&
-        verifyOrphanContainers(info) &&
-        verifySidecar(info)
+      val requests = verifyRequests(info)
+      val containers = verifyOrphanContainers(info)
+      val sidecar = verifySidecar(info)
+      requests && containers && sidecar
     }
 
     tryVerify match {
@@ -124,7 +125,8 @@ trait VerifyRequests {
    */
   def verifyRequests(info: EnvironmentInfo) = {
     log.logBlock(s"Verifying requests") {
-      info.requests.forall(verifyRequest(_, info))
+      info.requests.map(verifyRequest(_, info))
+        .forall(identity)
     }
   }
 
@@ -193,7 +195,9 @@ trait VerifySidecar {
           log.println(s" ${log.Fail} ${sidecarHosts.size} Sidecar instances running [${allHost.size} expected]")
         }
 
-        SidecarUtils.verifyInSync(info) && SidecarUtils.verifyServices(info)
+        val inSync = SidecarUtils.verifyInSync(info)
+        val services = SidecarUtils.verifyServices(info)
+        inSync && services
       }
     } else {
       true // No sidecars running (assuming cluster valid)
