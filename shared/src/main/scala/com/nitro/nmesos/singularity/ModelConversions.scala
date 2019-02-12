@@ -98,7 +98,13 @@ object ModelConversions {
   }
 
   def toRequestType(config: CmdConfig): String = {
-    if (config.environment.singularity.schedule.isDefined) "SCHEDULED" else "SERVICE"
+    if (config.environment.singularity.requestType.isDefined) {
+      config.environment.singularity.requestType.get
+    } else if (config.environment.singularity.schedule.isDefined) {
+      "SCHEDULED"
+    } else {
+      "SERVICE"
+    }
   }
 
   type DeployId = String
