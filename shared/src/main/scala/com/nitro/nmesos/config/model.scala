@@ -53,6 +53,7 @@ object model {
   case class SingularityConf(
     url: String,
     schedule: Option[String],
+    requestType: Option[String],
     deployInstanceCountPerStep: Option[Int],
     deployStepWaitTimeMs: Option[Int],
     deployHealthTimeoutSeconds: Option[Int],
