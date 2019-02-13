@@ -9,45 +9,50 @@ object Validations extends ValidationHelper {
   def checkAll(localConfig: CmdConfig): Seq[Validation] = Seq(
     checkResources(localConfig.environment.resources),
     checkContainer(localConfig.environment.container),
-    if (localConfig.environment.singularity.schedule.isDefined) {
-      checkJob(localConfig.environment)
-    } else {
-      checkService(localConfig.environment)
-    }).flatten.sortBy(_.name)
+    checkScheduledJob(localConfig.environment),
+    checkService(localConfig.environment)).flatten.sortBy(_.name)
 
   private def checkResources(resources: Resources): Seq[Validation] = Seq(
     check("Resources - Memory Instances", "Must be > 0") {
       resources.memoryMb > 0
     })
 
-  private def checkService(env: Environment): Seq[Validation] = Seq(
-    check("Resources - Num Instances", "Must be > 0") {
-      env.singularity.slavePlacement.exists(_ == "SPREAD_ALL_SLAVES") || env.resources.instances.exists(_ > 0)
-    },
-    checkWarning("Container - Ports", "Should be defined in HOST mode") {
-      env.container.network.exists(_ == "HOST") || !env.container.ports.toSet.flatten.isEmpty
-    },
-    check("Container - Port values", "Must be >= 0 and <= 65535") {
-      env.container.ports.toSeq.flatten.forall(isValidPort)
-    },
-    check("Container - Network", "Unsupported network") {
-      env.container.network match {
-        case None => true
-        case Some("HOST") | Some("BRIDGE") => true
-        case _ => false
-      }
-    },
-    checkWarning("Singularity - Healthcheck", "No healthcheck defined") {
-      env.singularity.healthcheckUri.exists(_.trim.nonEmpty)
-    })
+  private def checkService(env: Environment): Seq[Validation] = if (isService(env)) {
+    Seq(
+      check("Resources - Num Instances", "Must be > 0") {
+        env.singularity.slavePlacement.exists(_ == "SPREAD_ALL_SLAVES") || env.resources.instances.exists(_ > 0)
+      },
+      checkWarning("Container - Ports", "Should be defined in HOST mode") {
+        env.container.network.exists(_ == "HOST") || !env.container.ports.toSet.flatten.isEmpty
+      },
+      check("Container - Port values", "Must be >= 0 and <= 65535") {
+        env.container.ports.toSeq.flatten.forall(isValidPort)
+      },
+      check("Container - Network", "Unsupported network") {
+        env.container.network match {
+          case None => true
+          case Some("HOST") | Some("BRIDGE") => true
+          case _ => false
+        }
+      },
+      checkWarning("Singularity - Healthcheck", "No healthcheck defined") {
+        env.singularity.healthcheckUri.exists(_.trim.nonEmpty)
+      })
+  } else {
+    Seq.empty
+  }
 
-  private def checkJob(env: Environment): Seq[Validation] = Seq(
-    check("Resources - Num Instances", "Must be = 0") {
-      env.resources.instances.isEmpty
-    },
-    check("Singularity - Job cron", "Missing") {
-      env.singularity.schedule.isDefined
-    })
+  private def checkScheduledJob(env: Environment): Seq[Validation] = if (isScheduled(env)) {
+    Seq(
+      check("Resources - Num Instances", "Must be = 0") {
+        env.resources.instances.isEmpty
+      },
+      check("Singularity - Job cron", "Missing") {
+        env.singularity.schedule.isDefined
+      })
+  } else {
+    Seq.empty
+  }
 
   private def checkContainer(container: Container): Seq[Validation] = Seq(
     checkWarning("Container - Labels", "No labels defined") {
@@ -57,6 +62,13 @@ object Validations extends ValidationHelper {
       !container.env_vars.toSet.flatten.isEmpty
     })
 
+  def isService(env: Environment) = {
+    (env.singularity.requestType.isEmpty && env.singularity.schedule.isEmpty) || env.singularity.requestType == "SERVICE"
+  }
+
+  def isScheduled(env: Environment) = {
+    (env.singularity.requestType.isEmpty && env.singularity.schedule.isDefined) || env.singularity.requestType == "SCHEDULED"
+  }
 }
 
 trait ValidationHelper {
@@ -88,6 +100,9 @@ trait ValidationHelper {
 sealed trait Validation {
   def name: String
 }
+
 case class Ok(name: String) extends Validation
+
 case class Warning(name: String, error: String) extends Validation
+
 case class Fail(name: String, error: String) extends Validation
