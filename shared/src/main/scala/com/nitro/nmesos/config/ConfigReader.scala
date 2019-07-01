@@ -31,9 +31,44 @@ object ConfigReader {
         ConfigError(msg, file)
 
       case ValidYaml(config, hash) =>
+        val envVarDifferences = findMissingContainerEnvVarKeys(config)
+        if (envVarDifferences.nonEmpty) {
+          logger.logBlock("Environment env_var keys not equal") {
+            for (diff <- envVarDifferences) {
+              logger.error(s"Environment ${diff._1}: Missing env_var keys: ${diff._2.mkString(", ")}")
+            }
+          }
+        }
         environmentFromConfig(config, environmentName, hash, file)
 
     }
+  }
+
+  /**
+   * Check all feature-toggles (env_var keys) of every environment and
+   * return a Map[EnvironmentName, Set[String]] of missing env_var keys.
+   * key: environment name
+   * val: a Set of all keys that are missing in this environment
+   */
+  def findMissingContainerEnvVarKeys(config: Config): Map[EnvironmentName, Set[String]] = {
+    val allEnvVarKeys = config.environments.foldLeft(Set[String]()) {
+      case (allKeys, (_, environment)) =>
+        environment.container.env_vars match {
+          case Some(envVars) => envVars.keys.toSet ++ allKeys
+          case None => allKeys
+        }
+    }
+
+    (for {
+      (envName, environment) <- config.environments
+      envVars <- environment.container.env_vars
+    } yield {
+      val missingKeys = allEnvVarKeys.diff(envVars.keys.toSet)
+      if (missingKeys.isEmpty)
+        None
+      else
+        Some(envName, missingKeys)
+    }).flatten.toMap
   }
 
   /**
