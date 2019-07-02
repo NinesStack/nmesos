@@ -1,0 +1,79 @@
+## Example config for testing
+nmesos_version: '0.0.1' ## Min nmesos required to execute this config
+
+common:
+
+  resources:
+    instances: 2 # Number of instances to deploy
+    cpus: 0.1
+    memoryMb: 64
+
+  container:
+
+    image: hubspot/singularity-test-service # Docker repo/image without the tag
+    forcePullImage: true                    # Optional to force pull (default false)
+    ports:
+      - 8080 # Exposed port by the container (Mesos will auto assign a external port)
+
+    volumes:
+      - /tmp/foo:/tmp/foo  #  (HOST:CONTAINER) with default rw or (HOST:CONTAINER:rw)
+
+    labels:
+      ServiceName: "exampleServer"
+      ## Sidecar config
+      HealthCheck: "HttpGet"
+      HealthCheckArgs: "http://{{ host }}:{{ tcp 8080 }}/hello"
+
+    env_vars:
+      NEW_RELIC_LICENSE_KEY: "xxxxx"
+      JAVA_OPTS: >
+        -Xms64m
+        -Xmx64m
+
+    extraDockerConf:
+      network: HOST
+      dockerParameters:
+        cap-add: NET_ADMIN
+
+  singularity:
+    deployInstanceCountPerStep: 1   # Number of instances deployed at once.
+    autoAdvanceDeploySteps: true    # false to have Canary deployments.
+    deployStepWaitTimeMs: 1000      # Time to wait between deployments
+    healthcheckUri: "/hello"  # Used for singularity to determine if a deploy was success
+    slavePlacement: "SPREAD_ALL_SLAVES"
+    requiredRole: "OPS"
+
+  ## Optional configuration to define environments variables to be passed to the Mesos executor
+  executor:
+    customExecutorCmd: "/opt/mesos/executor.sh"   # Optional custom Mesos Executor.
+    env_vars:
+      EXECUTOR_SIDECAR_DISCOVER: "false" # Default true, false => the executor will not healthcheck
+      EXECUTOR_SIDECAR_BACKOFF: "20m"    # default 1m
+
+environments:
+  dev:
+    singularity:
+      url: "http://test"
+    container:
+      env_vars:
+        all_envs: "something"
+        dev_and_prod: "something"
+        only_dev: "something"
+
+  prod:
+    singularity:
+      url: "http://testprod"
+    container:
+      env_vars:
+        all_envs: "something"
+        dev_and_prod: "something"
+        only_prod: "something"
+
+
+  test:
+    singularity:
+      url: "http://testprod"
+    container:
+      env_vars:
+        all_envs: "something"
+        only_test: "something"
