@@ -31,7 +31,7 @@ nmesos release example-service --environment dev --tag latest
 ### Config Yml file
 
 ```
-nmesos_version: '0.1.0'
+nmesos_version: '0.1.2'
 common:
   resources:
     memoryMb: 128
@@ -75,7 +75,7 @@ Install Nmesos CLI manually:
 
 ```
 curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.1.2/nmesos-cli-0.1.2.tgz | tar -xz
-cd nmesos-cli-0.1.0 && chmod u+x nmesos
+cd nmesos-cli-0.1.2 && chmod u+x nmesos
 ````
 
 Alternatively on MacOS, you can also install it with brew:
