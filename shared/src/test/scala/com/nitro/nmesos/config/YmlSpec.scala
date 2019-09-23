@@ -3,7 +3,7 @@ package com.nitro.nmesos.config
 import com.nitro.nmesos.util.InfoLogger
 import com.nitro.nmesos.config.YamlParser._
 import com.nitro.nmesos.config.YamlParserHelper.YamlCustomProtocol._
-import com.nitro.nmesos.config.model.{ ExecutorConf, PortMap, SingularityConf }
+import com.nitro.nmesos.config.model._
 import net.jcazevedo.moultingyaml._
 import org.specs2.mutable.Specification
 
@@ -53,6 +53,26 @@ class YmlSpec extends Specification with YmlTestFixtures {
 
       modelConfig.environments("dev").singularity.requiredRole should be equalTo Some("OPS")
       modelConfig.environments("dev").singularity.slavePlacement should be equalTo Some("SPREAD_ALL_SLAVES")
+    }
+
+    "parse the after deploy configuration in a valid Yaml file" in {
+      val conf = YamlParser.parse(YamlExampleAfterDeploy, InfoLogger)
+      conf should beAnInstanceOf[ValidYaml]
+
+      val modelConfig = conf.asInstanceOf[ValidYaml].config
+      val successJob1 = modelConfig.environments("dev").afterDeploy.get.onSuccess.head
+      val successJob2 = modelConfig.environments("dev").afterDeploy.get.onSuccess.drop(1).head
+
+      successJob1.service shouldEqual "job1"
+      successJob1.tag shouldEqual "job1tag"
+
+      successJob2.service shouldEqual "job2"
+      successJob2.tag shouldEqual "job2tag"
+
+      val failureJob = modelConfig.environments("dev").afterDeploy.get.onFailure.get
+
+      failureJob.service shouldEqual "jobFailure"
+      failureJob.tag shouldEqual "jobFailureTag"
     }
 
     "parse the mesos slaves attributes in a valid Yaml file" in {
@@ -127,6 +147,8 @@ trait YmlTestFixtures {
   def YamlExampleValid = Source.fromURL(getClass.getResource("/config/example-config.yml")).mkString
 
   def YamlExampleExecutorEnvs = Source.fromURL(getClass.getResource("/config/example-config-with-executor.yml")).mkString
+
+  def YamlExampleAfterDeploy = Source.fromURL(getClass.getResource("/config/example-config-with-after-deploy.yml")).mkString
 
   def YamlJobExampleValid = Source.fromURL(getClass.getResource("/config/example-without-optional-config.yml")).mkString
 
