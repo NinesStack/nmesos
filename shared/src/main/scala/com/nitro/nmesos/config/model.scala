@@ -74,5 +74,5 @@ object model {
 
   case class AfterDeployConf(onSuccess: List[DeployJob], onFailure: Option[DeployJob])
 
-  case class DeployJob(service: String, tag: String)
+  case class DeployJob(serviceName: String, tag: String)
 }

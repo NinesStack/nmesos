@@ -5,10 +5,15 @@ import java.io.File
 import com.nitro.nmesos.cli.model.{ Cmd, ReleaseAction }
 import com.nitro.nmesos.config.ConfigReader
 import com.nitro.nmesos.config.ConfigReader.ValidConfig
-import com.nitro.nmesos.util.InfoLogger
+import com.nitro.nmesos.util.{ CustomLogger, InfoLogger }
 import org.specs2.mutable.Specification
 
 class CliSpec extends Specification with CliSpecFixtures {
+
+  import org.specs2.execute._
+  implicit def unitAsResult: AsResult[Unit] = new AsResult[Unit] {
+    def asResult(u: => Unit): Result = { u; Success() }
+  }
 
   "Cli main" should {
 
@@ -17,6 +22,58 @@ class CliSpec extends Specification with CliSpecFixtures {
       val cmdConfig = CliManager.toServiceConfig(cmd, ValidYamlConfig)
 
       cmdConfig.serviceName shouldEqual "test"
+    }
+
+    "build a valid command chain" in {
+      val cmd = ValidCmd.copy(serviceName = "cli/src/test/resources/config/example-deploy-chain-service-0")
+
+      val expectedCommandChain = Right(
+        List(
+          (
+            cmd,
+            getValidYmlConfig("example-deploy-chain-service-0")),
+          (
+            cmd.copy(
+              serviceName = "cli/src/test/resources/config/example-deploy-chain-service-1",
+              tag = "job1tag",
+              force = true),
+            getValidYmlConfig("example-deploy-chain-service-1")),
+          (
+            cmd.copy(
+              serviceName = "cli/src/test/resources/config/example-deploy-chain-service-2",
+              tag = "job2tag",
+              force = true),
+            getValidYmlConfig("example-deploy-chain-service-2")),
+          (
+            cmd.copy(
+              serviceName = "cli/src/test/resources/config/example-deploy-chain-service-3",
+              tag = "job3tag",
+              force = true),
+            getValidYmlConfig("example-deploy-chain-service-3"))))
+
+      val commandChain = CliManager.getCommandChain(cmd, InfoLogger)
+
+      commandChain.right.get.zip(expectedCommandChain.right.get).foreach {
+        case (command, expectedCommand) =>
+          command._1 shouldEqual expectedCommand._1
+          command._2.environment shouldEqual expectedCommand._2.environment
+          command._2.environmentName shouldEqual expectedCommand._2.environmentName
+          command._2.fileHash shouldEqual expectedCommand._2.fileHash
+      }
+    }
+
+    "return an error on a cyclic reference command chain" in {
+      val cmd = ValidCmd.copy(serviceName = "cli/src/test/resources/config/example-deploy-chain-service-cyclic-0")
+      val commandChain = CliManager.getCommandChain(cmd, InfoLogger)
+
+      commandChain.left.get.msg shouldEqual "Job appearing more than once in job chain"
+    }
+
+    "return an error for a self referencing after deploy job" in {
+      val cmd = ValidCmd.copy(serviceName = "cli/src/test/resources/config/example-deploy-chain-self-referencing")
+      val commandChain = CliManager.getCommandChain(cmd, InfoLogger)
+
+      commandChain.left.get.msg shouldEqual "Job appearing more than once in job chain"
     }
   }
 
@@ -61,4 +118,13 @@ trait CliSpecFixtures {
     config.getOrElse(sys.error("Invalid yml"))
   }
 
+  def getValidYmlConfig(serviceName: String): ValidConfig = {
+    val yml = new File(getClass.getResource(s"/config/${serviceName}.yml").getFile)
+    val config = ConfigReader.parseEnvironment(yml, "dev", InfoLogger) match {
+      case v: ValidConfig => Some(v)
+      case _ => None
+    }
+    config.getOrElse(sys.error("Invalid yml"))
+
+  }
 }

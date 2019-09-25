@@ -63,15 +63,15 @@ class YmlSpec extends Specification with YmlTestFixtures {
       val successJob1 = modelConfig.environments("dev").afterDeploy.get.onSuccess.head
       val successJob2 = modelConfig.environments("dev").afterDeploy.get.onSuccess.drop(1).head
 
-      successJob1.service shouldEqual "job1"
+      successJob1.serviceName shouldEqual "job1"
       successJob1.tag shouldEqual "job1tag"
 
-      successJob2.service shouldEqual "job2"
+      successJob2.serviceName shouldEqual "job2"
       successJob2.tag shouldEqual "job2tag"
 
       val failureJob = modelConfig.environments("dev").afterDeploy.get.onFailure.get
 
-      failureJob.service shouldEqual "jobFailure"
+      failureJob.serviceName shouldEqual "jobFailure"
       failureJob.tag shouldEqual "jobFailureTag"
     }
 

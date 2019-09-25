@@ -1,8 +1,9 @@
 package com.nitro.nmesos.cli
 
 import com.nitro.nmesos.BuildInfo
-import com.nitro.nmesos.cli.model.VerifyAction
+import com.nitro.nmesos.util.{ CustomLogger, InfoLogger, Logger }
 import com.nitro.nmesos.commands.{ CheckCommand, CommandResult, ScaleCommand, VerifyEnvCommand }
+import com.nitro.nmesos.config.model.DeployJob
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -47,22 +48,89 @@ object CliManager {
     }
   }
 
-  def processYmlCommand(cmd: Cmd, log: Logger) = {
-    val yamlFile = toFile(cmd, log)
+  def processYmlCommand(initialCmd: Cmd, log: Logger) = {
+    val commandChainEither = getCommandChain(initialCmd, log)
 
-    ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
-      case error: ConfigError =>
-        showConfigError(cmd, error, log)
+    commandChainEither match {
+      case Left(_) => exitWithError()
 
-      case config: ValidConfig =>
-        executeCommand(cmd, config, log)
+      case Right(commandChain) =>
+        for ((cmd, config) <- commandChain) {
+          executeCommand(cmd, config, log) match {
+            case CommandSuccess(msg) =>
+              log.info(msg)
+
+            case CommandError(error) =>
+              log.error(error)
+              exitWithError()
+          }
+        }
     }
+  }
+
+  /**
+   * Parses and returns a valid chain of Commands and their corresponding Config file.
+   * Exits on the first invalid command/config
+   */
+
+  type ChainEither = Either[ConfigError, List[(Cmd, ValidConfig)]]
+
+  def getCommandChain(initialCmd: Cmd, log: Logger): ChainEither = {
+    def buildChain(cmd: Cmd, chainEither: ChainEither, cmdQueue: List[Cmd]): ChainEither = {
+      chainEither match {
+        case Left(error) => Left(error)
+
+        case Right(chain) =>
+          val yamlFile = toFile(cmd, log)
+
+          ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
+            case error: ConfigError =>
+              showConfigError(cmd, error, log)
+              Left(error)
+
+            case configForCmd: ValidConfig =>
+              // Get the queue of after-deploy commands and append them to the cmdQueue
+              // so that it will be traversed in a breath-first manner
+              val cmdQueueFromConfig = getJobQueueFromConfig(configForCmd).map(cmdFromDeployJob(_, initialCmd))
+              val cmdQueueAll = cmdQueue ++ cmdQueueFromConfig
+
+              if (cmdQueueAll.isEmpty) {
+                Right(chain :+ (cmd, configForCmd))
+              } else if (chainContainsCmd(chain, cmdQueueAll.head)) {
+                Left(ConfigError("Job appearing more than once in job chain", yamlFile))
+              } else {
+                val newChain = Right(chain :+ (cmd, configForCmd))
+                buildChain(cmdQueueAll.head, newChain, cmdQueueAll.tail)
+              }
+
+          }
+      }
+    }
+
+    buildChain(initialCmd, Right(List()), List())
+  }
+
+  private def chainContainsCmd(chain: List[(Cmd, ValidConfig)], cmd: Cmd): Boolean =
+    chain.exists { case (cmdInChain, _) => cmd == cmdInChain }
+
+  private def getJobQueueFromConfig(config: ValidConfig): List[DeployJob] = {
+    config.environment.afterDeploy match {
+      case None => List()
+      case Some(afterDeploy) => afterDeploy.onSuccess
+    }
+  }
+
+  private def cmdFromDeployJob(job: DeployJob, initialCmd: Cmd): Cmd = {
+    initialCmd.copy(
+      serviceName = job.serviceName,
+      tag = job.tag,
+      force = true)
   }
 
   /**
    * Execute the detected command for a valid configuration.
    */
-  def executeCommand(cmd: Cmd, config: ValidConfig, log: Logger): Unit = {
+  def executeCommand(cmd: Cmd, config: ValidConfig, log: Logger): CommandResult = {
     val cmdResult: CommandResult = cmd.action match {
       case ReleaseAction =>
         val serviceConfig = toServiceConfig(cmd, config)
@@ -80,7 +148,7 @@ object CliManager {
         sys.exit(1)
     }
 
-    exit(log, cmdResult)
+    cmdResult
   }
 
   def showConfigError(cmd: Cmd, configError: ConfigError, log: Logger): Unit = {

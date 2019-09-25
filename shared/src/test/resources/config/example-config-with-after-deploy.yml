@@ -51,11 +51,11 @@ environments:
     ## Optional configuration to define a job to deploy after this job
     afterDeploy:
       onSuccess:
-        - service: "job1"
+        - serviceName: "job1"
           tag: "job1tag"
-        - service: "job2"
+        - serviceName: "job2"
           tag: "job2tag"
 
       onFailure:
-        service: "jobFailure"
+        serviceName: "jobFailure"
         tag: "jobFailureTag"

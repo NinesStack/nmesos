@@ -15,3 +15,13 @@ environments:
   dev:
     singularity:
       url: "http://192.168.99.104:7099/singularity"
+
+    ## Optional configuration to define a job to deploy after this job
+    afterDeploy:
+      onSuccess:
+        - serviceName: "cli/src/test/resources/config/example-deploy-chain-service-3"
+          tag: "job3tag"
+
+      onFailure:
+        serviceName: "cli/src/test/resources/config/jobFailure"
+        tag: "jobFailureTag"
