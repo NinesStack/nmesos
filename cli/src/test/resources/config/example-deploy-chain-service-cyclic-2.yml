@@ -14,7 +14,7 @@ common:
 environments:
   dev:
     singularity:
-      url: "http://192.168.99.104:7099/singularity"
+      url: "http://192.168.99.100:7099/singularity"
 
     ## Optional configuration to define a job to deploy after this job
     afterDeploy:
@@ -23,5 +23,5 @@ environments:
           tag: "job0tag"
 
       onFailure:
-        serviceName: "cli/src/test/resources/config/jobFailure"
+        serviceName: "cli/src/test/resources/config/example-deploy-chain-failure"
         tag: "jobFailureTag"

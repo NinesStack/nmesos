@@ -49,82 +49,134 @@ object CliManager {
   }
 
   def processYmlCommand(initialCmd: Cmd, log: Logger) = {
-    val commandChainEither = getCommandChain(initialCmd, log)
+    val commandChain = getCommandChain(initialCmd, log)
 
-    commandChainEither match {
+    commandChain match {
       case Left(_) => exitWithError()
 
-      case Right(commandChain) =>
-        for ((cmd, config) <- commandChain) {
+      case Right(chain) =>
+        val successful = chain._1
+        val onFailure = chain._2
+
+        for ((cmd, config) <- successful) {
           executeCommand(cmd, config, log) match {
             case CommandSuccess(msg) =>
               log.info(msg)
 
             case CommandError(error) =>
               log.error(error)
-              exitWithError()
+              maybeExecuteFailureCommandAndExit(onFailure, log)
           }
         }
     }
   }
 
+  type CommandAndConfig = (Cmd, ValidConfig)
+
+  type CommandChainOnSuccess = Either[ConfigError, List[CommandAndConfig]]
+
+  type CommandOnFailure = Either[ConfigError, Option[CommandAndConfig]]
+
+  type CommandChain = Either[ConfigError, (List[CommandAndConfig], Option[CommandAndConfig])]
+
+  //  def getCommandChain(initialCmd: Cmd, log: Logger): CommandChain = {
+  //    def buildChain(cmd: Cmd, chainEither: CommandChain, cmdQueue: List[Cmd]): CommandChain = {
+  //      chainEither match {
+  //        case Left(error) => Left(error)
+  //
+  //        case Right(chain) =>
+  //          val successfulChain = chain._1
+  //          val failureCommand = chain._2
+  //
+  //          val yamlFile = toFile(cmd, log)
+  //
+  //          ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
+  //            case error: ConfigError =>
+  //              showConfigError(cmd, error, log)
+  //
+  //              Left(error)
+  //
+  //            case configForCmd: ValidConfig =>
+  //              // Get the queue of after-deploy commands and append them to the cmdQueue
+  //              // so that it will be traversed in a breath-first manner
+  //              val cmdQueueFromConfig = getJobQueueFromConfig(configForCmd).map(cmdFromDeployJob(_, initialCmd))
+  //              val cmdQueueAll = cmdQueue ++ cmdQueueFromConfig
+  //
+  //              if (cmdQueueAll.isEmpty) {
+  //                Right(chain :+ (cmd, configForCmd))
+  //              } else if (chainContainsCmd(chain, cmdQueueAll.head)) {
+  //                Left(ConfigError("Job appearing more than once in job chain", yamlFile))
+  //              } else {
+  //                val newChain = Right(chain :+ (cmd, configForCmd))
+  //                buildChain(cmdQueueAll.head, newChain, cmdQueueAll.tail)
+  //              }
+  //
+  //          }
+  //      }
+  //    }
+  //
+  //    buildChain(initialCmd, Right(List()), List())
+  //  }
+
   /**
    * Parses and returns a valid chain of Commands and their corresponding Config file.
    * Exits on the first invalid command/config
    */
-
-  type ChainEither = Either[ConfigError, List[(Cmd, ValidConfig)]]
-
-  def getCommandChain(initialCmd: Cmd, log: Logger): ChainEither = {
-    def buildChain(cmd: Cmd, chainEither: ChainEither, cmdQueue: List[Cmd]): ChainEither = {
-      chainEither match {
+  def getCommandChain(initialCmd: Cmd, log: Logger): CommandChain = {
+    def buildCmdChainOnSuccess(cmd: Cmd, configForCmd: ValidConfig, chain: CommandChainOnSuccess, cmdQueue: List[Cmd]): CommandChainOnSuccess = {
+      chain match {
         case Left(error) => Left(error)
 
         case Right(chain) =>
-          val yamlFile = toFile(cmd, log)
+          // Get the queue of after-deploy commands and append them to the CommandChainOnSuccess
+          // so that it will be traversed in a breath-first manner
+          val cmdQueueFromConfig = getJobQueueFromConfig(configForCmd).map(gedCmdFromDeployJob(_, initialCmd))
+          val cmdQueueConcat = cmdQueue ++ cmdQueueFromConfig
 
-          ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
-            case error: ConfigError =>
-              showConfigError(cmd, error, log)
-              Left(error)
+          if (chainContainsCmd(chain, cmd)) {
+            Left(ConfigError("Job appearing more than once in job chain", toFile(cmd, log)))
+          } else if (cmdQueueConcat.isEmpty) {
+            Right(chain :+ (cmd, configForCmd))
+          } else {
+            val newChain = Right(chain :+ (cmd, configForCmd))
+            val nextCmd = cmdQueueConcat.head
 
-            case configForCmd: ValidConfig =>
-              // Get the queue of after-deploy commands and append them to the cmdQueue
-              // so that it will be traversed in a breath-first manner
-              val cmdQueueFromConfig = getJobQueueFromConfig(configForCmd).map(cmdFromDeployJob(_, initialCmd))
-              val cmdQueueAll = cmdQueue ++ cmdQueueFromConfig
-
-              if (cmdQueueAll.isEmpty) {
-                Right(chain :+ (cmd, configForCmd))
-              } else if (chainContainsCmd(chain, cmdQueueAll.head)) {
-                Left(ConfigError("Job appearing more than once in job chain", yamlFile))
-              } else {
-                val newChain = Right(chain :+ (cmd, configForCmd))
-                buildChain(cmdQueueAll.head, newChain, cmdQueueAll.tail)
-              }
-
+            getConfigFromCmd(nextCmd, log) match {
+              case Left(e) => Left(e)
+              case Right(nextConfig) =>
+                buildCmdChainOnSuccess(nextCmd, nextConfig, newChain, cmdQueueConcat.tail)
+            }
           }
       }
     }
 
-    buildChain(initialCmd, Right(List()), List())
-  }
+    def buildCmdOnFailure(initialConfig: ValidConfig) = {
+      getFailureJobFromConfig(initialConfig).map(gedCmdFromDeployJob(_, initialCmd)) match {
+        case None => Right(None)
 
-  private def chainContainsCmd(chain: List[(Cmd, ValidConfig)], cmd: Cmd): Boolean =
-    chain.exists { case (cmdInChain, _) => cmd == cmdInChain }
-
-  private def getJobQueueFromConfig(config: ValidConfig): List[DeployJob] = {
-    config.environment.afterDeploy match {
-      case None => List()
-      case Some(afterDeploy) => afterDeploy.onSuccess
+        case Some(cmd) =>
+          getConfigFromCmd(cmd, log) match {
+            case Left(e) => Left(e)
+            case Right(config) => Right(Some(cmd, config))
+          }
+      }
     }
-  }
 
-  private def cmdFromDeployJob(job: DeployJob, initialCmd: Cmd): Cmd = {
-    initialCmd.copy(
-      serviceName = job.serviceName,
-      tag = job.tag,
-      force = true)
+    getConfigFromCmd(initialCmd, log) match {
+      case Left(e) => Left(e)
+
+      case Right(initialConfig) =>
+        val cmdChainOnSuccess = buildCmdChainOnSuccess(initialCmd, initialConfig, Right(List()), List())
+        val cmdOnFailure = buildCmdOnFailure(initialConfig)
+
+        (cmdChainOnSuccess, cmdOnFailure) match {
+          case (Left(e), _) => Left(e)
+          case (_, Left(e)) => Left(e)
+
+          case (Right(cmdChainOnSuccess), Right(cmdOnFailure)) =>
+            Right((cmdChainOnSuccess, cmdOnFailure))
+        }
+    }
   }
 
   /**
@@ -199,5 +251,52 @@ object CliManager {
         log.error(error)
         exitWithError()
     }
+  }
+
+  private def getConfigFromCmd(cmd: Cmd, log: Logger): Either[ConfigError, ValidConfig] = {
+    val yamlFile = toFile(cmd, log)
+
+    ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
+      case error: ConfigError =>
+        showConfigError(cmd, error, log)
+        Left(error)
+
+      case configForCmd: ValidConfig =>
+        Right(configForCmd)
+    }
+  }
+
+  private def chainContainsCmd(chain: List[(Cmd, ValidConfig)], cmd: Cmd): Boolean =
+    chain.exists { case (cmdInChain, _) => cmd == cmdInChain }
+
+  private def getJobQueueFromConfig(config: ValidConfig): List[DeployJob] =
+    config.environment.afterDeploy match {
+      case None => List()
+      case Some(afterDeploy) => afterDeploy.onSuccess
+    }
+
+  private def getFailureJobFromConfig(config: ValidConfig): Option[DeployJob] =
+    config.environment.afterDeploy match {
+      case None => None
+      case Some(afterDeploy) => afterDeploy.onFailure
+    }
+
+  private def gedCmdFromDeployJob(job: DeployJob, initialCmd: Cmd): Cmd =
+    initialCmd.copy(
+      serviceName = job.serviceName,
+      tag = job.tag,
+      force = true)
+
+  private def maybeExecuteFailureCommandAndExit(onFailure: Option[CommandAndConfig], log: Logger): Unit = {
+    for ((failureCmd, failureConfig) <- onFailure) {
+      executeCommand(failureCmd, failureConfig, log) match {
+        case CommandSuccess(msg) =>
+          log.info(s"Executed failure command: ${msg}")
+
+        case CommandError(error) =>
+          log.error(error)
+      }
+    }
+    exitWithError()
   }
 }

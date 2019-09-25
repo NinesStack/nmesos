@@ -5,7 +5,7 @@ import java.io.File
 import com.nitro.nmesos.cli.model.{ Cmd, ReleaseAction }
 import com.nitro.nmesos.config.ConfigReader
 import com.nitro.nmesos.config.ConfigReader.ValidConfig
-import com.nitro.nmesos.util.{ CustomLogger, InfoLogger }
+import com.nitro.nmesos.util.{ InfoLogger }
 import org.specs2.mutable.Specification
 
 class CliSpec extends Specification with CliSpecFixtures {
@@ -27,7 +27,7 @@ class CliSpec extends Specification with CliSpecFixtures {
     "build a valid command chain" in {
       val cmd = ValidCmd.copy(serviceName = "cli/src/test/resources/config/example-deploy-chain-service-0")
 
-      val expectedCommandChain = Right(
+      val expectedCommandChainOnSuccess =
         List(
           (
             cmd,
@@ -49,17 +49,29 @@ class CliSpec extends Specification with CliSpecFixtures {
               serviceName = "cli/src/test/resources/config/example-deploy-chain-service-3",
               tag = "job3tag",
               force = true),
-            getValidYmlConfig("example-deploy-chain-service-3"))))
+            getValidYmlConfig("example-deploy-chain-service-3")))
 
-      val commandChain = CliManager.getCommandChain(cmd, InfoLogger)
+      val expectedCommandOnFailure = (
+        cmd.copy(
+          serviceName = "cli/src/test/resources/config/example-deploy-chain-failure",
+          tag = "jobFailureTag",
+          force = true),
+        getValidYmlConfig("example-deploy-chain-failure"))
 
-      commandChain.right.get.zip(expectedCommandChain.right.get).foreach {
+      val (commandChainOnSuccess, commandOnFailure) = CliManager.getCommandChain(cmd, InfoLogger).right.get
+
+      commandChainOnSuccess.zip(expectedCommandChainOnSuccess).foreach {
         case (command, expectedCommand) =>
           command._1 shouldEqual expectedCommand._1
           command._2.environment shouldEqual expectedCommand._2.environment
           command._2.environmentName shouldEqual expectedCommand._2.environmentName
           command._2.fileHash shouldEqual expectedCommand._2.fileHash
       }
+
+      commandOnFailure.get._1 shouldEqual expectedCommandOnFailure._1
+      commandOnFailure.get._2.environment shouldEqual expectedCommandOnFailure._2.environment
+      commandOnFailure.get._2.environmentName shouldEqual expectedCommandOnFailure._2.environmentName
+      commandOnFailure.get._2.fileHash shouldEqual expectedCommandOnFailure._2.fileHash
     }
 
     "return an error on a cyclic reference command chain" in {
