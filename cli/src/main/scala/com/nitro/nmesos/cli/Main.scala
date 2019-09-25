@@ -79,45 +79,6 @@ object CliManager {
 
   type CommandChain = Either[ConfigError, (List[CommandAndConfig], Option[CommandAndConfig])]
 
-  //  def getCommandChain(initialCmd: Cmd, log: Logger): CommandChain = {
-  //    def buildChain(cmd: Cmd, chainEither: CommandChain, cmdQueue: List[Cmd]): CommandChain = {
-  //      chainEither match {
-  //        case Left(error) => Left(error)
-  //
-  //        case Right(chain) =>
-  //          val successfulChain = chain._1
-  //          val failureCommand = chain._2
-  //
-  //          val yamlFile = toFile(cmd, log)
-  //
-  //          ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
-  //            case error: ConfigError =>
-  //              showConfigError(cmd, error, log)
-  //
-  //              Left(error)
-  //
-  //            case configForCmd: ValidConfig =>
-  //              // Get the queue of after-deploy commands and append them to the cmdQueue
-  //              // so that it will be traversed in a breath-first manner
-  //              val cmdQueueFromConfig = getJobQueueFromConfig(configForCmd).map(cmdFromDeployJob(_, initialCmd))
-  //              val cmdQueueAll = cmdQueue ++ cmdQueueFromConfig
-  //
-  //              if (cmdQueueAll.isEmpty) {
-  //                Right(chain :+ (cmd, configForCmd))
-  //              } else if (chainContainsCmd(chain, cmdQueueAll.head)) {
-  //                Left(ConfigError("Job appearing more than once in job chain", yamlFile))
-  //              } else {
-  //                val newChain = Right(chain :+ (cmd, configForCmd))
-  //                buildChain(cmdQueueAll.head, newChain, cmdQueueAll.tail)
-  //              }
-  //
-  //          }
-  //      }
-  //    }
-  //
-  //    buildChain(initialCmd, Right(List()), List())
-  //  }
-
   /**
    * Parses and returns a valid chain of Commands and their corresponding Config file.
    * Exits on the first invalid command/config
