@@ -48,9 +48,9 @@ object CliManager {
   }
 
   /**
-    * Process all ymls in a deploy chain.
-    * Log and exit on the first error
-    */
+   * Process all ymls in a deploy chain.
+   * Log and exit on the first error
+   */
   def processYmlCommand(initialCmd: Cmd, log: Logger) = {
     val commandChain = getCommandChain(initialCmd, log)
 

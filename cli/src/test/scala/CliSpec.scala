@@ -73,6 +73,26 @@ class CliSpec extends Specification with CliSpecFixtures {
       commandOnFailure.get._2.fileHash shouldEqual expectedCommandOnFailure._2.fileHash
     }
 
+    "build a command chain with only one command" in {
+      val cmd = ValidCmd.copy(
+        serviceName = "cli/src/test/resources/config/example-deploy-chain-service-2",
+        tag = "job2tag")
+      val (commandChainOnSuccess, commandOnFailure) = CliManager.getCommandChain(cmd, InfoLogger).right.get
+
+      val expectedCommand = (
+        cmd.copy(
+          serviceName = "cli/src/test/resources/config/example-deploy-chain-service-2",
+          tag = "job2tag"),
+        getValidYmlConfig("example-deploy-chain-service-2"))
+
+      commandChainOnSuccess.length shouldEqual 1
+
+      commandChainOnSuccess.head._1 shouldEqual expectedCommand._1
+      commandChainOnSuccess.head._2.environment shouldEqual expectedCommand._2.environment
+      commandChainOnSuccess.head._2.environmentName shouldEqual expectedCommand._2.environmentName
+      commandChainOnSuccess.head._2.fileHash shouldEqual expectedCommand._2.fileHash
+    }
+
     "return an error on a cyclic reference command chain" in {
       val cmd = ValidCmd.copy(serviceName = "cli/src/test/resources/config/example-deploy-chain-service-cyclic-0")
       val commandChain = CliManager.getCommandChain(cmd, InfoLogger)
