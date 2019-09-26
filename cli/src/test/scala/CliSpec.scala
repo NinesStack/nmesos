@@ -3,9 +3,13 @@ package com.nitro.nmesos.cli
 import java.io.File
 
 import com.nitro.nmesos.cli.model.{ Cmd, ReleaseAction }
+import com.nitro.nmesos.commands.ReleaseCommand
 import com.nitro.nmesos.config.ConfigReader
 import com.nitro.nmesos.config.ConfigReader.ValidConfig
-import com.nitro.nmesos.util.{ InfoLogger }
+import com.nitro.nmesos.config.model.CmdConfig
+import com.nitro.nmesos.singularity.ModelConversions.toSingularityRequest
+import com.nitro.nmesos.singularity.{ RealSingularityManager, SingularityManager }
+import com.nitro.nmesos.util.InfoLogger
 import org.specs2.mutable.Specification
 
 class CliSpec extends Specification with CliSpecFixtures {

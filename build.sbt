@@ -5,6 +5,8 @@ scalaVersion in ThisBuild := "2.12.1"
 
 lazy val cli = Project("nmesos-cli", file("cli"))
   .dependsOn(shared)
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings: _*)
 
 lazy val shared = Project("nmesos-shared", file("shared"))
   .enablePlugins(BuildInfoPlugin)
