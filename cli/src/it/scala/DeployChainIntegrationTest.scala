@@ -19,6 +19,9 @@ import org.specs2.mutable.Specification
   */
 class DeployChainIntegrationTest extends Specification with DeployChainFixtures {
 
+  // dirty hack so that the test doesn't scream the
+  // "No implicits found for parameter evidence"
+  // because the last line is not an assertion
   import org.specs2.execute._
   implicit def unitAsResult: AsResult[Unit] = new AsResult[Unit] {
     def asResult(u: => Unit): Result = { u; Success() }
@@ -34,13 +37,15 @@ class DeployChainIntegrationTest extends Specification with DeployChainFixtures 
         "dev_example_deploy_chain_service_real_3"
       )
 
+      // First file to deploy that has a deploy-chain on it
       val cmd = ValidCmd.copy(
         serviceName = "cli/src/it/resources/config/example-deploy-chain-service-real-0",
         isDryrun = false)
 
-
+      // Kickoff
       CliManager.processCmd(cmd)
 
+      // Check running singularity task and assert that our expected services are running
       val manager = getManager("example-deploy-chain-service-real-0")
       val runningTasks = manager.getSingularityActiveTasks().get
       for (runningTask <- runningTasks) {

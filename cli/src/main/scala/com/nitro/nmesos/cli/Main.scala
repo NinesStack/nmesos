@@ -47,11 +47,17 @@ object CliManager {
     }
   }
 
+  /**
+    * Process all ymls in a deploy chain.
+    * Log and exit on the first error
+    */
   def processYmlCommand(initialCmd: Cmd, log: Logger) = {
     val commandChain = getCommandChain(initialCmd, log)
 
     commandChain match {
-      case Left(_) => exitWithError()
+      case Left(error) =>
+        log.error(error)
+        exitWithError()
 
       case Right(chain) =>
         val onSuccess = chain._1
@@ -94,6 +100,7 @@ object CliManager {
           val cmdQueueConcat = cmdQueue ++ cmdQueueFromConfig
 
           if (chainContainsCmd(chain, cmd)) {
+            // this is here to prevent cyclic references
             Left(ConfigError("Job appearing more than once in job chain", toFile(cmd, log)))
           } else if (cmdQueueConcat.isEmpty) {
             Right(chain :+ (cmd, configForCmd))
@@ -112,7 +119,9 @@ object CliManager {
 
     def buildCmdOnFailure(initialConfig: ValidConfig) = {
       getFailureJobFromConfig(initialConfig).map(gedCmdFromDeployJob(_, initialCmd)) match {
-        case None => Right(None)
+        case None =>
+          // No OnFailure job specified
+          Right(None)
 
         case Some(cmd) =>
           getConfigFromCmd(cmd, log) match {
