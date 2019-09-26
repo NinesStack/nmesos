@@ -55,26 +55,6 @@ class YmlSpec extends Specification with YmlTestFixtures {
       modelConfig.environments("dev").singularity.slavePlacement should be equalTo Some("SPREAD_ALL_SLAVES")
     }
 
-    "parse the after deploy configuration in a valid Yaml file" in {
-      val conf = YamlParser.parse(YamlExampleAfterDeploy, InfoLogger)
-      conf should beAnInstanceOf[ValidYaml]
-
-      val modelConfig = conf.asInstanceOf[ValidYaml].config
-      val successJob1 = modelConfig.environments("dev").afterDeploy.get.onSuccess.head
-      val successJob2 = modelConfig.environments("dev").afterDeploy.get.onSuccess.drop(1).head
-
-      successJob1.serviceName shouldEqual "job1"
-      successJob1.tag shouldEqual Some("job1tag")
-
-      successJob2.serviceName shouldEqual "job2"
-      successJob2.tag shouldEqual None
-
-      val failureJob = modelConfig.environments("dev").afterDeploy.get.onFailure.get
-
-      failureJob.serviceName shouldEqual "jobFailure"
-      failureJob.tag shouldEqual Some("jobFailureTag")
-    }
-
     "parse the mesos slaves attributes in a valid Yaml file" in {
       val conf = YamlParser.parse(YamlMesosAttributeConfig, InfoLogger)
       conf should beAnInstanceOf[ValidYaml]
@@ -112,6 +92,26 @@ class YmlSpec extends Specification with YmlTestFixtures {
     "fail while parsing an invalid port specification" in {
       val ExpectedMessage = "Parser error for field environments/container/ports: Failed to deserialize the port map specification"
       YamlParser.parse(YamlInvalidPortMapConfig, InfoLogger) mustEqual InvalidYaml(ExpectedMessage)
+    }
+
+    "parse the after deploy configuration in a valid Yaml file" in {
+      val conf = YamlParser.parse(YamlExampleAfterDeploy, InfoLogger)
+      conf should beAnInstanceOf[ValidYaml]
+
+      val modelConfig = conf.asInstanceOf[ValidYaml].config
+      val successJob1 = modelConfig.environments("dev").after_deploy.get.on_success.head
+      val successJob2 = modelConfig.environments("dev").after_deploy.get.on_success.drop(1).head
+
+      successJob1.service_name shouldEqual "job1"
+      successJob1.tag shouldEqual Some("job1tag")
+
+      successJob2.service_name shouldEqual "job2"
+      successJob2.tag shouldEqual None
+
+      val failureJob = modelConfig.environments("dev").after_deploy.get.on_failure.get
+
+      failureJob.service_name shouldEqual "jobFailure"
+      failureJob.tag shouldEqual Some("jobFailureTag")
     }
   }
 }

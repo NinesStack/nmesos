@@ -244,20 +244,20 @@ object CliManager {
     chain.exists { case (cmdInChain, _) => cmd == cmdInChain }
 
   private def getJobQueueFromConfig(config: ValidConfig): List[DeployJob] =
-    config.environment.afterDeploy match {
+    config.environment.after_deploy match {
       case None => List()
-      case Some(afterDeploy) => afterDeploy.onSuccess
+      case Some(afterDeploy) => afterDeploy.on_success
     }
 
   private def getFailureJobFromConfig(config: ValidConfig): Option[DeployJob] =
-    config.environment.afterDeploy match {
+    config.environment.after_deploy match {
       case None => None
-      case Some(afterDeploy) => afterDeploy.onFailure
+      case Some(afterDeploy) => afterDeploy.on_failure
     }
 
   private def gedCmdFromDeployJob(job: DeployJob, initialCmd: Cmd): Cmd =
     initialCmd.copy(
-      serviceName = job.serviceName,
+      serviceName = job.service_name,
       tag = job.tag.getOrElse(initialCmd.tag),
       force = true)
 

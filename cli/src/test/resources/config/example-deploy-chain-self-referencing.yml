@@ -17,11 +17,11 @@ environments:
       url: "http://192.168.99.100:7099/singularity"
 
     ## Optional configuration to define a job to deploy after this job
-    afterDeploy:
-      onSuccess:
-        - serviceName: "cli/src/test/resources/config/example-deploy-chain-self-referencing"
+    after_deploy:
+      on_success:
+        - service_name: "cli/src/test/resources/config/example-deploy-chain-self-referencing"
           tag: "job0tag"
 
-      onFailure:
-        serviceName: "cli/src/test/resources/config/example-deploy-chain-failure"
+      on_failure:
+        service_name: "cli/src/test/resources/config/example-deploy-chain-failure"
         tag: "jobFailureTag"
