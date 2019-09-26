@@ -24,7 +24,9 @@ class CliSpec extends Specification with CliSpecFixtures {
     }
 
     "build a valid command chain" in {
-      val cmd = ValidCmd.copy(serviceName = "cli/src/test/resources/config/example-deploy-chain-service-0")
+      val cmd = ValidCmd.copy(
+        serviceName = "cli/src/test/resources/config/example-deploy-chain-service-0",
+        tag = "specialTag")
 
       val expectedCommandChainOnSuccess =
         List(
@@ -40,7 +42,7 @@ class CliSpec extends Specification with CliSpecFixtures {
           (
             cmd.copy(
               serviceName = "cli/src/test/resources/config/example-deploy-chain-service-2",
-              tag = "job2tag",
+              tag = "specialTag",
               force = true),
             getValidYmlConfig("example-deploy-chain-service-2")),
           (
@@ -76,13 +78,13 @@ class CliSpec extends Specification with CliSpecFixtures {
     "build a command chain with only one command" in {
       val cmd = ValidCmd.copy(
         serviceName = "cli/src/test/resources/config/example-deploy-chain-service-2",
-        tag = "job2tag")
+        tag = "latest")
       val (commandChainOnSuccess, commandOnFailure) = CliManager.getCommandChain(cmd, InfoLogger).right.get
 
       val expectedCommand = (
         cmd.copy(
           serviceName = "cli/src/test/resources/config/example-deploy-chain-service-2",
-          tag = "job2tag"),
+          tag = "latest"),
         getValidYmlConfig("example-deploy-chain-service-2"))
 
       commandChainOnSuccess.length shouldEqual 1

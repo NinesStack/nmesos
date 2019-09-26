@@ -40,6 +40,7 @@ class DeployChainIntegrationTest extends Specification with DeployChainFixtures 
       // First file to deploy that has a deploy-chain on it
       val cmd = ValidCmd.copy(
         serviceName = "cli/src/it/resources/config/example-deploy-chain-service-real-0",
+        tag = "stable",
         isDryrun = false)
 
       // Kickoff
@@ -50,6 +51,18 @@ class DeployChainIntegrationTest extends Specification with DeployChainFixtures 
       val runningTasks = manager.getSingularityActiveTasks().get
       for (runningTask <- runningTasks) {
         (expectedDeployedServices contains runningTask.taskId.requestId) shouldEqual true
+        if (runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_0") {
+          runningTask.taskId.deployId.contains("stable").shouldEqual(true)
+        }
+        if (runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_1") {
+          runningTask.taskId.deployId.contains("stable").shouldEqual(true)
+        }
+        if (runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_2") {
+          runningTask.taskId.deployId.contains("alpine").shouldEqual(true)
+        }
+        if (runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_3") {
+          runningTask.taskId.deployId.contains("mainline").shouldEqual(true)
+        }
       }
     }
   }

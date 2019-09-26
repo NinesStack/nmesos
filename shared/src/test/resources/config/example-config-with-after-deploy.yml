@@ -54,7 +54,6 @@ environments:
         - serviceName: "job1"
           tag: "job1tag"
         - serviceName: "job2"
-          tag: "job2tag"
 
       onFailure:
         serviceName: "jobFailure"

@@ -36,9 +36,8 @@ environments:
     afterDeploy:
       onSuccess:
         - serviceName: "cli/src/it/resources/config/example-deploy-chain-service-real-1"
-          tag: "latest"
         - serviceName: "cli/src/it/resources/config/example-deploy-chain-service-real-2"
-          tag: "latest"
+          tag: "alpine"
 
       onFailure:
         serviceName: "cli/src/it/resources/config/example-deploy-chain-service-real-failure"

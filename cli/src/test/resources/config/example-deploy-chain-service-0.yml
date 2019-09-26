@@ -22,7 +22,6 @@ environments:
         - serviceName: "cli/src/test/resources/config/example-deploy-chain-service-1"
           tag: "job1tag"
         - serviceName: "cli/src/test/resources/config/example-deploy-chain-service-2"
-          tag: "job2tag"
 
       onFailure:
         serviceName: "cli/src/test/resources/config/example-deploy-chain-failure"

@@ -2,6 +2,7 @@ package com.nitro.nmesos.cli
 
 import com.nitro.nmesos.BuildInfo
 import com.nitro.nmesos.commands.{ CheckCommand, CommandResult, ScaleCommand, VerifyEnvCommand }
+import com.nitro.nmesos.config.ConfigReader.ConfigResult
 import com.nitro.nmesos.config.model.DeployJob
 
 object Main {
@@ -89,54 +90,12 @@ object CliManager {
    * Returns a Left[ConfigError] on the first invalid command/config
    */
   def getCommandChain(initialCmd: Cmd, log: Logger): CommandChain = {
-    def buildCmdChainOnSuccess(cmd: Cmd, configForCmd: ValidConfig, chain: CommandChainOnSuccess, cmdQueue: List[Cmd]): CommandChainOnSuccess = {
-      chain match {
-        case Left(error) => Left(error)
-
-        case Right(chain) =>
-          // Get the queue of after-deploy commands and append them to the CommandChainOnSuccess
-          // so that it will be traversed in a breath-first manner
-          val cmdQueueFromConfig = getJobQueueFromConfig(configForCmd).map(gedCmdFromDeployJob(_, initialCmd))
-          val cmdQueueConcat = cmdQueue ++ cmdQueueFromConfig
-
-          if (chainContainsCmd(chain, cmd)) {
-            // this is here to prevent cyclic references
-            Left(ConfigError("Job appearing more than once in job chain", toFile(cmd, log)))
-          } else if (cmdQueueConcat.isEmpty) {
-            Right(chain :+ (cmd, configForCmd))
-          } else {
-            val newChain = Right(chain :+ (cmd, configForCmd))
-            val nextCmd = cmdQueueConcat.head
-
-            getConfigFromCmd(nextCmd, log) match {
-              case Left(e) => Left(e)
-              case Right(nextConfig) =>
-                buildCmdChainOnSuccess(nextCmd, nextConfig, newChain, cmdQueueConcat.tail)
-            }
-          }
-      }
-    }
-
-    def buildCmdOnFailure(initialConfig: ValidConfig) = {
-      getFailureJobFromConfig(initialConfig).map(gedCmdFromDeployJob(_, initialCmd)) match {
-        case None =>
-          // No OnFailure job specified
-          Right(None)
-
-        case Some(cmd) =>
-          getConfigFromCmd(cmd, log) match {
-            case Left(e) => Left(e)
-            case Right(config) => Right(Some(cmd, config))
-          }
-      }
-    }
-
     getConfigFromCmd(initialCmd, log) match {
-      case Left(e) => Left(e)
+      case e: ConfigError => Left(e)
 
-      case Right(initialConfig) =>
-        val cmdChainOnSuccess = buildCmdChainOnSuccess(initialCmd, initialConfig, Right(List()), List())
-        val cmdOnFailure = buildCmdOnFailure(initialConfig)
+      case initialConfig: ValidConfig =>
+        val cmdChainOnSuccess = buildCmdChainOnSuccess(initialCmd, initialConfig, Right(List()), List(), initialCmd, log)
+        val cmdOnFailure = buildCmdOnFailure(initialConfig, initialCmd, log)
 
         (cmdChainOnSuccess, cmdOnFailure) match {
           case (Left(e), _) => Left(e)
@@ -144,6 +103,52 @@ object CliManager {
 
           case (Right(cmdChainOnSuccess), Right(cmdOnFailure)) =>
             Right((cmdChainOnSuccess, cmdOnFailure))
+        }
+    }
+  }
+
+  private def buildCmdChainOnSuccess(
+    cmd: Cmd,
+    configForCmd: ValidConfig,
+    chain: CommandChainOnSuccess,
+    cmdQueue: List[Cmd],
+    initialCmd: Cmd,
+    log: Logger): CommandChainOnSuccess = chain match {
+    case Left(error) => Left(error)
+
+    case Right(chain) =>
+      // Get the queue of after-deploy commands and append them to the CommandChainOnSuccess
+      // so that it will be traversed in a breath-first manner
+      val cmdQueueFromConfig = getJobQueueFromConfig(configForCmd).map(gedCmdFromDeployJob(_, initialCmd))
+      val cmdQueueConcat = cmdQueue ++ cmdQueueFromConfig
+
+      if (chainContainsCmd(chain, cmd)) {
+        // this is here to prevent cyclic references
+        Left(ConfigError("Job appearing more than once in job chain", toFile(cmd, log)))
+      } else if (cmdQueueConcat.isEmpty) {
+        Right(chain :+ (cmd, configForCmd))
+      } else {
+        val newChain = Right(chain :+ (cmd, configForCmd))
+        val nextCmd = cmdQueueConcat.head
+
+        getConfigFromCmd(nextCmd, log) match {
+          case e: ConfigError => Left(e)
+          case nextConfig: ValidConfig =>
+            buildCmdChainOnSuccess(nextCmd, nextConfig, newChain, cmdQueueConcat.tail, initialCmd, log)
+        }
+      }
+  }
+
+  private def buildCmdOnFailure(initialConfig: ValidConfig, initialCmd: Cmd, log: Logger) = {
+    getFailureJobFromConfig(initialConfig).map(gedCmdFromDeployJob(_, initialCmd)) match {
+      case None =>
+        // No OnFailure job specified
+        Right(None)
+
+      case Some(cmd) =>
+        getConfigFromCmd(cmd, log) match {
+          case e: ConfigError => Left(e)
+          case config: ValidConfig => Right(Some(cmd, config))
         }
     }
   }
@@ -222,16 +227,16 @@ object CliManager {
     }
   }
 
-  private def getConfigFromCmd(cmd: Cmd, log: Logger): Either[ConfigError, ValidConfig] = {
+  private def getConfigFromCmd(cmd: Cmd, log: Logger): ConfigResult = {
     val yamlFile = toFile(cmd, log)
 
     ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
       case error: ConfigError =>
         showConfigError(cmd, error, log)
-        Left(error)
+        error
 
       case configForCmd: ValidConfig =>
-        Right(configForCmd)
+        configForCmd
     }
   }
 
@@ -253,7 +258,7 @@ object CliManager {
   private def gedCmdFromDeployJob(job: DeployJob, initialCmd: Cmd): Cmd =
     initialCmd.copy(
       serviceName = job.serviceName,
-      tag = job.tag,
+      tag = job.tag.getOrElse(initialCmd.tag),
       force = true)
 
   private def maybeExecuteFailureCommandAndExit(onFailure: Option[CommandAndConfig], log: Logger): Unit = {

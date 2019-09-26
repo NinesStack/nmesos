@@ -64,15 +64,15 @@ class YmlSpec extends Specification with YmlTestFixtures {
       val successJob2 = modelConfig.environments("dev").afterDeploy.get.onSuccess.drop(1).head
 
       successJob1.serviceName shouldEqual "job1"
-      successJob1.tag shouldEqual "job1tag"
+      successJob1.tag shouldEqual Some("job1tag")
 
       successJob2.serviceName shouldEqual "job2"
-      successJob2.tag shouldEqual "job2tag"
+      successJob2.tag shouldEqual None
 
       val failureJob = modelConfig.environments("dev").afterDeploy.get.onFailure.get
 
       failureJob.serviceName shouldEqual "jobFailure"
-      failureJob.tag shouldEqual "jobFailureTag"
+      failureJob.tag shouldEqual Some("jobFailureTag")
     }
 
     "parse the mesos slaves attributes in a valid Yaml file" in {
