@@ -14,11 +14,6 @@ import org.specs2.mutable.Specification
 
 class CliSpec extends Specification with CliSpecFixtures {
 
-  import org.specs2.execute._
-  implicit def unitAsResult: AsResult[Unit] = new AsResult[Unit] {
-    def asResult(u: => Unit): Result = { u; Success() }
-  }
-
   "Cli main" should {
 
     "sanizied an serviceName that contains a file paths " in {

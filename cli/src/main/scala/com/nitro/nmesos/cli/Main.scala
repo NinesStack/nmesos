@@ -1,7 +1,6 @@
 package com.nitro.nmesos.cli
 
 import com.nitro.nmesos.BuildInfo
-import com.nitro.nmesos.util.{ CustomLogger, InfoLogger, Logger }
 import com.nitro.nmesos.commands.{ CheckCommand, CommandResult, ScaleCommand, VerifyEnvCommand }
 import com.nitro.nmesos.config.model.DeployJob
 
@@ -55,10 +54,10 @@ object CliManager {
       case Left(_) => exitWithError()
 
       case Right(chain) =>
-        val successful = chain._1
+        val onSuccess = chain._1
         val onFailure = chain._2
 
-        for ((cmd, config) <- successful) {
+        for ((cmd, config) <- onSuccess) {
           executeCommand(cmd, config, log) match {
             case CommandSuccess(msg) =>
               log.info(msg)
@@ -81,7 +80,7 @@ object CliManager {
 
   /**
    * Parses and returns a valid chain of Commands and their corresponding Config file.
-   * Exits on the first invalid command/config
+   * Returns a Left[ConfigError] on the first invalid command/config
    */
   def getCommandChain(initialCmd: Cmd, log: Logger): CommandChain = {
     def buildCmdChainOnSuccess(cmd: Cmd, configForCmd: ValidConfig, chain: CommandChainOnSuccess, cmdQueue: List[Cmd]): CommandChainOnSuccess = {
