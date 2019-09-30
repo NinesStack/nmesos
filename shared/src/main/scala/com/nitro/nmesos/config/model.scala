@@ -27,7 +27,8 @@ object model {
     resources: Resources,
     container: Container,
     executor: Option[ExecutorConf],
-    singularity: SingularityConf)
+    singularity: SingularityConf,
+    after_deploy: Option[AfterDeployConf])
 
   case class Resources(
     cpus: Double,
@@ -70,4 +71,8 @@ object model {
   case class ExecutorConf(
     customExecutorCmd: Option[String],
     env_vars: Option[Map[String, String]])
+
+  case class AfterDeployConf(on_success: List[DeployJob], on_failure: Option[DeployJob])
+
+  case class DeployJob(service_name: String, tag: Option[String])
 }

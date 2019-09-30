@@ -3,7 +3,7 @@ package com.nitro.nmesos.config
 import com.nitro.nmesos.util.InfoLogger
 import com.nitro.nmesos.config.YamlParser._
 import com.nitro.nmesos.config.YamlParserHelper.YamlCustomProtocol._
-import com.nitro.nmesos.config.model.{ ExecutorConf, PortMap, SingularityConf }
+import com.nitro.nmesos.config.model._
 import net.jcazevedo.moultingyaml._
 import org.specs2.mutable.Specification
 
@@ -93,6 +93,26 @@ class YmlSpec extends Specification with YmlTestFixtures {
       val ExpectedMessage = "Parser error for field environments/container/ports: Failed to deserialize the port map specification"
       YamlParser.parse(YamlInvalidPortMapConfig, InfoLogger) mustEqual InvalidYaml(ExpectedMessage)
     }
+
+    "parse the after deploy configuration in a valid Yaml file" in {
+      val conf = YamlParser.parse(YamlExampleAfterDeploy, InfoLogger)
+      conf should beAnInstanceOf[ValidYaml]
+
+      val modelConfig = conf.asInstanceOf[ValidYaml].config
+      val successJob1 = modelConfig.environments("dev").after_deploy.get.on_success.head
+      val successJob2 = modelConfig.environments("dev").after_deploy.get.on_success.drop(1).head
+
+      successJob1.service_name shouldEqual "job1"
+      successJob1.tag shouldEqual Some("job1tag")
+
+      successJob2.service_name shouldEqual "job2"
+      successJob2.tag shouldEqual None
+
+      val failureJob = modelConfig.environments("dev").after_deploy.get.on_failure.get
+
+      failureJob.service_name shouldEqual "jobFailure"
+      failureJob.tag shouldEqual Some("jobFailureTag")
+    }
   }
 }
 
@@ -127,6 +147,8 @@ trait YmlTestFixtures {
   def YamlExampleValid = Source.fromURL(getClass.getResource("/config/example-config.yml")).mkString
 
   def YamlExampleExecutorEnvs = Source.fromURL(getClass.getResource("/config/example-config-with-executor.yml")).mkString
+
+  def YamlExampleAfterDeploy = Source.fromURL(getClass.getResource("/config/example-config-with-after-deploy.yml")).mkString
 
   def YamlJobExampleValid = Source.fromURL(getClass.getResource("/config/example-without-optional-config.yml")).mkString
 

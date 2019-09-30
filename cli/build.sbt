@@ -5,7 +5,7 @@ organization := "nitro"
 
 libraryDependencies ++= Seq(
   "com.github.scopt" %% "scopt" % "3.5.0",
-  "org.specs2" %% "specs2-core" % "3.8.6" % "test"
+  "org.specs2" %% "specs2-core" % "3.8.6" % "it,test"
 )
 
 val cli = Seq[String](

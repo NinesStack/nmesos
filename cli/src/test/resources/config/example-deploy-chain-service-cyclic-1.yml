@@ -1,0 +1,27 @@
+nmesos_version: '0.0.1'
+common:
+  resources:
+    instances: 1
+    cpus: 0.1
+    memoryMb: 64
+  container:
+    image: hubspot/singularity-test-service
+  singularity:
+    deployInstanceCountPerStep: 1
+    autoAdvanceDeploySteps: true
+    deployStepWaitTimeMs: 1000
+    healthcheckUri: "/hello"
+environments:
+  dev:
+    singularity:
+      url: "http://192.168.99.100:7099/singularity"
+
+    ## Optional configuration to define a job to deploy after this job
+    after_deploy:
+      on_success:
+        - service_name: "cli/src/test/resources/config/example-deploy-chain-service-cyclic-2"
+          tag: "job2tag"
+
+      on_failure:
+        service_name: "cli/src/test/resources/config/example-deploy-chain-failure"
+        tag: "jobFailureTag"

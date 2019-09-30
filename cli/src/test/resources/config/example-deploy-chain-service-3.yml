@@ -1,0 +1,17 @@
+nmesos_version: '0.0.1'
+common:
+  resources:
+    instances: 1
+    cpus: 0.1
+    memoryMb: 64
+  container:
+    image: hubspot/singularity-test-service
+  singularity:
+    deployInstanceCountPerStep: 1
+    autoAdvanceDeploySteps: true
+    deployStepWaitTimeMs: 1000
+    healthcheckUri: "/hello"
+environments:
+  dev:
+    singularity:
+      url: "http://192.168.99.100:7099/singularity"

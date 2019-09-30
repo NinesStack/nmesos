@@ -1,8 +1,9 @@
 package com.nitro.nmesos.cli
 
 import com.nitro.nmesos.BuildInfo
-import com.nitro.nmesos.cli.model.VerifyAction
 import com.nitro.nmesos.commands.{ CheckCommand, CommandResult, ScaleCommand, VerifyEnvCommand }
+import com.nitro.nmesos.config.ConfigReader.ConfigResult
+import com.nitro.nmesos.config.model.DeployJob
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -47,22 +48,115 @@ object CliManager {
     }
   }
 
-  def processYmlCommand(cmd: Cmd, log: Logger) = {
-    val yamlFile = toFile(cmd, log)
+  /**
+   * Process all ymls in a deploy chain.
+   * Log and exit on the first error
+   */
+  def processYmlCommand(initialCmd: Cmd, log: Logger) = {
+    val commandChain = getCommandChain(initialCmd, log)
 
-    ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
-      case error: ConfigError =>
-        showConfigError(cmd, error, log)
+    commandChain match {
+      case Left(error) =>
+        log.error(error)
+        exitWithError()
 
-      case config: ValidConfig =>
-        executeCommand(cmd, config, log)
+      case Right(chain) =>
+        val onSuccess = chain._1
+        val onFailure = chain._2
+
+        for ((cmd, config) <- onSuccess) {
+          executeCommand(cmd, config, log) match {
+            case CommandSuccess(msg) =>
+              log.info(msg)
+
+            case CommandError(error) =>
+              log.error(error)
+              maybeExecuteFailureCommandAndExit(onFailure, log)
+          }
+        }
+    }
+  }
+
+  type CommandAndConfig = (Cmd, ValidConfig)
+
+  type CommandChainOnSuccess = Either[ConfigError, List[CommandAndConfig]]
+
+  type CommandOnFailure = Either[ConfigError, Option[CommandAndConfig]]
+
+  type CommandChain = Either[ConfigError, (List[CommandAndConfig], Option[CommandAndConfig])]
+
+  /**
+   * Parses and returns a valid chain of Commands and their corresponding Config file.
+   * Returns a Left[ConfigError] on the first invalid command/config
+   */
+  def getCommandChain(initialCmd: Cmd, log: Logger): CommandChain = {
+    getConfigFromCmd(initialCmd, log) match {
+      case e: ConfigError => Left(e)
+
+      case initialConfig: ValidConfig =>
+        val cmdChainOnSuccess = buildCmdChainOnSuccess(initialCmd, initialConfig, Right(List()), List(), initialCmd, log)
+        val cmdOnFailure = buildCmdOnFailure(initialConfig, initialCmd, log)
+
+        (cmdChainOnSuccess, cmdOnFailure) match {
+          case (Left(e), _) => Left(e)
+          case (_, Left(e)) => Left(e)
+
+          case (Right(cmdChainOnSuccess), Right(cmdOnFailure)) =>
+            Right((cmdChainOnSuccess, cmdOnFailure))
+        }
+    }
+  }
+
+  private def buildCmdChainOnSuccess(
+    cmd: Cmd,
+    configForCmd: ValidConfig,
+    chain: CommandChainOnSuccess,
+    cmdQueue: List[Cmd],
+    initialCmd: Cmd,
+    log: Logger): CommandChainOnSuccess = chain match {
+    case Left(error) => Left(error)
+
+    case Right(chain) =>
+      // Get the queue of after-deploy commands and append them to the CommandChainOnSuccess
+      // so that it will be traversed in a breath-first manner
+      val cmdQueueFromConfig = getJobQueueFromConfig(configForCmd).map(gedCmdFromDeployJob(_, initialCmd))
+      val cmdQueueConcat = cmdQueue ++ cmdQueueFromConfig
+
+      if (chainContainsCmd(chain, cmd)) {
+        // this is here to prevent cyclic references
+        Left(ConfigError("Job appearing more than once in job chain", toFile(cmd, log)))
+      } else if (cmdQueueConcat.isEmpty) {
+        Right(chain :+ (cmd, configForCmd))
+      } else {
+        val newChain = Right(chain :+ (cmd, configForCmd))
+        val nextCmd = cmdQueueConcat.head
+
+        getConfigFromCmd(nextCmd, log) match {
+          case e: ConfigError => Left(e)
+          case nextConfig: ValidConfig =>
+            buildCmdChainOnSuccess(nextCmd, nextConfig, newChain, cmdQueueConcat.tail, initialCmd, log)
+        }
+      }
+  }
+
+  private def buildCmdOnFailure(initialConfig: ValidConfig, initialCmd: Cmd, log: Logger) = {
+    getFailureJobFromConfig(initialConfig).map(gedCmdFromDeployJob(_, initialCmd)) match {
+      case None =>
+        // No OnFailure job specified
+        Right(None)
+
+      case Some(cmd) =>
+        getConfigFromCmd(cmd, log) match {
+          case e: ConfigError => Left(e)
+          case config: ValidConfig => Right(Some(cmd, config))
+        }
     }
   }
 
   /**
    * Execute the detected command for a valid configuration.
    */
-  def executeCommand(cmd: Cmd, config: ValidConfig, log: Logger): Unit = {
+  def executeCommand(cmd: Cmd, config: ValidConfig, log: Logger): CommandResult = {
     val cmdResult: CommandResult = cmd.action match {
       case ReleaseAction =>
         val serviceConfig = toServiceConfig(cmd, config)
@@ -80,7 +174,7 @@ object CliManager {
         sys.exit(1)
     }
 
-    exit(log, cmdResult)
+    cmdResult
   }
 
   def showConfigError(cmd: Cmd, configError: ConfigError, log: Logger): Unit = {
@@ -131,5 +225,52 @@ object CliManager {
         log.error(error)
         exitWithError()
     }
+  }
+
+  private def getConfigFromCmd(cmd: Cmd, log: Logger): ConfigResult = {
+    val yamlFile = toFile(cmd, log)
+
+    ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
+      case error: ConfigError =>
+        showConfigError(cmd, error, log)
+        error
+
+      case configForCmd: ValidConfig =>
+        configForCmd
+    }
+  }
+
+  private def chainContainsCmd(chain: List[(Cmd, ValidConfig)], cmd: Cmd): Boolean =
+    chain.exists { case (cmdInChain, _) => cmd == cmdInChain }
+
+  private def getJobQueueFromConfig(config: ValidConfig): List[DeployJob] =
+    config.environment.after_deploy match {
+      case None => List()
+      case Some(afterDeploy) => afterDeploy.on_success
+    }
+
+  private def getFailureJobFromConfig(config: ValidConfig): Option[DeployJob] =
+    config.environment.after_deploy match {
+      case None => None
+      case Some(afterDeploy) => afterDeploy.on_failure
+    }
+
+  private def gedCmdFromDeployJob(job: DeployJob, initialCmd: Cmd): Cmd =
+    initialCmd.copy(
+      serviceName = job.service_name,
+      tag = job.tag.getOrElse(initialCmd.tag),
+      force = true)
+
+  private def maybeExecuteFailureCommandAndExit(onFailure: Option[CommandAndConfig], log: Logger): Unit = {
+    for ((failureCmd, failureConfig) <- onFailure) {
+      executeCommand(failureCmd, failureConfig, log) match {
+        case CommandSuccess(msg) =>
+          log.info(s"Executed failure command: ${msg}")
+
+        case CommandError(error) =>
+          log.error(error)
+      }
+    }
+    exitWithError()
   }
 }
