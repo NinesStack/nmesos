@@ -66,6 +66,7 @@ object model {
     healthcheckMaxTotalTimeoutSeconds: Option[Int],
     requiredRole: Option[String],
     requiredAttributes: Option[Map[String, String]],
+    allowedSlaveAttributes: Option[Map[String, String]],
     slavePlacement: Option[String])
 
   case class ExecutorConf(

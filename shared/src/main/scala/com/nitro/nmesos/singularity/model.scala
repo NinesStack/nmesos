@@ -72,6 +72,7 @@ object model {
     instances: Option[Int] = None,
     schedule: Option[String] = None,
     requiredSlaveAttributes: Map[String, String] = Map.empty,
+    allowedSlaveAttributes: Map[String, String] = Map.empty,
     requiredRole: Option[String] = None)
 
   case class SingularityDeployRequest(

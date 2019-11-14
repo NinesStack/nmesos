@@ -55,9 +55,14 @@ class YmlSpec extends Specification with YmlTestFixtures {
       modelConfig.environments("dev").singularity.slavePlacement should be equalTo Some("SPREAD_ALL_SLAVES")
     }
 
-    "parse the mesos slaves attributes in a valid Yaml file" in {
+    "parse the mesos slaves required and allowed attributes in a valid Yaml file" in {
       val conf = YamlParser.parse(YamlMesosAttributeConfig, InfoLogger)
       conf should beAnInstanceOf[ValidYaml]
+      val singularity = conf.asInstanceOf[ValidYaml].config.environments("dev").singularity
+      singularity.requiredAttributes shouldEqual Some(Map(
+        "mesosfunction" -> "master-prod",
+        "Role" -> "docker-host"))
+      singularity.allowedSlaveAttributes shouldEqual Some(Map("compute_class" -> "high_cpu"))
     }
 
     "parse the port config from a valid Yaml file" in {
