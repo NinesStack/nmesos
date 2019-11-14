@@ -13,6 +13,8 @@ common:
     requiredAttributes: # Deploy only in nodes with the attributes
       mesosfunction: "master-prod"
       Role: "docker-host"
+    allowedSlaveAttributes:
+      compute_class: "high_cpu"
 
 environments:
   dev:

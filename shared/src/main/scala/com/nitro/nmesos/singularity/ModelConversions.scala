@@ -150,6 +150,7 @@ object ModelConversions {
     slavePlacement = config.environment.singularity.slavePlacement.getOrElse("OPTIMISTIC"),
     schedule = config.environment.singularity.schedule,
     requiredSlaveAttributes = config.environment.singularity.requiredAttributes.getOrElse(Map.empty),
+    allowedSlaveAttributes = config.environment.singularity.allowedSlaveAttributes.getOrElse(Map.empty),
     requiredRole = config.environment.singularity.requiredRole)
 
   def describeDeploy(request: SingularityRequest, deploy: SingularityDeploy): Seq[String] = {
@@ -161,7 +162,8 @@ object ModelConversions {
          | cpus: ${deploy.resources.cpus}
          | memory: ${deploy.resources.memoryMb}Mb
          | role: ${request.requiredRole.getOrElse("*")}
-         | attributes: ${request.requiredSlaveAttributes.mkString(",")}
+         | required slave attributes: ${request.requiredSlaveAttributes.mkString(",")}
+         | allowed slave attributes: ${request.allowedSlaveAttributes.mkString(",")}
          |""".stripMargin)
     if (request.schedule.isDefined) {
       common ++ request.schedule.map(cron => s"scheduled: $cron").toSeq

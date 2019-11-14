@@ -104,7 +104,7 @@ trait BaseCommand extends Command {
       case None =>
         Failure(new Exception(s" No Mesos config found with id: '${local.id}'"))
 
-      case Some(SingularityRequest(_, _, "SPREAD_ALL_SLAVES", _, _, _, _)) =>
+      case Some(SingularityRequest(_, _, "SPREAD_ALL_SLAVES", _, _, _, _, _)) =>
         Failure(new Exception(s" Unable to scale to a fix number of instances. Using auto-scale [slavePlacement: SPREAD_ALL_SLAVES]"))
 
       case Some(remote) if (remote.instances != local.instances) =>
