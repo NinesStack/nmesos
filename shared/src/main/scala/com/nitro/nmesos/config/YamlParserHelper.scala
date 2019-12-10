@@ -45,7 +45,7 @@ object YamlParserHelper {
     }
 
     implicit val resourcesFormat = yamlFormat3(Resources)
-    implicit val containerFormat = yamlFormat9(Container)
+    implicit val containerFormat = yamlFormat10(Container)
     implicit val singularityFormat = yamlFormat16(SingularityConf)
     implicit val executorFormat = yamlFormat2(ExecutorConf)
     implicit val deployJobFormat = yamlFormat2(DeployJob)
