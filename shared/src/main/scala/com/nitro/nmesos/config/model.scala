@@ -49,7 +49,8 @@ object model {
     env_vars: Option[Map[String, String]],
     volumes: Option[Seq[String]],
     network: Option[String],
-    dockerParameters: Option[Map[String, String]])
+    dockerParameters: Option[Map[String, String]],
+    deploy_freeze: Option[Boolean])
 
   case class SingularityConf(
     url: String,

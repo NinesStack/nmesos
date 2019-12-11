@@ -65,13 +65,18 @@ object CliManager {
         val onFailure = chain._2
 
         for ((cmd, config) <- onSuccess) {
-          executeCommand(cmd, config, log) match {
-            case CommandSuccess(msg) =>
-              log.info(msg)
+          if (config.environment.container.deploy_freeze.getOrElse(false)) {
+            log.error("Attention: deploy_freeze set to true. You're not able to deploy this config.")
+            exitWithError()
+          } else {
+            executeCommand(cmd, config, log) match {
+              case CommandSuccess(msg) =>
+                log.info(msg)
 
-            case CommandError(error) =>
-              log.error(error)
-              maybeExecuteFailureCommandAndExit(onFailure, log)
+              case CommandError(error) =>
+                log.error(error)
+                maybeExecuteFailureCommandAndExit(onFailure, log)
+            }
           }
         }
     }

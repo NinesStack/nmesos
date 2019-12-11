@@ -118,6 +118,14 @@ class YmlSpec extends Specification with YmlTestFixtures {
       failureJob.service_name shouldEqual "jobFailure"
       failureJob.tag shouldEqual Some("jobFailureTag")
     }
+
+    "return a value for deploy_freeze" in {
+      val parsed_deploy_freeze = YamlParser.parse(YamlExampleWithDeployFreeze, InfoLogger).asInstanceOf[ValidYaml]
+      val parsed_without_deploy_freeze = YamlParser.parse(YamlExampleWithoutDeployFreeze, InfoLogger).asInstanceOf[ValidYaml]
+
+      parsed_deploy_freeze.config.environments.get("dev").get.container.deploy_freeze shouldEqual Some(true)
+      parsed_without_deploy_freeze.config.environments.get("dev").get.container.deploy_freeze shouldEqual None
+    }
   }
 }
 
@@ -166,4 +174,8 @@ trait YmlTestFixtures {
   def YamlInvalidPortMapConfig = Source.fromURL(getClass.getResource("/config/invalid-port-map-config.yml")).mkString
 
   def YamlMesosAttributeConfig = Source.fromURL(getClass.getResource("/config/example-mesos-attribute-config.yml")).mkString
+
+  def YamlExampleWithDeployFreeze = Source.fromURL(getClass.getResource("/config/example-config-deploy-freeze.yml")).mkString
+
+  def YamlExampleWithoutDeployFreeze = Source.fromURL(getClass.getResource("/config/example-config.yml")).mkString
 }
