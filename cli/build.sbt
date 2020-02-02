@@ -1,6 +1,6 @@
 // Assembly as a CLI auto runnable bin.
 
-scalaVersion := "2.12.1"
+scalaVersion := "2.12.10"
 organization := "nitro"
 
 libraryDependencies ++= Seq(

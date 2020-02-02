@@ -1,7 +1,7 @@
 name in ThisBuild := "nmesos"
 organization in ThisBuild := "com.gonitro"
-version in ThisBuild := "0.2.16"
-scalaVersion in ThisBuild := "2.12.1"
+version in ThisBuild := "0.2.17"
+scalaVersion in ThisBuild := "2.12.10"
 
 lazy val cli = Project("nmesos-cli", file("cli"))
   .dependsOn(shared)
@@ -14,7 +14,7 @@ lazy val shared = Project("nmesos-shared", file("shared"))
   .settings(Defaults.itSettings: _*)
   .settings(
     buildInfoPackage := "com.nitro.nmesos",
-    crossScalaVersions := Seq("2.12.1", "2.10.6"),
+    crossScalaVersions := Seq("2.12.10", "2.12.1", "2.10.6"),
     parallelExecution in Test := false,
     libraryDependencies ++= Seq(
       "net.jcazevedo" %% "moultingyaml" % "0.3.1",

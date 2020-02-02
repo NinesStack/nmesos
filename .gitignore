@@ -15,3 +15,8 @@ project/plugins/project/
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
+
+# metals specific
+.metals/
+.bloop/
+project/metals.sbt
