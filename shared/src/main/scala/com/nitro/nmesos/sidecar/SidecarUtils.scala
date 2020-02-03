@@ -31,7 +31,6 @@ object SidecarUtils {
    * Verify the containers (integrated with Sidecar) and Sidecar state is in sync.
    */
   def verifyServices(info: EnvironmentInfo)(implicit log: Logger): Boolean = {
-
     // fetch all Containers where SidecarDiscover!=false
     val containersByServiceName = info.containers
       .filter(!_.env.exists { case (key, value) => key == "SidecarDiscover" && value == "false" })
@@ -49,25 +48,35 @@ object SidecarUtils {
         val sidecarInfo = sidecarEntries.filter(_.Status == 0)
           .map { s => s"${s.Image} @ ${s.Hostname}" }.sorted
 
-        val diff = sidecarInfo.diff(containerInfo)
-        if (diff.isEmpty) {
-          log.println(s""" ${log.Ok} Sidecar mapping for $serviceName match all containers running """)
-          sidecarInfo.foreach { info =>
-            log.info(s"\t\t$info")
-          }
-        } else {
-          log.println(s""" ${log.Fail} Invalid Sidecar mapping for $serviceName""")
-          log.error("\tExpected (Containers running):")
-          containerInfo.foreach { info =>
-            log.error(s"\t\t$info")
-          }
-          log.error("\tFound (in Sidecar):")
-          sidecarInfo.foreach { info =>
-            log.error(s"\t\t$info")
-          }
-        }
-        diff.isEmpty
+        diffInfo(containerInfo, sidecarInfo, serviceName)
     }.reduce(_ && _)
   }
 
+  def diffInfo(containerInfo: Seq[String], sidecarInfo: Seq[String], serviceName: String)(implicit log: Logger): Boolean = {
+    val diff = sidecarInfo.diff(containerInfo)
+    if (diff.isEmpty) {
+      log.println(s""" ${log.Ok} Sidecar mapping for $serviceName match all containers running """)
+      sidecarInfo.foreach { info =>
+        log.info(s"\t\t$info")
+      }
+      true
+    } else if (containerInfo.isEmpty) {
+      log.info("\tFound (in Sidecar, but not in mesos):")
+      sidecarInfo.foreach { info =>
+        log.info(s"\t\t$info")
+      }
+      true
+    } else {
+      log.println(s""" ${log.Fail} Invalid Sidecar mapping for $serviceName""")
+      log.error("\tExpected (Containers running):")
+      containerInfo.foreach { info =>
+        log.error(s"\t\t$info")
+      }
+      log.error("\tFound (in Sidecar):")
+      sidecarInfo.foreach { info =>
+        log.error(s"\t\t$info")
+      }
+      false
+    }
+  }
 }
