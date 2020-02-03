@@ -158,6 +158,5 @@ trait CliSpecFixtures {
       case _ => None
     }
     config.getOrElse(sys.error("Invalid yml"))
-
   }
 }

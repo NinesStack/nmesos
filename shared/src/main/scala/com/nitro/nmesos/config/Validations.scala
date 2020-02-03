@@ -63,11 +63,11 @@ object Validations extends ValidationHelper {
     })
 
   def isService(env: Environment) = {
-    (env.singularity.requestType.isEmpty && env.singularity.schedule.isEmpty) || env.singularity.requestType == "SERVICE"
+    (env.singularity.requestType.isEmpty && env.singularity.schedule.isEmpty) || env.singularity.requestType == Option("SERVICE")
   }
 
   def isScheduled(env: Environment) = {
-    (env.singularity.requestType.isEmpty && env.singularity.schedule.isDefined) || env.singularity.requestType == "SCHEDULED"
+    (env.singularity.requestType.isEmpty && env.singularity.schedule.isDefined) || env.singularity.requestType == Option("SCHEDULED")
   }
 }
 

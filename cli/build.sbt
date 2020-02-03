@@ -17,8 +17,6 @@ mainClass in assembly := Some("com.nitro.nmesos.cli.Main")
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(cli))
 assemblyJarName in assembly := "nmesos"
 
-
-
 enablePlugins(UniversalPlugin)
 packageName in Universal := "nmesos-cli-" + version.value
 mappings in Universal in packageZipTarball := {
