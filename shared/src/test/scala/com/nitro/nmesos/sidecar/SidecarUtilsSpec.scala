@@ -9,10 +9,14 @@ class SidecarUtilsSpec extends Specification {
 
   "Sidecar Utils" should {
     "diff the infos right" in {
-      SidecarUtils.diffInfo(Seq("image @ host"), Seq("image @ host"), "service") should beTrue
-      SidecarUtils.diffInfo(Seq(), Seq("image @ host"), "service") should beTrue
-      SidecarUtils.diffInfo(Seq("image @ host"), Seq("image @ host", "image @ host2"), "service") should beFalse
-      SidecarUtils.diffInfo(Seq("image @ host", "image @ host2)"), Seq("image @ host"), "service") should beTrue
+      val containerNotDepoyedOnMesos = Seq()
+      val goodContainerInfo, goodSidecarInfo = Seq("image @ host")
+      val badContainerInfo, badSidecarInfo = Seq("image @ host", "image @ host2")
+
+      SidecarUtils.diffInfo(goodContainerInfo, goodSidecarInfo, "service") should beTrue
+      SidecarUtils.diffInfo(containerNotDepoyedOnMesos, goodSidecarInfo, "service") should beTrue
+      SidecarUtils.diffInfo(goodContainerInfo, badSidecarInfo, "service") should beFalse
+      SidecarUtils.diffInfo(badContainerInfo, goodSidecarInfo, "service") should beFalse
     }
   }
 }

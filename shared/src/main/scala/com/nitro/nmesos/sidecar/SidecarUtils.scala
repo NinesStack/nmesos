@@ -53,8 +53,7 @@ object SidecarUtils {
   }
 
   def diffInfo(containerInfo: Seq[String], sidecarInfo: Seq[String], serviceName: String)(implicit log: Logger): Boolean = {
-    val diff = sidecarInfo.diff(containerInfo)
-    if (diff.isEmpty) {
+    if (containerInfo.sameElements(sidecarInfo)) {
       log.println(s""" ${log.Ok} Sidecar mapping for $serviceName match all containers running """)
       sidecarInfo.foreach { info =>
         log.info(s"\t\t$info")
