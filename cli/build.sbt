@@ -1,6 +1,6 @@
 // Assembly as a CLI auto runnable bin.
 
-scalaVersion := "2.12.1"
+scalaVersion := "2.12.10"
 organization := "nitro"
 
 libraryDependencies ++= Seq(
@@ -16,8 +16,6 @@ val cli = Seq[String](
 mainClass in assembly := Some("com.nitro.nmesos.cli.Main")
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(cli))
 assemblyJarName in assembly := "nmesos"
-
-
 
 enablePlugins(UniversalPlugin)
 packageName in Universal := "nmesos-cli-" + version.value

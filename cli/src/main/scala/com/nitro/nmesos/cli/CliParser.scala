@@ -64,7 +64,7 @@ object CliParser {
           .abbr("t")
           .text("Tag/Version to release")
           .required()
-          .validate(tag => if (tag.isEmpty) Left("Tag is required") else Right())
+          .validate(tag => if (tag.isEmpty) Left("Tag is required") else Right(()))
           .action((input, params) => params.copy(tag = input)),
 
         opt[Unit]("force")

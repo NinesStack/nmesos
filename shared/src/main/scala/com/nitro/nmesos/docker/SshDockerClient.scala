@@ -2,6 +2,8 @@ package com.nitro.nmesos.docker
 
 import com.nitro.nmesos.docker.model.Container
 
+import scala.language.postfixOps
+
 import sys.process._
 
 /**
