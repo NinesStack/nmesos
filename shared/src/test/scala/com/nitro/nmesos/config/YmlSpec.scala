@@ -39,6 +39,10 @@ class YmlSpec extends Specification with YmlTestFixtures {
       YamlParser.parse(YamlJobExampleValid, InfoLogger) should beAnInstanceOf[ValidYaml]
     }
 
+    "return a valid config from a valid Yaml with optional envar config being empty" in {
+      YamlParser.parse(YamlEnvVarExampleValid, InfoLogger) should beAnInstanceOf[ValidYaml]
+    }
+
     "parse the executor configuration in a valid Yaml file" in {
       val conf = YamlParser.parse(YamlExampleExecutorEnvs, InfoLogger)
       conf should beAnInstanceOf[ValidYaml]
@@ -178,4 +182,6 @@ trait YmlTestFixtures {
   def YamlExampleWithDeployFreeze = Source.fromURL(getClass.getResource("/config/example-config-deploy-freeze.yml")).mkString
 
   def YamlExampleWithoutDeployFreeze = Source.fromURL(getClass.getResource("/config/example-config.yml")).mkString
+
+  def YamlEnvVarExampleValid = Source.fromURL(getClass.getResource("/config/example-without-optional-envvar-config.yml")).mkString
 }
