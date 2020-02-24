@@ -13,6 +13,12 @@
 * Approve PR
 * Merge PR
 * Relase a new version (optional) ...
-  * ???
-  * ???
-  * ???
+  * Manually bump the version at `build.sbt`
+  * [nmesos cli](cli/README.md) release process:
+    * Build a new distributable `.tgz` with:
+    `sbt clean "nmesos-shared/publishLocal"  "nmesos-cli/assembly" nmesos-cli/universal:packageZipTarball
+    * Publish the new version in a public repo:
+    `sbt nmesos-cli/universal:publish`
+  * (optional) Update the `brew` [Formula](Formula/nmesos-cli.rb)
+    * Modify url to the new distributable and `sha256`
+    * Publish to Master
