@@ -82,11 +82,6 @@ object YamlParserHelper {
     val common = yaml.fields(commonKey).asYamlObject
     val environments: Map[YamlValue, YamlValue] = yaml.fields(YamlString("environments")).asYamlObject.fields
 
-    var mergedFields = Map.empty[YamlValue, YamlValue]
-
-    // Add commons fields
-    mergedFields ++= common.fields
-
     // Add environments fields recursively
     val updatedEnvironments = environments.mapValues { environment =>
       smartMerge(common.fields, environment.asYamlObject)
@@ -100,7 +95,7 @@ object YamlParserHelper {
   private def smartMerge(initialFields: Map[YamlValue, YamlValue], element: YamlObject): YamlObject = {
     val fields = element.fields.foldLeft(initialFields) {
       case (mergedFields, (key, value)) =>
-        if (!mergedFields.contains(key)) {
+        if (!mergedFields.contains(key) || mergedFields(key) == YamlNull) {
           mergedFields + (key -> value)
         } else {
           // already exist, deep merge the objects.
