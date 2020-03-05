@@ -6,6 +6,7 @@
 * Fork the repo
 * Make the changes (inlcuding writing the test(s) to verify/validate the changes)
 * Create a PR (linking back to the issue; explain what/why/how you changed the code)
+* Note: Please keep the `.gitignore` file clean of your personal build/IDE artifacts by using/setting up a global gitignore file on your side (probably a good idea/practice anyway; `git config --global core.excludesfile ~/.gitignore_global`) 
 
 ## Maintainers
 
