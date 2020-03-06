@@ -31,5 +31,5 @@ import com.typesafe.sbt.packager.SettingsHelper._
 makeDeploymentSettings(Universal, packageZipTarball, "tgz")
 
 publishTo := {
-  Some("S3" at "s3://s3.amazonaws.com/nitro-public/repo")
+  Some("Nmesos" at "https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo")
 }
