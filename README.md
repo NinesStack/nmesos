@@ -73,7 +73,7 @@ To know more about the yml format check the [yml examples](docs/examples)
 Install Nmesos CLI manually:
 ```
 curl https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.2.19/nmesos-cli-0.2.19.tgz | tar -xz
-cd nmesos-cli-0.1.2 && chmod u+x nmesos
+cd nmesos-cli-0.2.19 && chmod u+x nmesos
 ```
 
 Note: Older version of Nmesos (up to 0.2.18) are available here:
