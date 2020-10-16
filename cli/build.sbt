@@ -31,5 +31,15 @@ import com.typesafe.sbt.packager.SettingsHelper._
 makeDeploymentSettings(Universal, packageZipTarball, "tgz")
 
 publishTo := {
-  Some("Nmesos" at "https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo")
+  Some("Nmesos" at "s3://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo")
+}
+
+import com.amazonaws.auth.{AWSCredentialsProviderChain, DefaultAWSCredentialsProviderChain}
+import com.amazonaws.auth.profile.ProfileCredentialsProvider
+
+s3CredentialsProvider := { (bucket: String) =>
+  new AWSCredentialsProviderChain(
+    new ProfileCredentialsProvider("nmesos"),
+    DefaultAWSCredentialsProviderChain.getInstance()
+  )
 }
