@@ -14,12 +14,16 @@ object model {
     singularity: String,
     tag: String,
     force: Boolean,
-    action: Action)
+    action: Action,
+    deprecatedSoftGraceLimit: Int,
+    deprecatedHardGraceLimit: Int)
 
   object DefaultValues {
     val IsDryRun = true
     val Verbose = false
     val IsFormatted = true
+    val DeprecatedSoftGraceLimit = 14
+    val DeprecatedHardGraceLimit = 28
   }
 
   sealed trait Action

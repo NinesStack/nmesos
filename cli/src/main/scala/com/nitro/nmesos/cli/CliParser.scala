@@ -8,7 +8,12 @@ import com.nitro.nmesos.BuildInfo
  * Usage:
  *  val cmds = Cli.parser(args)
  * Cli example:
- *  nmesos release service_name --environment dev --version 0.0.1 --dry-run false
+ *  nmesos release service_name \
+ *    --environment dev \
+ *    --version 0.0.1 \
+ *    --dry-run false \
+ *    --deprecated-soft-grace-limit 10 \
+ *    --deprecated-hard-grace-limit 10
  */
 object CliParser {
 
@@ -22,7 +27,9 @@ object CliParser {
       singularity = "",
       environment = "",
       tag = "",
-      force = false)
+      force = false,
+      deprecatedSoftGraceLimit = DefaultValues.DeprecatedSoftGraceLimit,
+      deprecatedHardGraceLimit = DefaultValues.DeprecatedHardGraceLimit)
     cmdParser.parse(args, nilCommand)
   }
 
@@ -33,6 +40,7 @@ object CliParser {
       .text("More verbose output")
 
     opt[Unit]("noformat")
+      .abbr("d")
       .optional()
       .action((_, c) => c.copy(isFormatted = false))
       .text("Disable ansi codes in the output")
@@ -74,10 +82,28 @@ object CliParser {
           .action((input, params) => params.copy(force = true)),
 
         opt[Boolean]("dryrun")
+          .abbr("x")
+          .text("Is this a dry run?")
+          .optional()
+          .action((input, params) => params.copy(isDryrun = input)),
+
+        opt[Boolean]("dry-run")
           .abbr("n")
           .text("Is this a dry run?")
           .optional()
-          .action((input, params) => params.copy(isDryrun = input)))
+          .action((input, params) => params.copy(isDryrun = input)),
+
+        opt[Int]("deprecated-soft-grace-limit")
+          .abbr("s")
+          .text("Number of days, before warning")
+          .optional()
+          .action((input, params) => params.copy(deprecatedSoftGraceLimit = input)),
+
+        opt[Int]("deprecated-hard-grace-limit")
+          .abbr("h")
+          .text("Number of days, before error/abort")
+          .optional()
+          .action((input, params) => params.copy(deprecatedHardGraceLimit = input)))
 
     note("\n")
 
@@ -99,6 +125,12 @@ object CliParser {
           .action((input, params) => params.copy(environment = input)),
 
         opt[Boolean]("dryrun")
+          .abbr("x")
+          .text("Is this a dry run?")
+          .optional()
+          .action((input, params) => params.copy(isDryrun = input)),
+
+        opt[Boolean]("dry-run")
           .abbr("n")
           .text("Is this a dry run?")
           .optional()
@@ -121,7 +153,21 @@ object CliParser {
           .abbr("e")
           .text("The environment to verify")
           .required()
-          .action((input, params) => params.copy(environment = input)))
+          .action((input, params) => params.copy(environment = input)),
+
+        opt[Int]("deprecated-soft-grace-limit")
+          .abbr("s")
+          .text("Number of days, before warning")
+          .optional()
+          .action((input, params) => params.copy(deprecatedSoftGraceLimit = input)),
+
+        opt[Int]("deprecated-hard-grace-limit")
+          .abbr("h")
+          .text("Number of days, before error/abort")
+          .optional()
+          .action((input, params) => params.copy(deprecatedHardGraceLimit = input)))
+
+    note("\n")
 
     cmd("verify")
       .text(" Verify a complete Singularity server by comparing the expected Singularity state with the Mesos state and docker state\n Usage: nmesos verify --singularity http://url/singularity")
