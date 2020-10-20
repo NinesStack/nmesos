@@ -9,11 +9,11 @@ Requirements
 * Project already Dockerized and published on DockerHub. 
 
 
-## Release cli
+## Release CLI
 
 ```
-sbt "nmesos-shared/test" "nmesos-shared/it:test"
-sbt clean "nmesos-shared/publishLocal"  "nmesos-cli/assembly" nmesos-cli/universal:packageZipTarball nmesos-cli/universal:publish
+sbt "nmesos-shared/test" "nmesos-shared/it:test" "nmesos-cli/test"
+sbt clean "nmesos-shared/publishLocal"  "nmesos-cli/assembly" "nmesos-cli/universal:packageZipTarball" "nmesos-cli/universal:publish"
 ```
 
 ## Release a brew update
