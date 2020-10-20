@@ -11,6 +11,7 @@ common:
     autoAdvanceDeploySteps: true
     deployStepWaitTimeMs: 1000
     healthcheckUri: "/hello"
+
 environments:
   dev:
     singularity:
