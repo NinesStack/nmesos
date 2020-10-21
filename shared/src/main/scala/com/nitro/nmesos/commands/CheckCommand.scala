@@ -7,11 +7,16 @@ import com.nitro.nmesos.config.{ Fail, Validations, Warning }
 /**
  * Verify the configuration without any external call.
  */
-case class CheckCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean) extends BaseCommand {
+case class CheckCommand(
+  localConfig: CmdConfig,
+  log: Logger,
+  isDryrun: Boolean,
+  deprecatedSoftGracePeriod: Int,
+  deprecatedHardGracePeriod: Int) extends BaseCommand {
 
   override protected def processCmd(): CommandResult = {
     log.logBlock("Checking...") {
-      val checks = Validations.checkAll(localConfig)
+      val checks = Validations.checkAll(localConfig, (deprecatedSoftGracePeriod, deprecatedHardGracePeriod))
       val errors = checks.collect { case f: Fail => f }
       val warnings = checks.collect { case f: Warning => f }
       Validations.logResult(checks, log)

@@ -1,7 +1,5 @@
 package com.nitro.nmesos.config
 
-import java.io.File
-
 /**
  * Yaml file model.
  * ConfigReader.parse(file) load a file into this model.
@@ -17,7 +15,7 @@ object model {
     environmentName: EnvironmentName,
     environment: Environment,
     fileHash: String,
-    file: File)
+    file: java.io.File)
 
   case class Config(
     nmesos_version: String,

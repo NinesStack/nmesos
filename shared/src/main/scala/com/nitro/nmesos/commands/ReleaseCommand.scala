@@ -21,7 +21,19 @@ import scala.annotation.tailrec
  *  - deploy a new version of the service
  *  - show Mesos task status.
  */
-case class ReleaseCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean) extends DeployCommandHelper {
+case class ReleaseCommand(
+  localConfig: CmdConfig,
+  log: Logger,
+  isDryrun: Boolean,
+  deprecatedSoftGracePeriod: Int,
+  deprecatedHardGracePeriod: Int) extends DeployCommandHelper {
+
+  def verifyCommand(): Try[Unit] = log.logBlock("Verifying") {
+    val checks = Validations.checkAll(localConfig, (deprecatedSoftGracePeriod, deprecatedHardGracePeriod))
+    val errors = checks.collect { case f: Fail => f }
+    Validations.logResult(checks, log)
+    if (errors.isEmpty) Success(()) else Failure(new Exception(s"Invalid Config"))
+  }
 
   def processCmd(): CommandResult = {
 
@@ -69,13 +81,6 @@ case class ReleaseCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean
 }
 
 trait DeployCommandHelper extends BaseCommand {
-
-  def verifyCommand(): Try[Unit] = log.logBlock("Verifying") {
-    val checks = Validations.checkAll(localConfig)
-    val errors = checks.collect { case f: Fail => f }
-    Validations.logResult(checks, log)
-    if (errors.isEmpty) Success(()) else Failure(new Exception(s"Invalid Config"))
-  }
 
   /**
    * Compare remote deploy running and desired deploy, deploying a new Singularity Deploy if needed.
