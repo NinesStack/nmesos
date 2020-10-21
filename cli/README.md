@@ -12,7 +12,7 @@ Requirements
 ## Release CLI
 
 ```
-sbt "nmesos-shared/test" "nmesos-shared/it:test" "nmesos-cli/test"
+sbt "nmesos-shared/test" "nmesos-cli/test"
 sbt clean "nmesos-shared/publishLocal"  "nmesos-cli/assembly" "nmesos-cli/universal:packageZipTarball" "nmesos-cli/universal:publish"
 ```
 
