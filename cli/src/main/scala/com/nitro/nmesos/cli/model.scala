@@ -15,15 +15,15 @@ object model {
     tag: String,
     force: Boolean,
     action: Action,
-    deprecatedSoftGraceLimit: Int,
-    deprecatedHardGraceLimit: Int)
+    deprecatedSoftGracePeriod: Int,
+    deprecatedHardGracePeriod: Int)
 
   object DefaultValues {
     val IsDryRun = true
     val Verbose = false
     val IsFormatted = true
-    val DeprecatedSoftGraceLimit = 14
-    val DeprecatedHardGraceLimit = 28
+    val DeprecatedSoftGracePeriod = 14
+    val DeprecatedHardGracePeriod = 28
   }
 
   sealed trait Action

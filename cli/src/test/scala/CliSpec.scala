@@ -142,8 +142,8 @@ class CliSpec extends Specification with CliSpecFixtures {
 
 trait CliSpecFixtures {
 
-  val ValidCliArgs = "release test -v -d -e dev -t latest -s 10 -h 20 -f -n false".split(" ")
-  val ValidCliArgsLong = "release test --verbose --noformat --environment dev --tag latest --deprecated-soft-grace-limit 10 --deprecated-hard-grace-limit 20 --force --dry-run false".split(" ")
+  val ValidCliArgs = "release testService -v -d -e dev -t latest -S 10 -H 20 -f -n false".split(" ")
+  val ValidCliArgsLong = "release testService --verbose --noformat --environment dev --tag latest --deprecated-soft-grace-period 10 --deprecated-hard-grace-period 20 --force --dry-run false".split(" ")
   val InvalidCliArgs = "release test -e dev -t".split(" ")
 
   val ValidCmd = Cmd(
@@ -151,13 +151,13 @@ trait CliSpecFixtures {
     isDryrun = false,
     verbose = true,
     isFormatted = false,
-    serviceName = "test",
+    serviceName = "testService",
     environment = "dev",
     singularity = "",
     tag = "latest",
     force = true,
-    deprecatedSoftGraceLimit = 10,
-    deprecatedHardGraceLimit = 20)
+    deprecatedSoftGracePeriod = 10,
+    deprecatedHardGracePeriod = 20)
 
   lazy val ValidYamlConfig = {
     val yml = new File(

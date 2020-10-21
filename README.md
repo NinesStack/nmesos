@@ -129,14 +129,14 @@ common:
     labels:
       ServiceName: "exampleServer"
     env_vars:
-      OLD_ENV_VAR: "old value" # @deprecated_on 01-JAN-2020
+      OLD_ENV_VAR: "old value" # @deprecated_on 01-Jan-2020
       NEW_ENV_VAR: "new value"
 
   singularity:
     healthcheckUri: "/hello"
 ```
 
-The date is the date, when you deprecated the env_var. `nmesos` checks the date to find env_vars, where the grace period is expired. The default for the `deprecated-soft-grace-limit` is 14 days. The default for the `deprected-hard-grace-limit` is 28 days.
+The date is the date, when you deprecated the env_var. `nmesos` checks the date to find env_vars, where the grace period is expired. The default for the `deprecated-soft-grace-period` is 14 days. The default for the `deprected-hard-grace-period` is 28 days.
 
 When the soft-limit is reached a warning is printed. When the hard-limit it reached an error is printed and the deploy is aborted.
 
@@ -152,22 +152,22 @@ nmesos release [options] service-name
   -e, --environment <value>                The environment to use
   -t, --tag <value>                        Tag/Version to release
   -f, --force                              Force action!
-  -n, --dry-run <true|false>               Is this a dry run?
-  -s, --deprecated-soft-grace-limit 10     Number of days, before warning
-  -h, --deprecated-hard-grace-limit 20     Number of days, before error/abort
+  -n, --dry-run <true|false>               Is this a dry run? Default: true.
+  -S, --deprecated-soft-grace-period 10    Number of days, before warning
+  -H, --deprecated-hard-grace-period 20    Number of days, before error/abort
 
 nmesos scale [options] service-name
  Update the Environment.
  Usage: nmesos scale service_name --environment dev
   service-name                             Name of the service to scale
   -e, --environment <value>                The environment to use
-  -n, --dry-run <true|false>               Is this a dry run?
+  -n, --dry-run <true|false>               Is this a dry run? Default: true.
 
 nmesos check [options] service-name
  Check the environment conf without running it.
  Usage: nmesos check service_name --environment dev
   service-name                             Name of the service to verify
   -e, --environment <value>                The environment to verify
-  -s, --deprecated-soft-grace-limit 10     Number of days, before warning
-  -h, --deprecated-hard-grace-limit 20     Number of days, before error/abort
+  -S, --deprecated-soft-grace-period 10    Number of days, before warning
+  -H, --deprecated-hard-grace-period 20    Number of days, before error/abort
 ```

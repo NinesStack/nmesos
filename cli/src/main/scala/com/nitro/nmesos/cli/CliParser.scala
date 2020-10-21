@@ -12,8 +12,8 @@ import com.nitro.nmesos.BuildInfo
  *    --environment dev \
  *    --version 0.0.1 \
  *    --dry-run false \
- *    --deprecated-soft-grace-limit 10 \
- *    --deprecated-hard-grace-limit 10
+ *    --deprecated-soft-grace-period 10 \
+ *    --deprecated-hard-grace-period 20
  */
 object CliParser {
 
@@ -28,22 +28,23 @@ object CliParser {
       environment = "",
       tag = "",
       force = false,
-      deprecatedSoftGraceLimit = DefaultValues.DeprecatedSoftGraceLimit,
-      deprecatedHardGraceLimit = DefaultValues.DeprecatedHardGraceLimit)
+      deprecatedSoftGracePeriod = DefaultValues.DeprecatedSoftGracePeriod,
+      deprecatedHardGracePeriod = DefaultValues.DeprecatedHardGracePeriod)
     cmdParser.parse(args, nilCommand)
   }
 
   private val cmdParser = new scopt.OptionParser[Cmd]("nmesos") {
     opt[Unit]("verbose")
       .abbr("v")
-      .action((_, c) => c.copy(verbose = true))
       .text("More verbose output")
+      .optional()
+      .action((_, c) => c.copy(verbose = true))
 
     opt[Unit]("noformat")
       .abbr("d")
+      .text("Disable ansi codes in the output")
       .optional()
       .action((_, c) => c.copy(isFormatted = false))
-      .text("Disable ansi codes in the output")
 
     help("help")
       .abbr("h")
@@ -52,7 +53,7 @@ object CliParser {
     note("\n")
 
     cmd("release")
-      .text(" Release the a new version of the service.\n Usage:  nmesos release example-service --environment dev --tag 0.0.1")
+      .text("Release the a new version of the service.\n Usage:  nmesos release example-service --environment dev --tag 0.0.1")
       .required()
       .action((_, params) => params.copy(action = ReleaseAction))
       .children(
@@ -93,17 +94,17 @@ object CliParser {
           .optional()
           .action((input, params) => params.copy(isDryrun = input)),
 
-        opt[Int]("deprecated-soft-grace-limit")
-          .abbr("s")
+        opt[Int]("deprecated-soft-grace-period")
+          .abbr("S")
           .text("Number of days, before warning")
           .optional()
-          .action((input, params) => params.copy(deprecatedSoftGraceLimit = input)),
+          .action((input, params) => params.copy(deprecatedSoftGracePeriod = input)),
 
-        opt[Int]("deprecated-hard-grace-limit")
-          .abbr("h")
+        opt[Int]("deprecated-hard-grace-period")
+          .abbr("H")
           .text("Number of days, before error/abort")
           .optional()
-          .action((input, params) => params.copy(deprecatedHardGraceLimit = input)))
+          .action((input, params) => params.copy(deprecatedHardGracePeriod = input)))
 
     note("\n")
 
@@ -155,17 +156,17 @@ object CliParser {
           .required()
           .action((input, params) => params.copy(environment = input)),
 
-        opt[Int]("deprecated-soft-grace-limit")
-          .abbr("s")
+        opt[Int]("deprecated-soft-grace-period")
+          .abbr("S")
           .text("Number of days, before warning")
           .optional()
-          .action((input, params) => params.copy(deprecatedSoftGraceLimit = input)),
+          .action((input, params) => params.copy(deprecatedSoftGracePeriod = input)),
 
-        opt[Int]("deprecated-hard-grace-limit")
-          .abbr("h")
+        opt[Int]("deprecated-hard-grace-period")
+          .abbr("H")
           .text("Number of days, before error/abort")
           .optional()
-          .action((input, params) => params.copy(deprecatedHardGraceLimit = input)))
+          .action((input, params) => params.copy(deprecatedHardGracePeriod = input)))
 
     note("\n")
 
