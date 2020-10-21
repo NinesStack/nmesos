@@ -78,31 +78,31 @@ object CliParser {
 
         opt[Unit]("force")
           .abbr("f")
-          .text("Force action")
+          .text("Force action!!!}")
           .optional()
           .action((input, params) => params.copy(force = true)),
 
         opt[Boolean]("dryrun")
           .abbr("x")
-          .text("Is this a dry run?")
+          .text("Deprecated. Will be removed soon.")
           .optional()
           .action((input, params) => params.copy(isDryrun = input)),
 
         opt[Boolean]("dry-run")
           .abbr("n")
-          .text("Is this a dry run?")
+          .text(s"Is this a dry run? Default: ${DefaultValues.IsDryRun}")
           .optional()
           .action((input, params) => params.copy(isDryrun = input)),
 
         opt[Int]("deprecated-soft-grace-period")
           .abbr("S")
-          .text("Number of days, before warning")
+          .text(s"Number of days, before warning. Default: ${DefaultValues.DeprecatedSoftGracePeriod}")
           .optional()
           .action((input, params) => params.copy(deprecatedSoftGracePeriod = input)),
 
         opt[Int]("deprecated-hard-grace-period")
           .abbr("H")
-          .text("Number of days, before error/abort")
+          .text(s"Number of days, before error/abort. Default: ${DefaultValues.DeprecatedHardGracePeriod}")
           .optional()
           .action((input, params) => params.copy(deprecatedHardGracePeriod = input)))
 
@@ -127,13 +127,13 @@ object CliParser {
 
         opt[Boolean]("dryrun")
           .abbr("x")
-          .text("Is this a dry run?")
+          .text("Deprecated. Will be removed soon.")
           .optional()
           .action((input, params) => params.copy(isDryrun = input)),
 
         opt[Boolean]("dry-run")
           .abbr("n")
-          .text("Is this a dry run?")
+          .text(s"Is this a dry run? Default: ${DefaultValues.IsDryRun}")
           .optional()
           .action((input, params) => params.copy(isDryrun = input)))
 
@@ -158,13 +158,13 @@ object CliParser {
 
         opt[Int]("deprecated-soft-grace-period")
           .abbr("S")
-          .text("Number of days, before warning")
+          .text(s"Number of days, before warning. Default: ${DefaultValues.DeprecatedSoftGracePeriod}")
           .optional()
           .action((input, params) => params.copy(deprecatedSoftGracePeriod = input)),
 
         opt[Int]("deprecated-hard-grace-period")
           .abbr("H")
-          .text("Number of days, before error/abort")
+          .text(s"Number of days, before error/abort. Default: ${DefaultValues.DeprecatedHardGracePeriod}")
           .optional()
           .action((input, params) => params.copy(deprecatedHardGracePeriod = input)))
 
