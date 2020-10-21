@@ -49,7 +49,7 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       )
       val result = command.run()
 
-      result must be equalTo CommandSuccess("Successfully deployed to 1 instances. [dryrun true] use --dryrun false")
+      result must be equalTo CommandSuccess("Successfully deployed to 1 instances. [dry-run true] use --dry-run false")
 
       val ExpectedOutput =
         s"""Deploying Config ---------------------------------------------------------------
