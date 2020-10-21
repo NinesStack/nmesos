@@ -10,7 +10,7 @@ import com.nitro.nmesos.config.model.CmdConfig
 import org.specs2.mutable.Specification
 
 /**
-  * This integration test needs a clean Singularity running in dev at http://192.168.99.100:7099/singularity
+  * This integration test needs a clean Singularity running in dev at http://localhost:7099/singularity
   * To run Singularity locally:
   * cd $SINGULARITY_PATH
   * docker-compose rm
@@ -23,7 +23,13 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
   "Deploy Command" should {
 
     "Fail with a friendly message if it can't connect to Singularity" in {
-      val command = ReleaseCommand(serviceConfigWithInvalidApi("example-service"), InfoLogger, isDryrun = true)
+      val command = ReleaseCommand(
+        serviceConfigWithInvalidApi("example-service"),
+        InfoLogger,
+        isDryrun = true,
+        deprecatedSoftGracePeriod = 10,
+        deprecatedHardGracePeriod = 20
+      )
       val result = command.run()
 
       val ExpectedError = CommandError("Unable to connect to http://invalid-api")
@@ -34,7 +40,13 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       val serviceConfig = buildConfig("example-service")
       val logger = new DummyLogger
 
-      val command = ReleaseCommand(serviceConfig, logger, isDryrun = true)
+      val command = ReleaseCommand(
+        serviceConfig,
+        logger,
+        isDryrun = true,
+        deprecatedSoftGracePeriod = 10,
+        deprecatedHardGracePeriod = 20
+      )
       val result = command.run()
 
       result must be equalTo CommandSuccess("Successfully deployed to 1 instances. [dryrun true] use --dryrun false")
@@ -85,7 +97,13 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       val serviceConfig = buildConfig("example-service").copy(serviceName = ServiceNameInThisTest)
 
       val logger = new DummyLogger
-      val command = ReleaseCommand(serviceConfig, logger, isDryrun = false)
+      val command = ReleaseCommand(
+        serviceConfig,
+        logger,
+        isDryrun = false,
+        deprecatedSoftGracePeriod = 10,
+        deprecatedHardGracePeriod = 20
+      )
       val result = command.run()
 
       result must be equalTo CommandSuccess("Successfully deployed to 1 instances.")
@@ -144,13 +162,25 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
 
       // create a new service (in case it doesn't exist already
       val serviceConfig = buildConfig("example-service").copy(serviceName = ServiceNameInThisTest)
-      val command = ReleaseCommand(serviceConfig, InfoLogger, isDryrun = false)
+      val command = ReleaseCommand(
+        serviceConfig,
+        InfoLogger,
+        isDryrun = false,
+        deprecatedSoftGracePeriod = 10,
+        deprecatedHardGracePeriod = 20
+      )
       val result = command.run()
 
 
       // After the first deploy we try to deploy again.
       val logger = new DummyLogger
-      val command2 = ReleaseCommand(serviceConfig, logger, isDryrun = false)
+      val command2 = ReleaseCommand(
+        serviceConfig,
+        logger,
+        isDryrun = false,
+        deprecatedSoftGracePeriod = 10,
+        deprecatedHardGracePeriod = 20
+      )
       val result2 = command2.run()
       val ExpectedRequestId = ModelConversions.toSingularityRequestId(serviceConfig)
       val ExpectedError = CommandError(s"Unable to deploy - There is already a deploy with id latest_${HashExampleService}, use --force to force the redeploy")
@@ -161,7 +191,13 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
     "deploy sidecar with an expected log" in {
       val serviceConfig = buildConfig("sidecar").copy(serviceName = s"test-sidecar-${System.currentTimeMillis}")
 
-      val command = ReleaseCommand(serviceConfig, InfoLogger, isDryrun = false)
+      val command = ReleaseCommand(
+        serviceConfig,
+        InfoLogger,
+        isDryrun = false,
+        deprecatedSoftGracePeriod = 10,
+        deprecatedHardGracePeriod = 20
+      )
       val result = command.run()
 
       result must be equalTo CommandSuccess("Successfully deployed to 1 instances.")
@@ -173,7 +209,13 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       val serviceConfig = buildConfig("example-job").copy(serviceName = JobNameInThisTest) //.copy(force = true)//.
 
       val logger =  new DummyLogger
-      val command = ReleaseCommand(serviceConfig, logger, isDryrun = false)
+      val command = ReleaseCommand(
+        serviceConfig,
+        logger,
+        isDryrun = false,
+        deprecatedSoftGracePeriod = 10,
+        deprecatedHardGracePeriod = 20
+      )
       val result = command.run()
 
       result must be equalTo CommandSuccess("Successfully scheduled - cron: '*/5 * * * *'.")
@@ -232,7 +274,7 @@ trait ReleaseCommandFixtures extends Specification {
 
   val JobNameInThisTest = s"integration-test-job-${System.currentTimeMillis}"
   val ServiceNameInThisTest = s"integration-test-${System.currentTimeMillis}"
-  val SingularityUrl = "http://192.168.99.100:7099/singularity"
+  val SingularityUrl = "http://localhost:7099/singularity"
 
   // Same conf with invalid api
   def serviceConfigWithInvalidApi(serviceName: String) = {

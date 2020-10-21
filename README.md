@@ -54,7 +54,7 @@ environments:
       instances: 1
       cpus: 0.1
     singularity:
-      url: "http://192.168.99.100:7099/singularity"
+      url: "http://localhost:7099/singularity"
 
   prod:
     resources:

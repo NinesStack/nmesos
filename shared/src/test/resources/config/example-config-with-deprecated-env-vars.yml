@@ -15,7 +15,7 @@ common:
 environments:
   dev:
     singularity:
-      url: "http://192.168.99.100:7099/singularity"
+      url: "http://localhost:7099/singularity"
     env_vars:
       OLD_ENV_VAR_10: "old value" # @deprecated-on 10-Jan-2020
       OLD_ENV_VAR_20: "old value" # @deprecated-on 20-Jan-2020

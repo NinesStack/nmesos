@@ -11,7 +11,7 @@ import com.nitro.nmesos.util.InfoLogger
 import org.specs2.mutable.Specification
 
 /**
-  * This integration test needs a clean Singularity running in dev at http://192.168.99.100:7099/singularity
+  * This integration test needs a clean Singularity running in dev at http://localhost:7099/singularity
   * To run Singularity locally:
   * cd $SINGULARITY_PATH
   * docker-compose rm
@@ -80,7 +80,10 @@ trait DeployChainFixtures {
     environment = "dev",
     singularity = "",
     tag = "latest",
-    force = false)
+    force = false,
+    deprecatedSoftGracePeriod = 10,
+    deprecatedHardGracePeriod = 20
+  )
 
   def getManager(serviceName: String) = {
     val serviceNameWithPath = s"cli/src/it/resources/config/${serviceName}"
@@ -91,6 +94,12 @@ trait DeployChainFixtures {
       case other => sys.error(other.toString)
     }
 
-    ReleaseCommand(cmdConfig, InfoLogger, isDryrun = false).manager
+    ReleaseCommand(
+      cmdConfig,
+      InfoLogger,
+      isDryrun = false,
+      deprecatedSoftGracePeriod = 10,
+      deprecatedHardGracePeriod = 20
+    ).manager
   }
 }
