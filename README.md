@@ -129,7 +129,7 @@ common:
     labels:
       ServiceName: "exampleServer"
     env_vars:
-      OLD_ENV_VAR: "old value" # @deprecated_on 01-Jan-2020
+      OLD_ENV_VAR: "old value" # @deprecated-on 01-Jan-2020
       NEW_ENV_VAR: "new value"
 
   singularity:
