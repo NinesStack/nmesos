@@ -1,5 +1,20 @@
 ![NMesos Logo](docs/nmesos_logo.png)
 
+<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
+**Table of Contents**
+
+- [Nmesos](#nmesos)
+    - [Features](#features)
+    - [Usage](#usage)
+        - [Release a service](#release-a-service)
+        - [Config Yml file](#config-yml-file)
+    - [Getting Started with the CLI tool](#getting-started-with-the-cli-tool)
+    - [Bash Completion support](#bash-completion-support)
+    - [Support to deprecate env_vars](#support-to-deprecate-env_vars)
+    - [Other Comands](#other-comands)
+
+<!-- markdown-toc end -->
+
 # Nmesos
 
 Nmesos is a command line tool that leverages [Singularity](https://github.com/HubSpot/Singularity) API to deploy services and schedule jobs in a [Apache Mesos](http://mesos.apache.org/) cluster.
@@ -31,7 +46,7 @@ nmesos release example-service --environment dev --tag latest
 ### Config Yml file
 
 ```
-nmesos_version: '0.1.2'
+nmesos_version: '0.2.20'
 common:
   resources:
     memoryMb: 128
@@ -73,8 +88,8 @@ To know more about the yml format check the [yml examples](docs/examples)
 
 Install Nmesos CLI manually:
 ```
-curl https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.2.19/nmesos-cli-0.2.19.tgz | tar -xz
-cd nmesos-cli-0.2.19 && chmod u+x nmesos
+curl https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.2.20/nmesos-cli-0.2.20.tgz | tar -xz
+cd nmesos-cli-0.2.20 && chmod u+x nmesos
 ```
 
 Note: Older version of Nmesos (up to 0.2.18) are available here:
@@ -112,12 +127,12 @@ brew install --with-bash-completion nmesos-cli
 
 ## Support to deprecate env_vars
 
-When you do not need an env_var anymore, it is hard to remove it from the deployment config right away, because you might need to rollback to a previous version of the service that still needs that env_var (and yes, strictly speaking you could say that the deployment config should/could also be rolled back, but then you might loose other changes that you had to make to the config and ... my experience is you do not want to fiddle with that while you are in the middle of a production outage).
+When you do not need an `env_var` anymore, it is hard to remove it from the deployment config right away, because you might need to rollback to a previous version of the service that still needs that `env_var` (and yes, strictly speaking you could say that the deployment config should/could also be rolled back, but then you might loose other changes that you had to make to the config and ... my experience is you do not want to fiddle with that while you are in the middle of a production outage).
 
-To make this easier/work `nmesos` supports an annotation to deprecate env_vars ...
+To make this easier/work `nmesos` supports an annotation to deprecate `env_vars` ...
 
 ```
-nmesos_version: '0.1.2'
+nmesos_version: '0.2.20'
 common:
   resources:
     memoryMb: 128
@@ -129,14 +144,14 @@ common:
     labels:
       ServiceName: "exampleServer"
     env_vars:
-      OLD_ENV_VAR: "old value" # @deprecated_on 01-Jan-2020
+      OLD_ENV_VAR: "old value" # @deprecated-on 01-Jan-2020
       NEW_ENV_VAR: "new value"
 
   singularity:
     healthcheckUri: "/hello"
 ```
 
-The date is the date, when you deprecated the env_var. `nmesos` checks the date to find env_vars, where the grace period is expired. The default for the `deprecated-soft-grace-period` is 14 days. The default for the `deprected-hard-grace-period` is 28 days.
+The date is the date, when you deprecated the `env_var`. `nmesos` checks the date to find env_vars, where the grace period is expired. The default for the `--deprecated-soft-grace-period` is 14 days. The default for the `--deprected-hard-grace-period` is 28 days.
 
 When the soft-limit is reached a warning is printed. When the hard-limit it reached an error is printed and the deploy is aborted.
 
