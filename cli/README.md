@@ -13,7 +13,7 @@ Requirements
 
 ```
 sbt "nmesos-shared/test" "nmesos-cli/test"
-sbt clean "nmesos-shared/publishLocal"  "nmesos-cli/assembly" "nmesos-cli/universal:packageZipTarball" "nmesos-cli/universal:publish"
+sbt clean "nmesos-cli/publishLocal"  "nmesos-cli/assembly" "nmesos-cli/universal:packageZipTarball" "nmesos-cli/universal:publish"
 ```
 
 ## Release a brew update
