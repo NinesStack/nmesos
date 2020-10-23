@@ -165,13 +165,23 @@ object CliManager {
     val cmdResult: CommandResult = cmd.action match {
       case ReleaseAction =>
         val serviceConfig = toServiceConfig(cmd, config)
-        ReleaseCommand(serviceConfig, log, isDryrun = cmd.isDryrun).run()
+        ReleaseCommand(
+          serviceConfig,
+          log,
+          isDryrun = cmd.isDryrun,
+          deprecatedSoftGracePeriod = cmd.deprecatedSoftGracePeriod,
+          deprecatedHardGracePeriod = cmd.deprecatedHardGracePeriod).run()
       case ScaleAction =>
         val serviceConfig = toServiceConfig(cmd, config)
         ScaleCommand(serviceConfig, log, isDryrun = cmd.isDryrun).run()
       case CheckAction =>
         val serviceConfig = toServiceConfig(cmd, config)
-        CheckCommand(serviceConfig, log, isDryrun = cmd.isDryrun).run()
+        CheckCommand(
+          serviceConfig,
+          log,
+          isDryrun = cmd.isDryrun,
+          deprecatedSoftGracePeriod = cmd.deprecatedSoftGracePeriod,
+          deprecatedHardGracePeriod = cmd.deprecatedHardGracePeriod).run()
 
       case other =>
         // nothing to do.

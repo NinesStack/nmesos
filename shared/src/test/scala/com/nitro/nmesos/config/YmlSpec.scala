@@ -152,7 +152,7 @@ trait YmlTestFixtures {
       |      - 9001:12001/udp
       |      - 9002:12002/tcp,udp
       |    singularity:
-      |      url: http://192.168.99.100:7099/singularity
+      |      url: http://localhost:7099/singularity
       |""".stripMargin
 
   def YamlInvalidRandom = Source.fromURL(getClass.getResource("/config/invalid-random.yml")).mkString

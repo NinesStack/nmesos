@@ -14,12 +14,16 @@ object model {
     singularity: String,
     tag: String,
     force: Boolean,
-    action: Action)
+    action: Action,
+    deprecatedSoftGracePeriod: Int,
+    deprecatedHardGracePeriod: Int)
 
   object DefaultValues {
     val IsDryRun = true
     val Verbose = false
     val IsFormatted = true
+    val DeprecatedSoftGracePeriod = 14
+    val DeprecatedHardGracePeriod = 28
   }
 
   sealed trait Action

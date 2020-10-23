@@ -25,7 +25,7 @@ common:
 environments:
   dev:
     singularity:
-      url: "http://192.168.99.100:7099/singularity"
+      url: "http://localhost:7099/singularity"
     container:
       env_vars:
         NEW_RELIC_LICENSE_KEY: "xxxxx"

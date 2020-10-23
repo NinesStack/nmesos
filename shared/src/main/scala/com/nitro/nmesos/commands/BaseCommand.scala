@@ -118,6 +118,6 @@ trait BaseCommand extends Command {
     }
   }
 
-  def dryWarning = if (isDryrun) log.importantColor(" [dryrun true] use --dryrun false") else ""
+  def dryWarning = if (isDryrun) log.importantColor(" [dry-run true] use --dry-run false") else ""
 
 }

@@ -8,7 +8,12 @@ import com.nitro.nmesos.BuildInfo
  * Usage:
  *  val cmds = Cli.parser(args)
  * Cli example:
- *  nmesos release service_name --environment dev --version 0.0.1 --dry-run false
+ *  nmesos release service_name \
+ *    --environment dev \
+ *    --version 0.0.1 \
+ *    --dry-run false \
+ *    --deprecated-soft-grace-period 10 \
+ *    --deprecated-hard-grace-period 20
  */
 object CliParser {
 
@@ -22,20 +27,24 @@ object CliParser {
       singularity = "",
       environment = "",
       tag = "",
-      force = false)
+      force = false,
+      deprecatedSoftGracePeriod = DefaultValues.DeprecatedSoftGracePeriod,
+      deprecatedHardGracePeriod = DefaultValues.DeprecatedHardGracePeriod)
     cmdParser.parse(args, nilCommand)
   }
 
   private val cmdParser = new scopt.OptionParser[Cmd]("nmesos") {
     opt[Unit]("verbose")
       .abbr("v")
-      .action((_, c) => c.copy(verbose = true))
       .text("More verbose output")
+      .optional()
+      .action((_, c) => c.copy(verbose = true))
 
     opt[Unit]("noformat")
+      .abbr("d")
+      .text("Disable ansi codes in the output")
       .optional()
       .action((_, c) => c.copy(isFormatted = false))
-      .text("Disable ansi codes in the output")
 
     help("help")
       .abbr("h")
@@ -44,7 +53,7 @@ object CliParser {
     note("\n")
 
     cmd("release")
-      .text(" Release the a new version of the service.\n Usage:  nmesos release example-service --environment dev --tag 0.0.1")
+      .text("Release the a new version of the service.\n Usage:  nmesos release example-service --environment dev --tag 0.0.1")
       .required()
       .action((_, params) => params.copy(action = ReleaseAction))
       .children(
@@ -69,15 +78,33 @@ object CliParser {
 
         opt[Unit]("force")
           .abbr("f")
-          .text("Force action")
+          .text("Force action!!!}")
           .optional()
           .action((input, params) => params.copy(force = true)),
 
         opt[Boolean]("dryrun")
-          .abbr("n")
-          .text("Is this a dry run?")
+          .abbr("x")
+          .text("Deprecated. Will be removed soon.")
           .optional()
-          .action((input, params) => params.copy(isDryrun = input)))
+          .action((input, params) => params.copy(isDryrun = input)),
+
+        opt[Boolean]("dry-run")
+          .abbr("n")
+          .text(s"Is this a dry run? Default: ${DefaultValues.IsDryRun}")
+          .optional()
+          .action((input, params) => params.copy(isDryrun = input)),
+
+        opt[Int]("deprecated-soft-grace-period")
+          .abbr("S")
+          .text(s"Number of days, before warning. Default: ${DefaultValues.DeprecatedSoftGracePeriod}")
+          .optional()
+          .action((input, params) => params.copy(deprecatedSoftGracePeriod = input)),
+
+        opt[Int]("deprecated-hard-grace-period")
+          .abbr("H")
+          .text(s"Number of days, before error/abort. Default: ${DefaultValues.DeprecatedHardGracePeriod}")
+          .optional()
+          .action((input, params) => params.copy(deprecatedHardGracePeriod = input)))
 
     note("\n")
 
@@ -99,8 +126,14 @@ object CliParser {
           .action((input, params) => params.copy(environment = input)),
 
         opt[Boolean]("dryrun")
+          .abbr("x")
+          .text("Deprecated. Will be removed soon.")
+          .optional()
+          .action((input, params) => params.copy(isDryrun = input)),
+
+        opt[Boolean]("dry-run")
           .abbr("n")
-          .text("Is this a dry run?")
+          .text(s"Is this a dry run? Default: ${DefaultValues.IsDryRun}")
           .optional()
           .action((input, params) => params.copy(isDryrun = input)))
 
@@ -121,7 +154,21 @@ object CliParser {
           .abbr("e")
           .text("The environment to verify")
           .required()
-          .action((input, params) => params.copy(environment = input)))
+          .action((input, params) => params.copy(environment = input)),
+
+        opt[Int]("deprecated-soft-grace-period")
+          .abbr("S")
+          .text(s"Number of days, before warning. Default: ${DefaultValues.DeprecatedSoftGracePeriod}")
+          .optional()
+          .action((input, params) => params.copy(deprecatedSoftGracePeriod = input)),
+
+        opt[Int]("deprecated-hard-grace-period")
+          .abbr("H")
+          .text(s"Number of days, before error/abort. Default: ${DefaultValues.DeprecatedHardGracePeriod}")
+          .optional()
+          .action((input, params) => params.copy(deprecatedHardGracePeriod = input)))
+
+    note("\n")
 
     cmd("verify")
       .text(" Verify a complete Singularity server by comparing the expected Singularity state with the Mesos state and docker state\n Usage: nmesos verify --singularity http://url/singularity")
