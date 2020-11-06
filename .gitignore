@@ -1,2 +1,3 @@
 # sbt/scala specific
 **/target/
+project/project/

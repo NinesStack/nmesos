@@ -1,6 +1,6 @@
 name in ThisBuild := "nmesos"
 organization in ThisBuild := "com.gonitro"
-version in ThisBuild := "0.2.19"
+version in ThisBuild := "0.2.21"
 scalaVersion in ThisBuild := "2.12.10"
 
 scalacOptions in ThisBuild ++= Seq(
@@ -33,3 +33,9 @@ lazy val shared = Project("nmesos-shared", file("shared"))
 lazy val root =
   project.in(file("."))
     .dependsOn(cli)
+
+import scala.sys.process._
+lazy val updateBrew = taskKey[Unit]("Update the brew formula")
+updateBrew := {
+  s"./Formula/update.sh ${version.value}" !
+}

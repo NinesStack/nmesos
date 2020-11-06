@@ -2,22 +2,27 @@ package com.nitro.nmesos.config
 
 import com.nitro.nmesos.config.model._
 import com.nitro.nmesos.util.Logger
+import java.{ util => ju, text => jt }
+import java.time.{ temporal => jtt }
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 // Basic model validations
 object Validations extends ValidationHelper {
 
-  def checkAll(localConfig: CmdConfig): Seq[Validation] = Seq(
+  def checkAll(localConfig: CmdConfig, gracePeriods: (Int, Int)): Seq[Validation] = Seq(
     checkResources(localConfig.environment.resources),
     checkContainer(localConfig.environment.container),
     checkScheduledJob(localConfig.environment),
-    checkService(localConfig.environment)).flatten.sortBy(_.name)
+    checkService(localConfig.environment),
+    checkDeprecated(localConfig.file, LocalDate.now(), gracePeriods)).flatten.sortBy(_.name)
 
-  private def checkResources(resources: Resources): Seq[Validation] = Seq(
+  def checkResources(resources: Resources): Seq[Validation] = Seq(
     check("Resources - Memory Instances", "Must be > 0") {
       resources.memoryMb > 0
     })
 
-  private def checkService(env: Environment): Seq[Validation] = if (isService(env)) {
+  def checkService(env: Environment): Seq[Validation] = if (isService(env)) {
     Seq(
       check("Resources - Num Instances", "Must be > 0") {
         env.singularity.slavePlacement.exists(_ == "SPREAD_ALL_SLAVES") || env.resources.instances.exists(_ > 0)
@@ -42,7 +47,7 @@ object Validations extends ValidationHelper {
     Seq.empty
   }
 
-  private def checkScheduledJob(env: Environment): Seq[Validation] = if (isScheduled(env)) {
+  def checkScheduledJob(env: Environment): Seq[Validation] = if (isScheduled(env)) {
     Seq(
       check("Resources - Num Instances", "Must be = 0") {
         env.resources.instances.isEmpty
@@ -54,7 +59,7 @@ object Validations extends ValidationHelper {
     Seq.empty
   }
 
-  private def checkContainer(container: Container): Seq[Validation] = Seq(
+  def checkContainer(container: Container): Seq[Validation] = Seq(
     checkWarning("Container - Labels", "No labels defined") {
       !container.labels.toSet.flatten.isEmpty
     },
@@ -62,12 +67,41 @@ object Validations extends ValidationHelper {
       !container.env_vars.toSet.flatten.isEmpty
     })
 
+  def checkDeprecated(file: java.io.File, today: LocalDate, gracePeriods: (Int, Int)): Seq[Validation] = {
+    val f = scala.io.Source.fromFile(file)
+    val deprecated = f.getLines().filterNot(_.trim().startsWith("#")).filter(_.contains("@deprecated-on")).map(processLine)
+    deprecated.map(processDeprecated(_, today, gracePeriods)).toSeq
+  }
+
   def isService(env: Environment) = {
     (env.singularity.requestType.isEmpty && env.singularity.schedule.isEmpty) || env.singularity.requestType == Option("SERVICE")
   }
 
   def isScheduled(env: Environment) = {
     (env.singularity.requestType.isEmpty && env.singularity.schedule.isDefined) || env.singularity.requestType == Option("SCHEDULED")
+  }
+
+  // OLD_ENV_VAR_10: "old value" # @deprecated-on 10-Jan-2020
+  def processLine(line: String): (String, LocalDate) = {
+    val p = raw"^\s*([A-Z0-9_]+):.*# @deprecated-on (.*)".r
+    val p(envVar, date) = line
+    val deprecatedOn = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
+    (envVar, deprecatedOn)
+  }
+
+  def processDeprecated(deprecated: (String, LocalDate), today: LocalDate, gracePeriods: (Int, Int)): Validation = {
+    val (envVar, deprecatedOn) = deprecated
+    val (deprecatedSoftGracePeriod, deprecatedHardGracePeriod) = gracePeriods
+    check(s"Deprecated Env Var - ${envVar}", s"< ${deprecatedHardGracePeriod}") {
+      jtt.ChronoUnit.DAYS.between(deprecatedOn, today) < deprecatedHardGracePeriod
+    } match {
+      case Ok(_) =>
+        checkWarning(s"Deprecated Env Var - ${envVar}", s"< ${deprecatedSoftGracePeriod}") {
+          jtt.ChronoUnit.DAYS.between(deprecatedOn, today) < deprecatedSoftGracePeriod
+        }
+      case error =>
+        error
+    }
   }
 }
 
