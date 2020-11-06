@@ -69,7 +69,7 @@ object Validations extends ValidationHelper {
 
   def checkDeprecated(file: java.io.File, today: LocalDate, gracePeriods: (Int, Int)): Seq[Validation] = {
     val f = scala.io.Source.fromFile(file)
-    val deprecated = f.getLines().filter(_.contains("@deprecated-on")).map(processLine)
+    val deprecated = f.getLines().filterNot(_.trim().startsWith("#")).filter(_.contains("@deprecated-on")).map(processLine)
     deprecated.map(processDeprecated(_, today, gracePeriods)).toSeq
   }
 
