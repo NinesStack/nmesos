@@ -1,16 +1,18 @@
-## Brew installer for NMesos CLI tool
+# Brew installer for NMesos CLI tool
 
 This tap contains a formulae to install nmesos cli tool.
 
 ## Usage
 
-Install:
+### Install
+
 ```
 brew  -v tap nitro/nmesos  git@github.com:Nitro/nmesos.git
 brew install nmesos-cli
 ```
 
-Update:
+### Update
+
 ```
 brew update
 brew upgrade nmesos-cli

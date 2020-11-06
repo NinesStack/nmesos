@@ -25,6 +25,8 @@
   * Bump the version in `build.sbt`
   * Build a new distributable `.tgz` with ...
     * `sbt clean`
+    * `sbt nmesos-shared/test` 
+    * `sbt nmesos-cli/test` 
     * `sbt nmesos-cli/publishLocal`
     * `sbt nmesos-cli/assembly`
     * `sbt nmesos-cli/universal:packageZipTarball`
