@@ -18,7 +18,6 @@
     aws_access_key_id = <access>
     aws_secret_access_key = <secret>    
     ```
-  * And also `export AWS_PROFILE=nmesos`
 * Review the PR (discussing the change/implementation; making changes as necessary)
 * Approve the PR
 * Merge the PR
@@ -33,13 +32,7 @@
       * `sbt nmesos-cli/universal:packageZipTarball`
     * Publish the new version in a public repo ...
       * `sbt nmesos-cli/universal:publish`
-    * Grant public access to the files ...
-      ```
-      > aws s3api put-object-acl --acl public-read --bucket nmesos-releases --key nitro-public/repo/nitro/nmesos-cli/0.2.19/nmesos-cli-0.2.19.tgz
-      > aws s3api put-object-acl --acl public-read --bucket nmesos-releases --key nitro-public/repo/nitro/nmesos-cli/0.2.19/nmesos-cli-0.2.19.tgz.md5
-      > aws s3api put-object-acl --acl public-read --bucket nmesos-releases --key nitro-public/repo/nitro/nmesos-cli/0.2.19/nmesos-cli-0.2.19.tgz.sha1
-      ```
   * Update the `brew` [Formula](Formula/nmesos-cli.rb)
     * Modify url to the new release and also replace the sha with the new sha (by running `shasum -a 256 cli/target/universal/nmesos-cli-0.2.19.tgz`)
   * Commit to `master`
-* Note: If something goes wrong and you need to re-release you first need to delete the old file (with `aws --profile nmesos s3 rm s3://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.2.19/nmesos-cli-0.2.19.tgz`).
+* Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.2.19/`).
