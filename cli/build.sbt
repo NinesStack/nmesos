@@ -29,4 +29,5 @@ import com.typesafe.sbt.packager.SettingsHelper._
 makeDeploymentSettings(Universal, packageZipTarball, "tgz")
 
 awsProfile := Some("nmesos")
+s3Region := Some("eu-west-1")
 publishTo := Some(s3resolver.value("nmesos-releases", s3("nmesos-releases/nitro-public/repo")))
