@@ -18,6 +18,11 @@
     aws_access_key_id = <access>
     aws_secret_access_key = <secret>    
     ```
+  * And add the following section to your `~/.aws/config` file ...
+    ```
+    [nmesos]
+    region = eu-west-1
+    ```
 * Review the PR (discussing the change/implementation; making changes as necessary)
 * Approve the PR
 * Merge the PR
