@@ -37,5 +37,6 @@ lazy val root =
 import scala.sys.process._
 lazy val updateBrew = taskKey[Unit]("Update the brew formula")
 updateBrew := {
-  s"./Formula/update.sh ${version.value}" !
+  val log = streams.value.log
+  s"./Formula/update.sh ${version.value}" ! log
 }

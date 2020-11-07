@@ -1,19 +1,22 @@
 #!/bin/bash
 
+prefix=" - "
+echo "${prefix}Updating brew formula ..."
+
 version=${1}
-echo "Version: ${version}"
+echo "${prefix}Version: ${version}"
 
 file=cli/target/universal/nmesos-cli-${version}.tgz
-echo "File: ${file}"
+echo "${prefix}File: ${file}"
 
 sha=$(shasum -a 256 ${file} | cut -d\  -f 1)
-echo "Sha: ${sha}"
+echo "${prefix}Sha: ${sha}"
 
 url=https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/${version}/nmesos-cli-${version}.tgz
-echo "Url: ${url}"
+echo "${prefix}Url: ${url}"
 
 formula=./Formula/nmesos-cli.rb
-echo "Generating ${formula} ..."
+echo "${prefix}Generating ${formula} ..."
 
 cat > ${formula} << EOF
 # This file is generated. Do not edit.
@@ -43,4 +46,4 @@ end
 
 EOF
 
-echo "... done!"
+echo "${prefix}... done!"
