@@ -18,28 +18,27 @@
     aws_access_key_id = <access>
     aws_secret_access_key = <secret>    
     ```
-  * And also `export AWS_PROFILE=nmesos`
+  * And add the following section to your `~/.aws/config` file ...
+    ```
+    [nmesos]
+    region = eu-west-1
+    ```
 * Review the PR (discussing the change/implementation; making changes as necessary)
 * Approve the PR
 * Merge the PR
-* Release a new version (optional) ...
-  * On the `master` branch ...
-  * Manually bump the version in `build.sbt`
-  * [nmesos cli](cli/README.md) release process ...
-    * Build a new distributable `.tgz` with ...
-      * `sbt clean`
-      * `sbt nmesos-cli/publishLocal`
-      * `sbt nmesos-cli/assembly`
-      * `sbt nmesos-cli/universal:packageZipTarball`
-    * Publish the new version in a public repo ...
-      * `sbt nmesos-cli/universal:publish`
-    * Grant public access to the files ...
-      ```
-      > aws s3api put-object-acl --acl public-read --bucket nmesos-releases --key nitro-public/repo/nitro/nmesos-cli/0.2.19/nmesos-cli-0.2.19.tgz
-      > aws s3api put-object-acl --acl public-read --bucket nmesos-releases --key nitro-public/repo/nitro/nmesos-cli/0.2.19/nmesos-cli-0.2.19.tgz.md5
-      > aws s3api put-object-acl --acl public-read --bucket nmesos-releases --key nitro-public/repo/nitro/nmesos-cli/0.2.19/nmesos-cli-0.2.19.tgz.sha1
-      ```
-  * Update the `brew` [Formula](Formula/nmesos-cli.rb)
-    * Modify url to the new release and also replace the sha with the new sha (by running `shasum -a 256 cli/target/universal/nmesos-cli-0.2.19.tgz`)
-  * Commit to `master`
-* Note: If something goes wrong and you need to re-release you first need to delete the old file (with `aws --profile nmesos s3 rm s3://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.2.19/nmesos-cli-0.2.19.tgz`).
+* Release a new version on the `master` branch (optional) ...
+  * Bump the version in `build.sbt`
+  * Build a new distributable `.tgz` with ...
+    * `sbt clean`
+    * `sbt nmesos-shared/test` 
+    * `sbt nmesos-cli/test` 
+    * `sbt nmesos-cli/publishLocal`
+    * `sbt nmesos-cli/assembly`
+    * `sbt nmesos-cli/universal:packageZipTarball`
+  * Publish the new version in the public repo ...
+    * `sbt nmesos-cli/universal:publish`
+  * Update the `brew formula` by running `sbt updateBrew`
+    * Note: This will run `./Formula/update.sh <version>` and will generate a new `./Formula/nmesos-cli.rb` file 
+  * Add/Commit/Push to `master`
+  * Tag the release (and push the tag)
+* Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.2.19/`).

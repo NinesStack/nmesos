@@ -33,3 +33,10 @@ lazy val shared = Project("nmesos-shared", file("shared"))
 lazy val root =
   project.in(file("."))
     .dependsOn(cli)
+
+import scala.sys.process._
+lazy val updateBrew = taskKey[Unit]("Update the brew formula")
+updateBrew := {
+  val log = streams.value.log
+  s"./Formula/update.sh ${version.value}" ! log
+}

@@ -1,3 +1,7 @@
+# This file is generated. Do not edit.
+# Instead edit and run update.sh.
+# You can run update.sh manually or with >sbt updateBrew<.
+
 require 'formula'
 
 class NmesosCli < Formula
@@ -18,3 +22,4 @@ class NmesosCli < Formula
     bin.install 'nmesos'
   end
 end
+

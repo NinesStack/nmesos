@@ -24,8 +24,8 @@ Nmesos is a command line tool that leverages [Singularity](https://github.com/Hu
 ## Features
 
 * Service configuration in Yaml format.
-* Dryrun mode
-* Auto detect changes between yaml and Singularity request (scale up instances and resources if needed)
+* Dry-run mode
+* Auto-detect changes between yaml and Singularity request (scale up instances and resources if needed)
 * [CLI tool](cli/)
 * [Integration with SBT](sbt-plugin/)(optional)
 * Scheduled jobs

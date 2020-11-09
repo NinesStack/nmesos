@@ -1,5 +1,3 @@
-// Assembly as a CLI auto runnable bin.
-
 scalaVersion := "2.12.10"
 organization := "nitro"
 
@@ -30,16 +28,5 @@ mappings in Universal in packageZipTarball := {
 import com.typesafe.sbt.packager.SettingsHelper._
 makeDeploymentSettings(Universal, packageZipTarball, "tgz")
 
-publishTo := {
-  Some("Nmesos" at "s3://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo")
-}
-
-import com.amazonaws.auth.{AWSCredentialsProviderChain, DefaultAWSCredentialsProviderChain}
-import com.amazonaws.auth.profile.ProfileCredentialsProvider
-
-s3CredentialsProvider := { (bucket: String) =>
-  new AWSCredentialsProviderChain(
-    new ProfileCredentialsProvider("nmesos"),
-    DefaultAWSCredentialsProviderChain.getInstance()
-  )
-}
+awsProfile := Some("nmesos")
+publishTo := Some(s3resolver.value("nmesos-releases", s3("nmesos-releases/nitro-public/repo")))
