@@ -40,4 +40,5 @@
   * Update the `brew formula` by running `sbt updateBrew`
     * Note: This will run `./Formula/update.sh <version>` and will generate a new `./Formula/nmesos-cli.rb` file 
   * Add/Commit/Push to `master`
+  * Tag the release (and push the tag)
 * Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.2.19/`).
