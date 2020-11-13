@@ -7,15 +7,15 @@ import sbt._
 import sbt.complete.Parsers.spaceDelimited
 
 /**
- * Auto Sbt Plugin for NMesos.
- */
+  * Auto Sbt Plugin for NMesos.
+  */
 object NmesosPlugin extends AutoPlugin {
 
   override def trigger = allRequirements
 
   /**
-   * Public task and keys offered by the plugin.
-   */
+    * Public task and keys offered by the plugin.
+    */
   object autoImport {
 
     lazy val nmesosRepositoryConfig = taskKey[String](
@@ -34,32 +34,41 @@ object NmesosPlugin extends AutoPlugin {
   object defaults {
 
     /**
-     * Default value of nmesosRepositoryConfig = env var NMESOS_CONFIG_REPOSITORY
-     */
-    def nmesosRepositoryConfigKey = nmesosRepositoryConfig := {
-      val base = baseDirectory.value
-      val log = (streams in nmesosRelease).value.log
-      NmesosPluginImpl.resolveRepositoryPath(base, log)
-    }
-
-    def nmesosReleaseKey = nmesosRelease := {
-      val args = spaceDelimited(ArgumentsParser.releaseExampleUsage).parsed
-      ArgumentsParser.parseReleaseArgs(args) match {
-        case None =>
-          sys.error(s"Invalid args. ${ArgumentsParser.releaseExampleUsage}")
-
-        case Some(arguments) =>
-          val serviceName = name.value
-          val log = (streams in nmesosRelease).value.log
-          val repositoryConfigPath = file(nmesosRepositoryConfig.value)
-          val defaultVersion = sbt.Keys.version.value
-
-          NmesosPluginImpl.release(arguments, serviceName, repositoryConfigPath, defaultVersion, log)
-
+      * Default value of nmesosRepositoryConfig = env var NMESOS_CONFIG_REPOSITORY
+      */
+    def nmesosRepositoryConfigKey =
+      nmesosRepositoryConfig := {
+        val base = baseDirectory.value
+        val log = (streams in nmesosRelease).value.log
+        NmesosPluginImpl.resolveRepositoryPath(base, log)
       }
-    }
 
-    lazy val defaultSettings: Seq[Setting[_]] = Seq(nmesosReleaseKey, nmesosRepositoryConfigKey, nmesosReleaseKey)
+    def nmesosReleaseKey =
+      nmesosRelease := {
+        val args = spaceDelimited(ArgumentsParser.releaseExampleUsage).parsed
+        ArgumentsParser.parseReleaseArgs(args) match {
+          case None =>
+            sys.error(s"Invalid args. ${ArgumentsParser.releaseExampleUsage}")
+
+          case Some(arguments) =>
+            val serviceName = name.value
+            val log = (streams in nmesosRelease).value.log
+            val repositoryConfigPath = file(nmesosRepositoryConfig.value)
+            val defaultVersion = sbt.Keys.version.value
+
+            NmesosPluginImpl.release(
+              arguments,
+              serviceName,
+              repositoryConfigPath,
+              defaultVersion,
+              log
+            )
+
+        }
+      }
+
+    lazy val defaultSettings: Seq[Setting[_]] =
+      Seq(nmesosReleaseKey, nmesosRepositoryConfigKey, nmesosReleaseKey)
 
   }
 

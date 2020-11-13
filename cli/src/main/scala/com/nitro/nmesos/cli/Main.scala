@@ -1,7 +1,12 @@
 package com.nitro.nmesos.cli
 
 import com.nitro.nmesos.BuildInfo
-import com.nitro.nmesos.commands.{ CheckCommand, CommandResult, ScaleCommand, VerifyEnvCommand }
+import com.nitro.nmesos.commands.{
+  CheckCommand,
+  CommandResult,
+  ScaleCommand,
+  VerifyEnvCommand
+}
 import com.nitro.nmesos.config.ConfigReader.ConfigResult
 import com.nitro.nmesos.config.model.DeployJob
 
@@ -17,11 +22,11 @@ object CliManager {
 
   import java.io.File
   import com.nitro.nmesos.cli.model._
-  import com.nitro.nmesos.commands.{ CommandError, CommandSuccess }
-  import com.nitro.nmesos.util.{ Logger, CustomLogger }
+  import com.nitro.nmesos.commands.{CommandError, CommandSuccess}
+  import com.nitro.nmesos.util.{Logger, CustomLogger}
   import com.nitro.nmesos.commands.ReleaseCommand
   import com.nitro.nmesos.config.ConfigReader
-  import com.nitro.nmesos.config.ConfigReader.{ ConfigError, ValidConfig }
+  import com.nitro.nmesos.config.ConfigReader.{ConfigError, ValidConfig}
   import com.nitro.nmesos.config.model.CmdConfig
 
   def process(args: Array[String]) = {
@@ -34,8 +39,8 @@ object CliManager {
   }
 
   /**
-   * Process the CLI input command and verify configuration.
-   */
+    * Process the CLI input command and verify configuration.
+    */
   def processCmd(cmd: Cmd) = {
     val log = CustomLogger(verbose = cmd.verbose, ansiEnabled = cmd.isFormatted)
 
@@ -49,9 +54,9 @@ object CliManager {
   }
 
   /**
-   * Process all ymls in a deploy chain.
-   * Log and exit on the first error
-   */
+    * Process all ymls in a deploy chain.
+    * Log and exit on the first error
+    */
   def processYmlCommand(initialCmd: Cmd, log: Logger) = {
     val commandChain = getCommandChain(initialCmd, log)
 
@@ -66,7 +71,9 @@ object CliManager {
 
         for ((cmd, config) <- onSuccess) {
           if (config.environment.container.deploy_freeze.getOrElse(false)) {
-            log.error("Attention: deploy_freeze set to true. You're not able to deploy this config.")
+            log.error(
+              "Attention: deploy_freeze set to true. You're not able to deploy this config."
+            )
             exitWithError()
           } else {
             executeCommand(cmd, config, log) match {
@@ -88,18 +95,26 @@ object CliManager {
 
   type CommandOnFailure = Either[ConfigError, Option[CommandAndConfig]]
 
-  type CommandChain = Either[ConfigError, (List[CommandAndConfig], Option[CommandAndConfig])]
+  type CommandChain =
+    Either[ConfigError, (List[CommandAndConfig], Option[CommandAndConfig])]
 
   /**
-   * Parses and returns a valid chain of Commands and their corresponding Config file.
-   * Returns a Left[ConfigError] on the first invalid command/config
-   */
+    * Parses and returns a valid chain of Commands and their corresponding Config file.
+    * Returns a Left[ConfigError] on the first invalid command/config
+    */
   def getCommandChain(initialCmd: Cmd, log: Logger): CommandChain = {
     getConfigFromCmd(initialCmd, log) match {
       case e: ConfigError => Left(e)
 
       case initialConfig: ValidConfig =>
-        val cmdChainOnSuccess = buildCmdChainOnSuccess(initialCmd, initialConfig, Right(List()), List(), initialCmd, log)
+        val cmdChainOnSuccess = buildCmdChainOnSuccess(
+          initialCmd,
+          initialConfig,
+          Right(List()),
+          List(),
+          initialCmd,
+          log
+        )
         val cmdOnFailure = buildCmdOnFailure(initialConfig, initialCmd, log)
 
         (cmdChainOnSuccess, cmdOnFailure) match {
@@ -113,55 +128,81 @@ object CliManager {
   }
 
   private def buildCmdChainOnSuccess(
-    cmd: Cmd,
-    configForCmd: ValidConfig,
-    chain: CommandChainOnSuccess,
-    cmdQueue: List[Cmd],
-    initialCmd: Cmd,
-    log: Logger): CommandChainOnSuccess = chain match {
-    case Left(error) => Left(error)
+      cmd: Cmd,
+      configForCmd: ValidConfig,
+      chain: CommandChainOnSuccess,
+      cmdQueue: List[Cmd],
+      initialCmd: Cmd,
+      log: Logger
+  ): CommandChainOnSuccess =
+    chain match {
+      case Left(error) => Left(error)
 
-    case Right(chain) =>
-      // Get the queue of after-deploy commands and append them to the CommandChainOnSuccess
-      // so that it will be traversed in a breath-first manner
-      val cmdQueueFromConfig = getJobQueueFromConfig(configForCmd).map(gedCmdFromDeployJob(_, initialCmd))
-      val cmdQueueConcat = cmdQueue ++ cmdQueueFromConfig
+      case Right(chain) =>
+        // Get the queue of after-deploy commands and append them to the CommandChainOnSuccess
+        // so that it will be traversed in a breath-first manner
+        val cmdQueueFromConfig = getJobQueueFromConfig(configForCmd).map(
+          gedCmdFromDeployJob(_, initialCmd)
+        )
+        val cmdQueueConcat = cmdQueue ++ cmdQueueFromConfig
 
-      if (chainContainsCmd(chain, cmd)) {
-        // this is here to prevent cyclic references
-        Left(ConfigError("Job appearing more than once in job chain", toFile(cmd, log)))
-      } else if (cmdQueueConcat.isEmpty) {
-        Right(chain :+ (cmd, configForCmd))
-      } else {
-        val newChain = Right(chain :+ (cmd, configForCmd))
-        val nextCmd = cmdQueueConcat.head
+        if (chainContainsCmd(chain, cmd)) {
+          // this is here to prevent cyclic references
+          Left(
+            ConfigError(
+              "Job appearing more than once in job chain",
+              toFile(cmd, log)
+            )
+          )
+        } else if (cmdQueueConcat.isEmpty) {
+          Right(chain :+ (cmd, configForCmd))
+        } else {
+          val newChain = Right(chain :+ (cmd, configForCmd))
+          val nextCmd = cmdQueueConcat.head
 
-        getConfigFromCmd(nextCmd, log) match {
-          case e: ConfigError => Left(e)
-          case nextConfig: ValidConfig =>
-            buildCmdChainOnSuccess(nextCmd, nextConfig, newChain, cmdQueueConcat.tail, initialCmd, log)
+          getConfigFromCmd(nextCmd, log) match {
+            case e: ConfigError => Left(e)
+            case nextConfig: ValidConfig =>
+              buildCmdChainOnSuccess(
+                nextCmd,
+                nextConfig,
+                newChain,
+                cmdQueueConcat.tail,
+                initialCmd,
+                log
+              )
+          }
         }
-      }
-  }
+    }
 
-  private def buildCmdOnFailure(initialConfig: ValidConfig, initialCmd: Cmd, log: Logger) = {
-    getFailureJobFromConfig(initialConfig).map(gedCmdFromDeployJob(_, initialCmd)) match {
+  private def buildCmdOnFailure(
+      initialConfig: ValidConfig,
+      initialCmd: Cmd,
+      log: Logger
+  ) = {
+    getFailureJobFromConfig(initialConfig).map(
+      gedCmdFromDeployJob(_, initialCmd)
+    ) match {
       case None =>
         // No OnFailure job specified
         Right(None)
 
       case Some(cmd) =>
         getConfigFromCmd(cmd, log) match {
-          case e: ConfigError => Left(e)
+          case e: ConfigError      => Left(e)
           case config: ValidConfig => Right(Some(cmd, config))
         }
     }
   }
 
   /**
-   * Execute the detected command for a valid configuration.
-   */
-  def executeCommand(cmd: Cmd, config: ValidConfig, log: Logger): CommandResult = {
+    * Execute the detected command for a valid configuration.
+    */
+  def executeCommand(
+      cmd: Cmd,
+      config: ValidConfig,
+      log: Logger
+  ): CommandResult = {
     val cmdResult: CommandResult = cmd.action match {
       case ReleaseAction =>
         val serviceConfig = toServiceConfig(cmd, config)
@@ -170,7 +211,8 @@ object CliManager {
           log,
           isDryrun = cmd.isDryrun,
           deprecatedSoftGracePeriod = cmd.deprecatedSoftGracePeriod,
-          deprecatedHardGracePeriod = cmd.deprecatedHardGracePeriod).run()
+          deprecatedHardGracePeriod = cmd.deprecatedHardGracePeriod
+        ).run()
       case ScaleAction =>
         val serviceConfig = toServiceConfig(cmd, config)
         ScaleCommand(serviceConfig, log, isDryrun = cmd.isDryrun).run()
@@ -181,7 +223,8 @@ object CliManager {
           log,
           isDryrun = cmd.isDryrun,
           deprecatedSoftGracePeriod = cmd.deprecatedSoftGracePeriod,
-          deprecatedHardGracePeriod = cmd.deprecatedHardGracePeriod).run()
+          deprecatedHardGracePeriod = cmd.deprecatedHardGracePeriod
+        ).run()
 
       case other =>
         // nothing to do.
@@ -194,8 +237,7 @@ object CliManager {
 
   def showConfigError(cmd: Cmd, configError: ConfigError, log: Logger): Unit = {
     log.logBlock("Invalid config") {
-      log.info(
-        s""" Service Name: ${sanitizeServiceName(cmd.serviceName)}
+      log.info(s""" Service Name: ${sanitizeServiceName(cmd.serviceName)}
            | Config File: ${configError.yamlFile.getAbsolutePath}
              """.stripMargin)
       log.error(configError.msg)
@@ -220,14 +262,16 @@ object CliManager {
   }
 
   // Cli command config to shared config model
-  def toServiceConfig(cmd: Cmd, config: ValidConfig) = CmdConfig(
-    serviceName = sanitizeServiceName(cmd.serviceName),
-    force = cmd.force,
-    tag = cmd.tag,
-    environment = config.environment,
-    environmentName = config.environmentName,
-    fileHash = config.fileHash,
-    file = config.file)
+  def toServiceConfig(cmd: Cmd, config: ValidConfig) =
+    CmdConfig(
+      serviceName = sanitizeServiceName(cmd.serviceName),
+      force = cmd.force,
+      tag = cmd.tag,
+      environment = config.environment,
+      environmentName = config.environmentName,
+      fileHash = config.fileHash,
+      file = config.file
+    )
 
   def exitWithError() = sys.exit(1)
 
@@ -255,18 +299,21 @@ object CliManager {
     }
   }
 
-  private def chainContainsCmd(chain: List[(Cmd, ValidConfig)], cmd: Cmd): Boolean =
+  private def chainContainsCmd(
+      chain: List[(Cmd, ValidConfig)],
+      cmd: Cmd
+  ): Boolean =
     chain.exists { case (cmdInChain, _) => cmd == cmdInChain }
 
   private def getJobQueueFromConfig(config: ValidConfig): List[DeployJob] =
     config.environment.after_deploy match {
-      case None => List()
+      case None              => List()
       case Some(afterDeploy) => afterDeploy.on_success
     }
 
   private def getFailureJobFromConfig(config: ValidConfig): Option[DeployJob] =
     config.environment.after_deploy match {
-      case None => None
+      case None              => None
       case Some(afterDeploy) => afterDeploy.on_failure
     }
 
@@ -274,9 +321,13 @@ object CliManager {
     initialCmd.copy(
       serviceName = job.service_name,
       tag = job.tag.getOrElse(initialCmd.tag),
-      force = true)
+      force = true
+    )
 
-  private def maybeExecuteFailureCommandAndExit(onFailure: Option[CommandAndConfig], log: Logger): Unit = {
+  private def maybeExecuteFailureCommandAndExit(
+      onFailure: Option[CommandAndConfig],
+      log: Logger
+  ): Unit = {
     for ((failureCmd, failureConfig) <- onFailure) {
       executeCommand(failureCmd, failureConfig, log) match {
         case CommandSuccess(msg) =>

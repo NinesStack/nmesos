@@ -3,8 +3,8 @@ package com.nitro.nmesos.util
 import scala.annotation.tailrec
 
 /**
- * Basic terminal output for the CLI app.
- */
+  * Basic terminal output for the CLI app.
+  */
 trait Logger extends AnsiLogger with Animations {
 
   def error(msg: => Any): Unit = println(errorColor(msg))
@@ -25,13 +25,13 @@ trait Logger extends AnsiLogger with Animations {
 }
 
 /**
- * Default terminal output with verbose disabled and ansi colors disabled.
- */
+  * Default terminal output with verbose disabled and ansi colors disabled.
+  */
 object InfoLogger extends CustomLogger(ansiEnabled = false, verbose = false)
 
 /**
- * Terminal output with verbose enabled and ansi colors enabled.
- */
+  * Terminal output with verbose enabled and ansi colors enabled.
+  */
 case class CustomLogger(ansiEnabled: Boolean, verbose: Boolean) extends Logger {
   def debug(msg: => Any): Unit = if (verbose) println(s" [debug] $msg") else {}
 }
@@ -82,10 +82,13 @@ trait Animations extends AnsiLogger {
   private val frames = "|/-\\".toCharArray
 
   /**
-   * Show while body is not None
-   */
+    * Show while body is not None
+    */
   @tailrec
-  final def showAnimated(fetchMessage: () => Option[String], step: Int = 0): Unit = {
+  final def showAnimated(
+      fetchMessage: () => Option[String],
+      step: Int = 0
+  ): Unit = {
     fetchMessage() match {
       case None =>
         eraseLine()

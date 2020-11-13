@@ -2,7 +2,7 @@ package com.nitro.nmesos.cli
 
 import java.io.File
 
-import com.nitro.nmesos.cli.model.{ Cmd, ReleaseAction }
+import com.nitro.nmesos.cli.model.{Cmd, ReleaseAction}
 import com.nitro.nmesos.commands.ReleaseCommand
 import com.nitro.nmesos.config.ConfigReader
 import com.nitro.nmesos.config.ConfigReader.ValidConfig
@@ -17,15 +17,18 @@ import org.specs2.mutable.Specification
   * docker-compose rm
   * docker-compose up
   */
-class DeployChainIntegrationTest extends Specification with DeployChainFixtures {
+class DeployChainIntegrationTest
+    extends Specification
+    with DeployChainFixtures {
 
   // dirty hack so that the test doesn't scream the
   // "No implicits found for parameter evidence"
   // because the last line is not an assertion
   import org.specs2.execute._
-  implicit def unitAsResult: AsResult[Unit] = new AsResult[Unit] {
-    def asResult(u: => Unit): Result = { u; Success() }
-  }
+  implicit def unitAsResult: AsResult[Unit] =
+    new AsResult[Unit] {
+      def asResult(u: => Unit): Result = { u; Success() }
+    }
 
   "Cli main" should {
 
@@ -39,9 +42,11 @@ class DeployChainIntegrationTest extends Specification with DeployChainFixtures 
 
       // First file to deploy that has a deploy-chain on it
       val cmd = ValidCmd.copy(
-        serviceName = "cli/src/it/resources/config/example-deploy-chain-service-real-0",
+        serviceName =
+          "cli/src/it/resources/config/example-deploy-chain-service-real-0",
         tag = "stable",
-        isDryrun = false)
+        isDryrun = false
+      )
 
       // Kickoff
       CliManager.processCmd(cmd)
@@ -51,16 +56,24 @@ class DeployChainIntegrationTest extends Specification with DeployChainFixtures 
       val runningTasks = manager.getSingularityActiveTasks().get
       for (runningTask <- runningTasks) {
         (expectedDeployedServices contains runningTask.taskId.requestId) shouldEqual true
-        if (runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_0") {
+        if (
+          runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_0"
+        ) {
           runningTask.taskId.deployId.contains("stable").shouldEqual(true)
         }
-        if (runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_1") {
+        if (
+          runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_1"
+        ) {
           runningTask.taskId.deployId.contains("stable").shouldEqual(true)
         }
-        if (runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_2") {
+        if (
+          runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_2"
+        ) {
           runningTask.taskId.deployId.contains("alpine").shouldEqual(true)
         }
-        if (runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_3") {
+        if (
+          runningTask.taskId.requestId == "dev_example_deploy_chain_service_real_3"
+        ) {
           runningTask.taskId.deployId.contains("mainline").shouldEqual(true)
         }
       }
@@ -87,12 +100,23 @@ trait DeployChainFixtures {
 
   def getManager(serviceName: String) = {
     val serviceNameWithPath = s"cli/src/it/resources/config/${serviceName}"
-    val yamlFile = new File(getClass.getResource(s"/config/${serviceName}.yml").toURI)
-    val cmdConfig = ConfigReader.parseEnvironment(yamlFile, "dev", InfoLogger) match {
-      case validConfig: ValidConfig =>
-        CmdConfig(serviceNameWithPath, "latest", force = false, validConfig.environmentName, validConfig.environment, validConfig.fileHash, yamlFile)
-      case other => sys.error(other.toString)
-    }
+    val yamlFile = new File(
+      getClass.getResource(s"/config/${serviceName}.yml").toURI
+    )
+    val cmdConfig =
+      ConfigReader.parseEnvironment(yamlFile, "dev", InfoLogger) match {
+        case validConfig: ValidConfig =>
+          CmdConfig(
+            serviceNameWithPath,
+            "latest",
+            force = false,
+            validConfig.environmentName,
+            validConfig.environment,
+            validConfig.fileHash,
+            yamlFile
+          )
+        case other => sys.error(other.toString)
+      }
 
     ReleaseCommand(
       cmdConfig,

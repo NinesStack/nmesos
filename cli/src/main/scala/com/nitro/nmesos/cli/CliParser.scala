@@ -4,17 +4,17 @@ import com.nitro.nmesos.cli.model._
 import com.nitro.nmesos.BuildInfo
 
 /**
- * CLI parser from `args` to `Cmd`.
- * Usage:
- *  val cmds = Cli.parser(args)
- * Cli example:
- *  nmesos release service_name \
- *    --environment dev \
- *    --version 0.0.1 \
- *    --dry-run false \
- *    --deprecated-soft-grace-period 10 \
- *    --deprecated-hard-grace-period 20
- */
+  * CLI parser from `args` to `Cmd`.
+  * Usage:
+  *  val cmds = Cli.parser(args)
+  * Cli example:
+  *  nmesos release service_name \
+  *    --environment dev \
+  *    --version 0.0.1 \
+  *    --dry-run false \
+  *    --deprecated-soft-grace-period 10 \
+  *    --deprecated-hard-grace-period 20
+  */
 object CliParser {
 
   def parse(args: Array[String]): Option[Cmd] = {
@@ -29,7 +29,8 @@ object CliParser {
       tag = "",
       force = false,
       deprecatedSoftGracePeriod = DefaultValues.DeprecatedSoftGracePeriod,
-      deprecatedHardGracePeriod = DefaultValues.DeprecatedHardGracePeriod)
+      deprecatedHardGracePeriod = DefaultValues.DeprecatedHardGracePeriod
+    )
     cmdParser.parse(args, nilCommand)
   }
 
@@ -53,125 +54,139 @@ object CliParser {
     note("\n")
 
     cmd("release")
-      .text("Release the a new version of the service.\n Usage:  nmesos release example-service --environment dev --tag 0.0.1")
+      .text(
+        "Release the a new version of the service.\n Usage:  nmesos release example-service --environment dev --tag 0.0.1"
+      )
       .required()
       .action((_, params) => params.copy(action = ReleaseAction))
       .children(
-
         arg[String]("service-name")
           .text("Name of the service to release")
           .required()
           .action((input, params) => params.copy(serviceName = input)),
-
         opt[String]("environment")
           .abbr("e")
           .text("The environment to use")
           .required()
           .action((input, params) => params.copy(environment = input)),
-
         opt[String]("tag")
           .abbr("t")
           .text("Tag/Version to release")
           .required()
-          .validate(tag => if (tag.isEmpty) Left("Tag is required") else Right(()))
+          .validate(tag =>
+            if (tag.isEmpty) Left("Tag is required")
+            else Right(())
+          )
           .action((input, params) => params.copy(tag = input)),
-
         opt[Unit]("force")
           .abbr("f")
           .text("Force action!!!}")
           .optional()
           .action((input, params) => params.copy(force = true)),
-
         opt[Boolean]("dryrun")
           .abbr("x")
           .text("Deprecated. Will be removed soon.")
           .optional()
           .action((input, params) => params.copy(isDryrun = input)),
-
         opt[Boolean]("dry-run")
           .abbr("n")
           .text(s"Is this a dry run? Default: ${DefaultValues.IsDryRun}")
           .optional()
           .action((input, params) => params.copy(isDryrun = input)),
-
         opt[Int]("deprecated-soft-grace-period")
           .abbr("S")
-          .text(s"Number of days, before warning. Default: ${DefaultValues.DeprecatedSoftGracePeriod}")
+          .text(
+            s"Number of days, before warning. Default: ${DefaultValues.DeprecatedSoftGracePeriod}"
+          )
           .optional()
-          .action((input, params) => params.copy(deprecatedSoftGracePeriod = input)),
-
+          .action((input, params) =>
+            params.copy(deprecatedSoftGracePeriod = input)
+          ),
         opt[Int]("deprecated-hard-grace-period")
           .abbr("H")
-          .text(s"Number of days, before error/abort. Default: ${DefaultValues.DeprecatedHardGracePeriod}")
+          .text(
+            s"Number of days, before error/abort. Default: ${DefaultValues.DeprecatedHardGracePeriod}"
+          )
           .optional()
-          .action((input, params) => params.copy(deprecatedHardGracePeriod = input)))
+          .action((input, params) =>
+            params.copy(deprecatedHardGracePeriod = input)
+          )
+      )
 
     note("\n")
 
     cmd("scale")
-      .text(" Update the Environment.\n Usage: nmesos scale service_name --environment dev")
+      .text(
+        " Update the Environment.\n Usage: nmesos scale service_name --environment dev"
+      )
       .required()
       .action((_, params) => params.copy(action = ScaleAction))
       .children(
-
         arg[String]("service-name")
           .text("Name of the service to scale")
           .required()
           .action((input, params) => params.copy(serviceName = input)),
-
         opt[String]("environment")
           .abbr("e")
           .text("The environment to use")
           .required()
           .action((input, params) => params.copy(environment = input)),
-
         opt[Boolean]("dryrun")
           .abbr("x")
           .text("Deprecated. Will be removed soon.")
           .optional()
           .action((input, params) => params.copy(isDryrun = input)),
-
         opt[Boolean]("dry-run")
           .abbr("n")
           .text(s"Is this a dry run? Default: ${DefaultValues.IsDryRun}")
           .optional()
-          .action((input, params) => params.copy(isDryrun = input)))
+          .action((input, params) => params.copy(isDryrun = input))
+      )
 
     note("\n")
 
     cmd("check")
-      .text(" Check the environment conf without running it.\n Usage: nmesos check service_name --environment dev")
+      .text(
+        " Check the environment conf without running it.\n Usage: nmesos check service_name --environment dev"
+      )
       .required()
       .action((_, params) => params.copy(action = CheckAction))
       .children(
-
         arg[String]("service-name")
           .text("Name of the service to verify")
           .required()
           .action((input, params) => params.copy(serviceName = input)),
-
         opt[String]("environment")
           .abbr("e")
           .text("The environment to verify")
           .required()
           .action((input, params) => params.copy(environment = input)),
-
         opt[Int]("deprecated-soft-grace-period")
           .abbr("S")
-          .text(s"Number of days, before warning. Default: ${DefaultValues.DeprecatedSoftGracePeriod}")
+          .text(
+            s"Number of days, before warning. Default: ${DefaultValues.DeprecatedSoftGracePeriod}"
+          )
           .optional()
-          .action((input, params) => params.copy(deprecatedSoftGracePeriod = input)),
-
+          .action((input, params) =>
+            params.copy(deprecatedSoftGracePeriod = input)
+          ),
         opt[Int]("deprecated-hard-grace-period")
           .abbr("H")
-          .text(s"Number of days, before error/abort. Default: ${DefaultValues.DeprecatedHardGracePeriod}")
+          .text(
+            s"Number of days, before error/abort. Default: ${DefaultValues.DeprecatedHardGracePeriod}"
+          )
           .optional()
-          .action((input, params) => params.copy(deprecatedHardGracePeriod = input)))
+          .action((input, params) =>
+            params.copy(deprecatedHardGracePeriod = input)
+          )
+      )
 
     note("\n")
 
     cmd("verify")
-      .text(" Verify a complete Singularity server by comparing the expected Singularity state with the Mesos state and docker state\n Usage: nmesos verify --singularity http://url/singularity")
+      .text(
+        " Verify a complete Singularity server by comparing the expected Singularity state with the Mesos state and docker state\n Usage: nmesos verify --singularity http://url/singularity"
+      )
       .required()
       .action((_, params) => params.copy(action = VerifyAction))
       .children(
@@ -179,11 +194,13 @@ object CliParser {
           .abbr("s")
           .text("The environment to verify")
           .required()
-          .action((input, params) => params.copy(singularity = input)))
+          .action((input, params) => params.copy(singularity = input))
+      )
 
     checkConfig { cmd =>
       val availableCommands = commands.map(_.fullName).mkString("|")
-      if (cmd.action != NilAction) success else failure(s"A command is required. $availableCommands\n")
+      if (cmd.action != NilAction) success
+      else failure(s"A command is required. $availableCommands\n")
     }
 
     override def showUsageOnError: Boolean = true
