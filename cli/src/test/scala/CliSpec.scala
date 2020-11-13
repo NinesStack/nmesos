@@ -2,13 +2,13 @@ package com.nitro.nmesos.cli
 
 import java.io.File
 
-import com.nitro.nmesos.cli.model.{ Cmd, ReleaseAction }
+import com.nitro.nmesos.cli.model.{Cmd, ReleaseAction}
 import com.nitro.nmesos.commands.ReleaseCommand
 import com.nitro.nmesos.config.ConfigReader
 import com.nitro.nmesos.config.ConfigReader.ValidConfig
 import com.nitro.nmesos.config.model.CmdConfig
 import com.nitro.nmesos.singularity.ModelConversions.toSingularityRequest
-import com.nitro.nmesos.singularity.{ RealSingularityManager, SingularityManager }
+import com.nitro.nmesos.singularity.{RealSingularityManager, SingularityManager}
 import com.nitro.nmesos.util.InfoLogger
 import org.specs2.mutable.Specification
 
@@ -27,7 +27,8 @@ class CliSpec extends Specification with CliSpecFixtures {
       val cmd = ValidCmd.copy(
         serviceName =
           "cli/src/test/resources/config/example-deploy-chain-service-0",
-        tag = "specialTag")
+        tag = "specialTag"
+      )
 
       val expectedCommandChainOnSuccess =
         List(
@@ -37,30 +38,39 @@ class CliSpec extends Specification with CliSpecFixtures {
               serviceName =
                 "cli/src/test/resources/config/example-deploy-chain-service-1",
               tag = "job1tag",
-              force = true),
-              getValidYmlConfig("example-deploy-chain-service-1")),
+              force = true
+            ),
+            getValidYmlConfig("example-deploy-chain-service-1")
+          ),
           (
             cmd.copy(
               serviceName =
                 "cli/src/test/resources/config/example-deploy-chain-service-2",
               tag = "specialTag",
-              force = true),
-              getValidYmlConfig("example-deploy-chain-service-2")),
+              force = true
+            ),
+            getValidYmlConfig("example-deploy-chain-service-2")
+          ),
           (
             cmd.copy(
               serviceName =
                 "cli/src/test/resources/config/example-deploy-chain-service-3",
               tag = "job3tag",
-              force = true),
-              getValidYmlConfig("example-deploy-chain-service-3")))
+              force = true
+            ),
+            getValidYmlConfig("example-deploy-chain-service-3")
+          )
+        )
 
       val expectedCommandOnFailure = (
         cmd.copy(
           serviceName =
             "cli/src/test/resources/config/example-deploy-chain-failure",
           tag = "jobFailureTag",
-          force = true),
-          getValidYmlConfig("example-deploy-chain-failure"))
+          force = true
+        ),
+        getValidYmlConfig("example-deploy-chain-failure")
+      )
 
       val (commandChainOnSuccess, commandOnFailure) =
         CliManager.getCommandChain(cmd, InfoLogger).right.get
@@ -83,7 +93,8 @@ class CliSpec extends Specification with CliSpecFixtures {
       val cmd = ValidCmd.copy(
         serviceName =
           "cli/src/test/resources/config/example-deploy-chain-service-2",
-        tag = "latest")
+        tag = "latest"
+      )
       val (commandChainOnSuccess, commandOnFailure) =
         CliManager.getCommandChain(cmd, InfoLogger).right.get
 
@@ -91,8 +102,10 @@ class CliSpec extends Specification with CliSpecFixtures {
         cmd.copy(
           serviceName =
             "cli/src/test/resources/config/example-deploy-chain-service-2",
-          tag = "latest"),
-          getValidYmlConfig("example-deploy-chain-service-2"))
+          tag = "latest"
+        ),
+        getValidYmlConfig("example-deploy-chain-service-2")
+      )
 
       commandChainOnSuccess.length shouldEqual 1
 
@@ -104,7 +117,8 @@ class CliSpec extends Specification with CliSpecFixtures {
 
     "return an error on a cyclic reference command chain" in {
       val cmd = ValidCmd.copy(serviceName =
-        "cli/src/test/resources/config/example-deploy-chain-service-cyclic-0")
+        "cli/src/test/resources/config/example-deploy-chain-service-cyclic-0"
+      )
       val commandChain = CliManager.getCommandChain(cmd, InfoLogger)
 
       commandChain.left.get.msg shouldEqual "Job appearing more than once in job chain"
@@ -112,7 +126,8 @@ class CliSpec extends Specification with CliSpecFixtures {
 
     "return an error for a self referencing after deploy job" in {
       val cmd = ValidCmd.copy(serviceName =
-        "cli/src/test/resources/config/example-deploy-chain-self-referencing")
+        "cli/src/test/resources/config/example-deploy-chain-self-referencing"
+      )
       val commandChain = CliManager.getCommandChain(cmd, InfoLogger)
 
       commandChain.left.get.msg shouldEqual "Job appearing more than once in job chain"
@@ -142,8 +157,13 @@ class CliSpec extends Specification with CliSpecFixtures {
 
 trait CliSpecFixtures {
 
-  val ValidCliArgs = "release testService -v -d -e dev -t latest -S 10 -H 20 -f -n false".split(" ")
-  val ValidCliArgsLong = "release testService --verbose --noformat --environment dev --tag latest --deprecated-soft-grace-period 10 --deprecated-hard-grace-period 20 --force --dry-run false".split(" ")
+  val ValidCliArgs =
+    "release testService -v -d -e dev -t latest -S 10 -H 20 -f -n false".split(
+      " "
+    )
+  val ValidCliArgsLong =
+    "release testService --verbose --noformat --environment dev --tag latest --deprecated-soft-grace-period 10 --deprecated-hard-grace-period 20 --force --dry-run false"
+      .split(" ")
   val InvalidCliArgs = "release test -e dev -t".split(" ")
 
   val ValidCmd = Cmd(
@@ -157,24 +177,27 @@ trait CliSpecFixtures {
     tag = "latest",
     force = true,
     deprecatedSoftGracePeriod = 10,
-    deprecatedHardGracePeriod = 20)
+    deprecatedHardGracePeriod = 20
+  )
 
   lazy val ValidYamlConfig = {
     val yml = new File(
-      getClass.getResource("/config/example-config.yml").getFile)
+      getClass.getResource("/config/example-config.yml").getFile
+    )
     val config = ConfigReader.parseEnvironment(yml, "dev", InfoLogger) match {
       case v: ValidConfig => Some(v)
-      case _ => None
+      case _              => None
     }
     config.getOrElse(sys.error("Invalid yml"))
   }
 
   def getValidYmlConfig(serviceName: String): ValidConfig = {
     val yml = new File(
-      getClass.getResource(s"/config/${serviceName}.yml").getFile)
+      getClass.getResource(s"/config/${serviceName}.yml").getFile
+    )
     val config = ConfigReader.parseEnvironment(yml, "dev", InfoLogger) match {
       case v: ValidConfig => Some(v)
-      case _ => None
+      case _              => None
     }
     config.getOrElse(sys.error("Invalid yml"))
   }

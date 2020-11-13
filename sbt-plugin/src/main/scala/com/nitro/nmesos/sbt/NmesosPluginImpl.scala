@@ -1,17 +1,17 @@
 package com.nitro.nmesos.sbt
 
-import com.nitro.nmesos.commands.{ CommandError, CommandSuccess, ReleaseCommand }
+import com.nitro.nmesos.commands.{CommandError, CommandSuccess, ReleaseCommand}
 import com.nitro.nmesos.config.ConfigReader
-import com.nitro.nmesos.config.ConfigReader.{ ConfigError, ValidConfig }
+import com.nitro.nmesos.config.ConfigReader.{ConfigError, ValidConfig}
 import com.nitro.nmesos.config.model.CmdConfig
 import com.nitro.nmesos.sbt.model.ReleaseArgs
-import com.nitro.nmesos.util.{ Logger => NLogger }
+import com.nitro.nmesos.util.{Logger => NLogger}
 import sbt._
 import sbt.Logger
 
 /**
- * Parse sbt args, read the configuration file and execute the command.
- */
+  * Parse sbt args, read the configuration file and execute the command.
+  */
 object NmesosPluginImpl {
 
   val ConfigRepositoryEnvName = "NMESOS_CONFIG_REPOSITORY"
@@ -21,7 +21,9 @@ object NmesosPluginImpl {
     val envValue = sys.env.get(ConfigRepositoryEnvName)
     val path = envValue match {
       case None =>
-        log.warn(s"[Nmesos] Environment var $ConfigRepositoryEnvName is not defined, using default path ${defaultPath.getAbsolutePath}")
+        log.warn(
+          s"[Nmesos] Environment var $ConfigRepositoryEnvName is not defined, using default path ${defaultPath.getAbsolutePath}"
+        )
         defaultPath.getAbsolutePath
       case Some(path) =>
         log.info(s"[Nmesos] Environment var $ConfigRepositoryEnvName=$path")
@@ -33,7 +35,13 @@ object NmesosPluginImpl {
     path
   }
 
-  def release(args: ReleaseArgs, serviceName: String, repositoryConfigPath: File, localVersion: String, logger: Logger) = {
+  def release(
+      args: ReleaseArgs,
+      serviceName: String,
+      repositoryConfigPath: File,
+      localVersion: String,
+      logger: Logger
+  ) = {
 
     val yamlFile = repositoryConfigPath / s"$serviceName.yml"
 
@@ -47,7 +55,9 @@ object NmesosPluginImpl {
           s""" Configuration Repo:          $repositoryConfigPath
              | Configuration service file:  $yamlFile
              | Local version:               ${log.infoColor(localVersion)}
-             | Version to deploy:           ${log.infoColor(args.tag)}""".stripMargin
+             | Version to deploy:           ${log.infoColor(
+            args.tag
+          )}""".stripMargin
         )
       }
 
@@ -56,16 +66,21 @@ object NmesosPluginImpl {
           showConfigError(serviceName, error, log)
 
         case config: ValidConfig =>
-
           executeCommand(args, serviceName, config, log)
       }
     }
 
   }
 
-  def executeCommand(args: ReleaseArgs, serviceName: String, config: ValidConfig, log: NLogger) = {
+  def executeCommand(
+      args: ReleaseArgs,
+      serviceName: String,
+      config: ValidConfig,
+      log: NLogger
+  ) = {
     val serviceConfig = toServiceConfig(serviceName, args, config)
-    val cmdResult = ReleaseCommand(serviceConfig, log, isDryrun = args.isDryrun).run()
+    val cmdResult =
+      ReleaseCommand(serviceConfig, log, isDryrun = args.isDryrun).run()
 
     cmdResult match {
       case CommandSuccess(msg) =>
@@ -77,10 +92,13 @@ object NmesosPluginImpl {
 
   }
 
-  def showConfigError(serviceName: String, configError: ConfigError, log: NLogger): Unit = {
+  def showConfigError(
+      serviceName: String,
+      configError: ConfigError,
+      log: NLogger
+  ): Unit = {
     log.logBlock("Invalid config") {
-      log.info(
-        s""" Service Name: $serviceName
+      log.info(s""" Service Name: $serviceName
            | Config File: ${configError.yamlFile.getAbsolutePath}
              """.stripMargin)
       log.error(configError.msg)
@@ -88,13 +106,19 @@ object NmesosPluginImpl {
     sys.error(configError.msg)
   }
 
-  def toServiceConfig(serviceName: String, cmd: ReleaseArgs, config: ValidConfig) = CmdConfig(
-    serviceName = serviceName,
-    force = cmd.force,
-    tag = cmd.tag,
-    environment = config.environment,
-    environmentName = config.environmentName,
-    fileHash = config.fileHash,
-    file = config.file)
+  def toServiceConfig(
+      serviceName: String,
+      cmd: ReleaseArgs,
+      config: ValidConfig
+  ) =
+    CmdConfig(
+      serviceName = serviceName,
+      force = cmd.force,
+      tag = cmd.tag,
+      environment = config.environment,
+      environmentName = config.environmentName,
+      fileHash = config.fileHash,
+      file = config.file
+    )
 
 }

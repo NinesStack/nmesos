@@ -28,10 +28,12 @@ lazy val shared = Project("nmesos-shared", file("shared"))
       "com.lihaoyi" %% "upickle" % "0.4.4",
       "org.scalaj" %% "scalaj-http" % "2.3.0",
       "org.specs2" %% "specs2-core" % "3.8.6" % "it,test"
-    ))
+    )
+  )
 
 lazy val root =
-  project.in(file("."))
+  project
+    .in(file("."))
     .dependsOn(cli)
 
 import scala.sys.process._

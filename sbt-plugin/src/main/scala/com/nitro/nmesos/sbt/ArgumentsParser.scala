@@ -1,15 +1,15 @@
 package com.nitro.nmesos.sbt.cli
 
 import com.nitro.nmesos.BuildInfo
-import com.nitro.nmesos.sbt.model.{ DefaultValues, ReleaseArgs }
+import com.nitro.nmesos.sbt.model.{DefaultValues, ReleaseArgs}
 
 /**
- * SBT args parser from `args` to `Cmd`.
- * Usage:
- * val cmds = ArgumentsParser.parser(args)
- * Cli example:
- * nmesosRelease service_name --environment dev --tag 0.0.1 --dry-run false
- */
+  * SBT args parser from `args` to `Cmd`.
+  * Usage:
+  * val cmds = ArgumentsParser.parser(args)
+  * Cli example:
+  * nmesosRelease service_name --environment dev --tag 0.0.1 --dry-run false
+  */
 object ArgumentsParser {
 
   def parseReleaseArgs(args: Seq[String]): Option[ReleaseArgs] = {
