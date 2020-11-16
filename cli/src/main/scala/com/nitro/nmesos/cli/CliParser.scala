@@ -197,6 +197,28 @@ object CliParser {
           .action((input, params) => params.copy(singularity = input))
       )
 
+    note("\n")
+
+    cmd("run-local")
+      .text("Run the service locally with environment variables from dev")
+      .required()
+      .action((_, params) => params.copy(action = RunLocalAction))
+      .children(
+        arg[String]("service-name")
+          .text("Name of the service to release")
+          .required()
+          .action((input, params) => params.copy(serviceName = input)),
+        opt[String]("tag")
+          .abbr("t")
+          .text("Tag/Version to release")
+          .required()
+          .validate(tag =>
+            if (tag.isEmpty) Left("Tag is required")
+            else Right(())
+          )
+          .action((input, params) => params.copy(tag = input))
+      )
+
     checkConfig { cmd =>
       val availableCommands = commands.map(_.fullName).mkString("|")
       if (cmd.action != NilAction) success

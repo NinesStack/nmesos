@@ -11,6 +11,8 @@ import com.nitro.nmesos.singularity.ModelConversions.toSingularityRequest
 import com.nitro.nmesos.singularity.{RealSingularityManager, SingularityManager}
 import com.nitro.nmesos.util.InfoLogger
 import org.specs2.mutable.Specification
+import com.nitro.nmesos.cli.model.RunLocalAction
+import com.nitro.nmesos.cli.model.DefaultValues
 
 class CliSpec extends Specification with CliSpecFixtures {
 
@@ -145,6 +147,10 @@ class CliSpec extends Specification with CliSpecFixtures {
       val cmd = CliParser.parse(ValidCliArgsLong)
       cmd should be equalTo Some(ValidCmd)
     }
+    "parse a valid run-local command" in {
+      val cmd = CliParser.parse(ValidRunLocalCliArgs)
+      cmd should be equalTo Some(ValidRunLocalCmd)
+    }
 
     "fail to parse an invalid release command" in {
       val cmd = CliParser.parse(InvalidCliArgs)
@@ -164,6 +170,9 @@ trait CliSpecFixtures {
   val ValidCliArgsLong =
     "release testService --verbose --noformat --environment dev --tag latest --deprecated-soft-grace-period 10 --deprecated-hard-grace-period 20 --force --dry-run false"
       .split(" ")
+
+  val ValidRunLocalCliArgs = "run-local testService -t random-tag".split(" ")
+
   val InvalidCliArgs = "release test -e dev -t".split(" ")
 
   val ValidCmd = Cmd(
@@ -178,6 +187,20 @@ trait CliSpecFixtures {
     force = true,
     deprecatedSoftGracePeriod = 10,
     deprecatedHardGracePeriod = 20
+  )
+
+  val ValidRunLocalCmd = Cmd(
+    action = RunLocalAction,
+    isDryrun = DefaultValues.IsDryRun,
+    verbose = DefaultValues.Verbose,
+    isFormatted = DefaultValues.IsFormatted,
+    serviceName = "testService",
+    environment = "",
+    singularity = "",
+    tag = "random-tag",
+    force = false,
+    deprecatedSoftGracePeriod = DefaultValues.DeprecatedSoftGracePeriod,
+    deprecatedHardGracePeriod = DefaultValues.DeprecatedHardGracePeriod
   )
 
   lazy val ValidYamlConfig = {

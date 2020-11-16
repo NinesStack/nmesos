@@ -4,6 +4,7 @@ import com.nitro.nmesos.BuildInfo
 import com.nitro.nmesos.commands.{
   CheckCommand,
   CommandResult,
+  RunLocalCommand,
   ScaleCommand,
   VerifyEnvCommand
 }
@@ -225,6 +226,16 @@ object CliManager {
           deprecatedSoftGracePeriod = cmd.deprecatedSoftGracePeriod,
           deprecatedHardGracePeriod = cmd.deprecatedHardGracePeriod
         ).run()
+      case RunLocalAction =>
+        val serviceConfig = toServiceConfig(cmd, config)
+
+        RunLocalCommand(
+          serviceConfig,
+          log,
+          isDryrun = false,
+          deprecatedSoftGracePeriod = cmd.deprecatedSoftGracePeriod,
+          deprecatedHardGracePeriod = cmd.deprecatedHardGracePeriod
+        ).run()
 
       case other =>
         // nothing to do.
@@ -289,7 +300,12 @@ object CliManager {
   private def getConfigFromCmd(cmd: Cmd, log: Logger): ConfigResult = {
     val yamlFile = toFile(cmd, log)
 
-    ConfigReader.parseEnvironment(yamlFile, cmd.environment, log) match {
+    val environment = cmd.action match {
+      case RunLocalAction => "dev"
+      case _              => cmd.environment
+    }
+
+    ConfigReader.parseEnvironment(yamlFile, environment, log) match {
       case error: ConfigError =>
         showConfigError(cmd, error, log)
         error
