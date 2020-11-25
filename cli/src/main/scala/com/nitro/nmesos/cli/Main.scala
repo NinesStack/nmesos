@@ -232,9 +232,7 @@ object CliManager {
         RunLocalCommand(
           serviceConfig,
           log,
-          isDryrun = false,
-          deprecatedSoftGracePeriod = cmd.deprecatedSoftGracePeriod,
-          deprecatedHardGracePeriod = cmd.deprecatedHardGracePeriod
+          isDryrun = false
         ).run()
 
       case other =>

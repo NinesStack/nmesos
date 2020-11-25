@@ -23,9 +23,7 @@ class RunLocalCommandSpec extends Specification {
       val commandString = RunLocalCommand(
         buildConfig(),
         InfoLogger,
-        isDryrun = true,
-        deprecatedSoftGracePeriod = 10,
-        deprecatedHardGracePeriod = 20
+        isDryrun = true
       ).runLocalCmdString()
 
       commandString must be equalTo "docker run -i -p 4000:4000 -e MY_ENV_VAR_2=MY_ENV_VAR_2 -e MY_ENV_VAR_1=MY_ENV_VAR_1 hubspot/singularity-test-service:latest"

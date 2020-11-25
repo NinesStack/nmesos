@@ -205,7 +205,7 @@ object CliParser {
       .action((_, params) => params.copy(action = RunLocalAction))
       .children(
         arg[String]("service-name")
-          .text("Name of the service to release")
+          .text("Name of the service to run")
           .required()
           .action((input, params) => params.copy(serviceName = input)),
         opt[String]("tag")

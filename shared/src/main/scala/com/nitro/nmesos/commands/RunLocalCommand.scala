@@ -13,9 +13,7 @@ import com.nitro.nmesos.singularity.ModelConversions
 case class RunLocalCommand(
     localConfig: CmdConfig,
     log: Logger,
-    isDryrun: Boolean,
-    deprecatedSoftGracePeriod: Int,
-    deprecatedHardGracePeriod: Int
+    isDryrun: Boolean
 ) extends BaseCommand {
 
   override def run(): CommandResult = {
