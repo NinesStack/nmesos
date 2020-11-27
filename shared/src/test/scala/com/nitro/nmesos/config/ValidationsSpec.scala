@@ -3,6 +3,9 @@ package com.nitro.nmesos.config
 import org.specs2.mutable.Specification
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.{ util => ju }
+import _root_.java.{ util => ju }
+import _root_.java.{ util => ju }
 
 /*
  * Test the (basic) Validations
@@ -67,7 +70,7 @@ class ValidationsSpec extends Specification {
   "Validations checkDeprecated" should {
 
     "succeed if no env_vars are expired" in {
-      val today = LocalDate.parse("30-Jan-2020", DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
+      val today = LocalDate.parse("30-Jan-2020", DateTimeFormatter.ofPattern("dd-MMM-yyyy", ju.Locale.US))
       val expectedResult = Seq(
         Ok("Deprecated Env Var - OLD_ENV_VAR_10"),
         Ok("Deprecated Env Var - OLD_ENV_VAR_20"),
@@ -76,7 +79,7 @@ class ValidationsSpec extends Specification {
     }
 
     "fail/warn if env_vars are expired" in {
-      val today = LocalDate.parse("30-Jan-2020", DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
+      val today = LocalDate.parse("30-Jan-2020", DateTimeFormatter.ofPattern("dd-MMM-yyyy", ju.Locale.US))
       val expectedResult = Seq(
         Fail("Deprecated Env Var - OLD_ENV_VAR_10", "< 20"),
         Warning("Deprecated Env Var - OLD_ENV_VAR_20", "< 10"),
@@ -90,7 +93,7 @@ class ValidationsSpec extends Specification {
 
     "succeed, if a well formed line needs to get processes" in {
       val line = "OLD_ENV_VAR_10: \"old value\" # @deprecated-on 10-Jan-2020"
-      val expectedDate = LocalDate.parse("10-Jan-2020", DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
+      val expectedDate = LocalDate.parse("10-Jan-2020", DateTimeFormatter.ofPattern("dd-MMM-yyyy", ju.Locale.US))
       Validations.processLine(line) should be equalTo ("OLD_ENV_VAR_10", expectedDate)
     }
 
