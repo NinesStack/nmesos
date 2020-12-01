@@ -85,7 +85,7 @@ object Validations extends ValidationHelper {
   def processLine(line: String): (String, LocalDate) = {
     val p = raw"^\s*([A-Z0-9_]+):.*# @deprecated-on (.*)".r
     val p(envVar, date) = line
-    val deprecatedOn = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MMM-yyyy"))
+    val deprecatedOn = LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MMM-yyyy", ju.Locale.US))
     (envVar, deprecatedOn)
   }
 
