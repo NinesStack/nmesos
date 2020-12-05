@@ -19,7 +19,6 @@ import org.specs2.mutable.Specification
 class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
   sequential
 
-
   "Deploy Command" should {
 
     "Fail with a friendly message if it can't connect to Singularity" in {
@@ -32,7 +31,8 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       )
       val result = command.run()
 
-      val ExpectedError = CommandError("Unable to connect to http://invalid-api")
+      val ExpectedError =
+        CommandError("Unable to connect to http://invalid-api")
       result must be equalTo ExpectedError
     }
 
@@ -49,7 +49,9 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       )
       val result = command.run()
 
-      result must be equalTo CommandSuccess("Successfully deployed to 1 instances. [dry-run true] use --dry-run false")
+      result must be equalTo CommandSuccess(
+        "Successfully deployed to 1 instances. [dry-run true] use --dry-run false"
+      )
 
       val ExpectedOutput =
         s"""Deploying Config ---------------------------------------------------------------
@@ -90,11 +92,10 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       compareOutput(ExpectedOutput, logger)
     }
 
-
     "deploy a example service for the first time with an expected log" in {
 
-
-      val serviceConfig = buildConfig("example-service").copy(serviceName = ServiceNameInThisTest)
+      val serviceConfig =
+        buildConfig("example-service").copy(serviceName = ServiceNameInThisTest)
 
       val logger = new DummyLogger
       val command = ReleaseCommand(
@@ -106,9 +107,12 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       )
       val result = command.run()
 
-      result must be equalTo CommandSuccess("Successfully deployed to 1 instances.")
+      result must be equalTo CommandSuccess(
+        "Successfully deployed to 1 instances."
+      )
 
-      val ExpectedRequestId = ModelConversions.toSingularityRequestId(serviceConfig)
+      val ExpectedRequestId =
+        ModelConversions.toSingularityRequestId(serviceConfig)
 
       val ExpectedOutput =
         s"""Deploying Config ---------------------------------------------------------------
@@ -157,11 +161,11 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       compareOutput(ExpectedOutput, logger)
     }
 
-
     "Ask for '--force' when deploying an existing service with the same version." in {
 
       // create a new service (in case it doesn't exist already
-      val serviceConfig = buildConfig("example-service").copy(serviceName = ServiceNameInThisTest)
+      val serviceConfig =
+        buildConfig("example-service").copy(serviceName = ServiceNameInThisTest)
       val command = ReleaseCommand(
         serviceConfig,
         InfoLogger,
@@ -170,7 +174,6 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
         deprecatedHardGracePeriod = 20
       )
       val result = command.run()
-
 
       // After the first deploy we try to deploy again.
       val logger = new DummyLogger
@@ -182,14 +185,19 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
         deprecatedHardGracePeriod = 20
       )
       val result2 = command2.run()
-      val ExpectedRequestId = ModelConversions.toSingularityRequestId(serviceConfig)
-      val ExpectedError = CommandError(s"Unable to deploy - There is already a deploy with id latest_${HashExampleService}, use --force to force the redeploy")
+      val ExpectedRequestId =
+        ModelConversions.toSingularityRequestId(serviceConfig)
+      val ExpectedError = CommandError(
+        s"Unable to deploy - There is already a deploy with id latest_${HashExampleService}, use --force to force the redeploy"
+      )
       result2 must be equalTo ExpectedError
     }
 
     // Example of a no standard project (using extra docker parameters)
     "deploy sidecar with an expected log" in {
-      val serviceConfig = buildConfig("sidecar").copy(serviceName = s"test-sidecar-${System.currentTimeMillis}")
+      val serviceConfig = buildConfig("sidecar").copy(serviceName =
+        s"test-sidecar-${System.currentTimeMillis}"
+      )
 
       val command = ReleaseCommand(
         serviceConfig,
@@ -200,15 +208,18 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       )
       val result = command.run()
 
-      result must be equalTo CommandSuccess("Successfully deployed to 1 instances.")
+      result must be equalTo CommandSuccess(
+        "Successfully deployed to 1 instances."
+      )
     }
 
     "deploy a job for the first time with an expected log" in {
 
+      val serviceConfig = buildConfig("example-job").copy(serviceName =
+        JobNameInThisTest
+      ) //.copy(force = true)//.
 
-      val serviceConfig = buildConfig("example-job").copy(serviceName = JobNameInThisTest) //.copy(force = true)//.
-
-      val logger =  new DummyLogger
+      val logger = new DummyLogger
       val command = ReleaseCommand(
         serviceConfig,
         logger,
@@ -218,9 +229,12 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
       )
       val result = command.run()
 
-      result must be equalTo CommandSuccess("Successfully scheduled - cron: '*/5 * * * *'.")
+      result must be equalTo CommandSuccess(
+        "Successfully scheduled - cron: '*/5 * * * *'."
+      )
 
-      val ExpectedRequestId = ModelConversions.toSingularityRequestId(serviceConfig)
+      val ExpectedRequestId =
+        ModelConversions.toSingularityRequestId(serviceConfig)
 
       val ExpectedOutput =
         s"""Deploying Config ---------------------------------------------------------------
@@ -269,7 +283,6 @@ class ReleaseCommandIntegrationTest extends ReleaseCommandFixtures {
   }
 }
 
-
 trait ReleaseCommandFixtures extends Specification {
 
   val JobNameInThisTest = s"integration-test-job-${System.currentTimeMillis}"
@@ -288,15 +301,24 @@ trait ReleaseCommandFixtures extends Specification {
     )
   }
 
-
   val HashExampleService = "17d5246"
   val HashExampleJobConfigFile = "8d4c0de"
 
   def buildConfig(serviceName: String) = {
-    val yamlFile = new File(getClass.getResource(s"/config/$serviceName.yml").toURI)
+    val yamlFile = new File(
+      getClass.getResource(s"/config/$serviceName.yml").toURI
+    )
     ConfigReader.parseEnvironment(yamlFile, "dev", InfoLogger) match {
       case validConfig: ValidConfig =>
-        CmdConfig(serviceName, "latest", force = false, validConfig.environmentName, validConfig.environment, validConfig.fileHash, yamlFile)
+        CmdConfig(
+          serviceName,
+          "latest",
+          force = false,
+          validConfig.environmentName,
+          validConfig.environment,
+          validConfig.fileHash,
+          yamlFile
+        )
       case other => sys.error(other.toString)
     }
 
@@ -308,29 +330,32 @@ trait ReleaseCommandFixtures extends Specification {
 
     def debug(msg: => Any): Unit = {}
 
-    override def println(msg: => Any): Unit = buffer :+= {
-      Console.println(msg)
-      msg.toString
-    }
+    override def println(msg: => Any): Unit =
+      buffer :+= {
+        Console.println(msg)
+        msg.toString
+      }
 
   }
 
   def compareOutput(expectedOutput: String, logger: DummyLogger) = {
     def isLineToIgnore(line: String): Boolean = {
-      line.startsWith(" Config File:") || line.contains("TaskId:") || line.contains("localhost:")
+      line.startsWith(" Config File:") || line.contains("TaskId:") || line
+        .contains("localhost:")
     }
 
+    val expectedLines =
+      expectedOutput.stripMargin.split("\n").filterNot(isLineToIgnore)
+    val outputLines =
+      logger.buffer.mkString("\n").split("\n").toSeq.filterNot(isLineToIgnore)
 
-    val expectedLines = expectedOutput.stripMargin.split("\n").filterNot(isLineToIgnore)
-    val outputLines = logger.buffer.mkString("\n").split("\n").toSeq.filterNot(isLineToIgnore)
-
-    outputLines.zip(expectedLines).foreach { case (expectedLine, outputLine) =>
-      println(s"Out:      [$outputLine]")
-      println(s"Expected: [$expectedLine]")
-      expectedLine must be equalTo outputLine
+    outputLines.zip(expectedLines).foreach {
+      case (expectedLine, outputLine) =>
+        println(s"Out:      [$outputLine]")
+        println(s"Expected: [$expectedLine]")
+        expectedLine must be equalTo outputLine
     }
     outputLines must be equalTo expectedLines
   }
-
 
 }

@@ -1,10 +1,19 @@
 package com.nitro.nmesos.sidecar
 
-import com.nitro.nmesos.util.{ HttpClientHelper, Logger }
+import com.nitro.nmesos.util.{HttpClientHelper, Logger}
 
-case class Service(ID: String, Name: String, Status: Int, Hostname: String, Image: String)
+case class Service(
+    ID: String,
+    Name: String,
+    Status: Int,
+    Hostname: String,
+    Image: String
+)
 
-case class SidecarServices(Services: Map[String, Seq[Service]], hostName: String = "")
+case class SidecarServices(
+    Services: Map[String, Seq[Service]],
+    hostName: String = ""
+)
 
 case class SidecarManager(log: Logger) extends HttpClientHelper {
 

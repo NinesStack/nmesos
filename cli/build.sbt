@@ -12,7 +12,8 @@ val cli = Seq[String](
 )
 
 mainClass in assembly := Some("com.nitro.nmesos.cli.Main")
-assemblyOption in assembly := (assemblyOption in assembly).value.copy(prependShellScript = Some(cli))
+assemblyOption in assembly := (assemblyOption in assembly).value
+  .copy(prependShellScript = Some(cli))
 assemblyJarName in assembly := "nmesos"
 
 enablePlugins(UniversalPlugin)
@@ -20,7 +21,9 @@ packageName in Universal := "nmesos-cli-" + version.value
 mappings in Universal in packageZipTarball := {
   Seq(
     file("README.md") -> "README.md",
-    file("contrib/etc/bash_completion.d/nmesos") -> "contrib/etc/bash_completion.d/nmesos",
+    file(
+      "contrib/etc/bash_completion.d/nmesos"
+    ) -> "contrib/etc/bash_completion.d/nmesos",
     file((assemblyOutputPath in assembly).value.getPath) -> "nmesos"
   )
 }
@@ -29,4 +32,6 @@ import com.typesafe.sbt.packager.SettingsHelper._
 makeDeploymentSettings(Universal, packageZipTarball, "tgz")
 
 awsProfile := Some("nmesos")
-publishTo := Some(s3resolver.value("nmesos-releases", s3("nmesos-releases/nitro-public/repo")))
+publishTo := Some(
+  s3resolver.value("nmesos-releases", s3("nmesos-releases/nitro-public/repo"))
+)

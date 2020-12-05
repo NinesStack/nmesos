@@ -1,7 +1,7 @@
 package com.nitro.nmesos.sidecar
 
 import org.specs2.mutable.Specification
-import com.nitro.nmesos.util.{ Logger, CustomLogger }
+import com.nitro.nmesos.util.{Logger, CustomLogger}
 
 class SidecarUtilsSpec extends Specification {
 
@@ -11,12 +11,29 @@ class SidecarUtilsSpec extends Specification {
     "diff the infos right" in {
       val containerNotDepoyedOnMesos = Seq()
       val goodContainerInfo, goodSidecarInfo = Seq("image @ host")
-      val badContainerInfo, badSidecarInfo = Seq("image @ host", "image @ host2")
+      val badContainerInfo, badSidecarInfo =
+        Seq("image @ host", "image @ host2")
 
-      SidecarUtils.diffInfo(goodContainerInfo, goodSidecarInfo, "service") should beTrue
-      SidecarUtils.diffInfo(containerNotDepoyedOnMesos, goodSidecarInfo, "service") should beTrue
-      SidecarUtils.diffInfo(goodContainerInfo, badSidecarInfo, "service") should beFalse
-      SidecarUtils.diffInfo(badContainerInfo, goodSidecarInfo, "service") should beFalse
+      SidecarUtils.diffInfo(
+        goodContainerInfo,
+        goodSidecarInfo,
+        "service"
+      ) should beTrue
+      SidecarUtils.diffInfo(
+        containerNotDepoyedOnMesos,
+        goodSidecarInfo,
+        "service"
+      ) should beTrue
+      SidecarUtils.diffInfo(
+        goodContainerInfo,
+        badSidecarInfo,
+        "service"
+      ) should beFalse
+      SidecarUtils.diffInfo(
+        badContainerInfo,
+        goodSidecarInfo,
+        "service"
+      ) should beFalse
     }
   }
 }
