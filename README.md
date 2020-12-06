@@ -157,6 +157,14 @@ When the soft-limit is reached a warning is printed. When the hard-limit it reac
 
 The default can be overriden with command line flags (see below or run `nmesos help`).
 
+## Support to run containers locally
+
+To run containers locally you can generate a `<service-name>.env` file and a `docker-compose.<service-name).yml` with the `docker-env` command.
+
+You can then start the service with `docker-compose --file docker-compose.<service-name>.yml` (to start it in the background just use the `--detach` flag).
+
+You can also have nmesos run `docker-compose` for you with the `docker-run` command (it will start the service in the background).
+
 ## Other Comands
 
 ```

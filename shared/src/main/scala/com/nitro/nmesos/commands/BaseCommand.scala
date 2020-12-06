@@ -59,7 +59,7 @@ trait BaseCommand extends Command {
 
   }
 
-  private def showCommand() = {
+  protected def showCommand() = {
     log.logBlock("Deploying Config") {
       log.info(
         s""" Service Name: ${localConfig.serviceName}

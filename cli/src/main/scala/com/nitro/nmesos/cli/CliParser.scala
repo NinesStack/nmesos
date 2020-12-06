@@ -55,7 +55,7 @@ object CliParser {
 
     cmd("release")
       .text(
-        "Release the a new version of the service.\n Usage:  nmesos release example-service --environment dev --tag 0.0.1"
+        "Release the a new version of the service.\n Usage:  nmesos release service-name --environment dev --tag 0.0.1"
       )
       .required()
       .action((_, params) => params.copy(action = ReleaseAction))
@@ -117,7 +117,7 @@ object CliParser {
 
     cmd("scale")
       .text(
-        " Update the Environment.\n Usage: nmesos scale service_name --environment dev"
+        " Update the Environment.\n Usage: nmesos scale service-name --environment dev"
       )
       .required()
       .action((_, params) => params.copy(action = ScaleAction))
@@ -147,7 +147,7 @@ object CliParser {
 
     cmd("check")
       .text(
-        " Check the environment conf without running it.\n Usage: nmesos check service_name --environment dev"
+        " Check the environment conf without running it.\n Usage: nmesos check service-name --environment dev"
       )
       .required()
       .action((_, params) => params.copy(action = CheckAction))
@@ -195,6 +195,35 @@ object CliParser {
           .text("The environment to verify")
           .required()
           .action((input, params) => params.copy(singularity = input))
+      )
+
+    note("\n")
+
+    cmd("docker-env")
+      .text(
+        " Create a <service-name>.env file (to run a/the docker container locally).\n Usage: nmesos docker-env service-name --environment dev --tag tag"
+      )
+      .required()
+      .action((_, params) => params.copy(action = DockerEnvAction))
+      .children(
+        arg[String]("service-name")
+          .text("Name of the service to build")
+          .required()
+          .action((input, params) => params.copy(serviceName = input)),
+        opt[String]("environment")
+          .abbr("e")
+          .text("The environment to build")
+          .required()
+          .action((input, params) => params.copy(environment = input)),
+        opt[String]("tag")
+          .abbr("t")
+          .text("Tag/Version to build")
+          .required()
+          .validate(tag =>
+            if (tag.isEmpty) Left("Tag is required")
+            else Right(())
+          )
+          .action((input, params) => params.copy(tag = input)),
       )
 
     checkConfig { cmd =>

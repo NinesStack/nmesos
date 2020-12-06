@@ -5,7 +5,8 @@ import com.nitro.nmesos.commands.{
   CheckCommand,
   CommandResult,
   ScaleCommand,
-  VerifyEnvCommand
+  VerifyEnvCommand,
+  DockerEnvCommand
 }
 import com.nitro.nmesos.config.ConfigReader.ConfigResult
 import com.nitro.nmesos.config.model.DeployJob
@@ -224,6 +225,13 @@ object CliManager {
           isDryrun = cmd.isDryrun,
           deprecatedSoftGracePeriod = cmd.deprecatedSoftGracePeriod,
           deprecatedHardGracePeriod = cmd.deprecatedHardGracePeriod
+        ).run()
+      case DockerEnvAction =>
+        val serviceConfig = toServiceConfig(cmd, config)
+        DockerEnvCommand(
+          serviceConfig,
+          log,
+          isDryrun = false
         ).run()
 
       case other =>
