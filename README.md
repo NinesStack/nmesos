@@ -33,6 +33,8 @@ Nmesos is a command line tool that leverages [Singularity](https://github.com/Hu
 
 ## Usage
 
+Note: You can run `nmesos` from the directory that got the config files in it or from any other directory, but then you need to let it know where the config files are by setting the `NMESOS_CONFIG_REPOSITORY` environment variable (e.g. `NMESOS_CONFIG_REPOSITORY=<some-dir> nmessos <rest-of-the-command-line`).
+
 ### Release a service
 
 The following command will read [example-service.yml](docs/examples/example-service.yml)
