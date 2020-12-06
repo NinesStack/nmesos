@@ -27,10 +27,12 @@ case class DockerEnvCommand(
       val imageWithTag = containerInfo.docker.image
       val portMappings = containerInfo.docker.portMappings
       val portString = if (portMappings.isEmpty) "[]" else "\n" ++ portMappings
-        .map(pm => s"      - ${pm.containerPort}:${pm.containerPort}")
+        .map(pm => s"      - ${pm.hostPort}:${pm.containerPort}")
         .mkString("\n")
-      val volumeMappings = List.empty
-      val volumeString = if (volumeMappings.isEmpty) "[]" else ""
+      val volumeMappings = containerInfo.volumes
+      val volumeString = if (volumeMappings.isEmpty) "[]" else "\n" ++ volumeMappings
+        .map(vm => s"      - ${vm.hostPath}:${vm.containerPath}")
+        .mkString("\n")
 
       val composeFilename = s"docker-compose.${localConfig.serviceName}.yml"
       val composeString = s"""version: "3.8"
