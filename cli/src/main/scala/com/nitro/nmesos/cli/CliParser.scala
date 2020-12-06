@@ -153,12 +153,12 @@ object CliParser {
       .action((_, params) => params.copy(action = CheckAction))
       .children(
         arg[String]("service-name")
-          .text("Name of the service to verify")
+          .text("Name of the service to check")
           .required()
           .action((input, params) => params.copy(serviceName = input)),
         opt[String]("environment")
           .abbr("e")
-          .text("The environment to verify")
+          .text("The environment to use")
           .required()
           .action((input, params) => params.copy(environment = input)),
         opt[Int]("deprecated-soft-grace-period")
@@ -192,7 +192,7 @@ object CliParser {
       .children(
         opt[String]("singularity")
           .abbr("s")
-          .text("The environment to verify")
+          .text("The environment to use")
           .required()
           .action((input, params) => params.copy(singularity = input))
       )
@@ -201,23 +201,52 @@ object CliParser {
 
     cmd("docker-env")
       .text(
-        " Create a <service-name>.env file (to run a/the docker container locally).\n Usage: nmesos docker-env service-name --environment dev --tag tag"
+        " Create a <service-name>.env/docker-compose.<service-name>.yml file (to run a/the docker container locally).\n Usage: nmesos docker-env service-name --environment dev --tag tag"
       )
       .required()
       .action((_, params) => params.copy(action = DockerEnvAction))
       .children(
         arg[String]("service-name")
-          .text("Name of the service to build")
+          .text("Name of the service to create")
           .required()
           .action((input, params) => params.copy(serviceName = input)),
         opt[String]("environment")
           .abbr("e")
-          .text("The environment to build")
+          .text("The environment to use")
           .required()
           .action((input, params) => params.copy(environment = input)),
         opt[String]("tag")
           .abbr("t")
-          .text("Tag/Version to build")
+          .text("Tag/Version to create")
+          .required()
+          .validate(tag =>
+            if (tag.isEmpty) Left("Tag is required")
+            else Right(())
+          )
+          .action((input, params) => params.copy(tag = input)),
+      )
+
+    note("\n")
+
+    cmd("docker-run")
+      .text(
+        " Run a/the docker container locally.\n Usage: nmesos docker-run service-name --environment dev --tag tag"
+      )
+      .required()
+      .action((_, params) => params.copy(action = DockerRunAction))
+      .children(
+        arg[String]("service-name")
+          .text("Name of the service to start")
+          .required()
+          .action((input, params) => params.copy(serviceName = input)),
+        opt[String]("environment")
+          .abbr("e")
+          .text("The environment to use")
+          .required()
+          .action((input, params) => params.copy(environment = input)),
+        opt[String]("tag")
+          .abbr("t")
+          .text("Tag/Version to start")
           .required()
           .validate(tag =>
             if (tag.isEmpty) Left("Tag is required")

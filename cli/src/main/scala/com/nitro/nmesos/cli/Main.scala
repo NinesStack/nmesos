@@ -6,7 +6,8 @@ import com.nitro.nmesos.commands.{
   CommandResult,
   ScaleCommand,
   VerifyEnvCommand,
-  DockerEnvCommand
+  DockerEnvCommand,
+  DockerRunCommand
 }
 import com.nitro.nmesos.config.ConfigReader.ConfigResult
 import com.nitro.nmesos.config.model.DeployJob
@@ -229,6 +230,13 @@ object CliManager {
       case DockerEnvAction =>
         val serviceConfig = toServiceConfig(cmd, config)
         DockerEnvCommand(
+          serviceConfig,
+          log,
+          isDryrun = false
+        ).run()
+      case DockerRunAction =>
+        val serviceConfig = toServiceConfig(cmd, config)
+        DockerRunCommand(
           serviceConfig,
           log,
           isDryrun = false
