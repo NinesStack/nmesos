@@ -33,5 +33,7 @@ object model {
   case object ScaleAction extends Action
   case object CheckAction extends Action
   case object VerifyAction extends Action
+  case object DockerEnvAction extends Action
+  case object DockerRunAction extends Action
 
 }

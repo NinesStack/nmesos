@@ -2,7 +2,8 @@ package com.nitro.nmesos.cli
 
 import java.io.File
 
-import com.nitro.nmesos.cli.model.{Cmd, ReleaseAction}
+import com.nitro.nmesos.cli.model.DefaultValues
+import com.nitro.nmesos.cli.model.{Cmd, ReleaseAction, DockerEnvAction}
 import com.nitro.nmesos.commands.ReleaseCommand
 import com.nitro.nmesos.config.ConfigReader
 import com.nitro.nmesos.config.ConfigReader.ValidConfig
@@ -157,27 +158,45 @@ class CliSpec extends Specification with CliSpecFixtures {
 
 trait CliSpecFixtures {
 
+  val testService = "testService"
   val ValidCliArgs =
-    "release testService -v -d -e dev -t latest -S 10 -H 20 -f -n false".split(
-      " "
-    )
-  val ValidCliArgsLong =
-    "release testService --verbose --noformat --environment dev --tag latest --deprecated-soft-grace-period 10 --deprecated-hard-grace-period 20 --force --dry-run false"
+    s"release ${testService} -v -d -e dev -t abcdef -S 10 -H 20 -f -n false"
       .split(" ")
-  val InvalidCliArgs = "release test -e dev -t".split(" ")
-
+  val ValidCliArgsLong =
+    s"release ${testService} --verbose --noformat --environment dev --tag abcdef --deprecated-soft-grace-period 10 --deprecated-hard-grace-period 20 --force --dry-run false"
+      .split(" ")
+  val InvalidCliArgs =
+    s"release ${testService} -e dev -t"
+      .split(" ")
   val ValidCmd = Cmd(
     action = ReleaseAction,
     isDryrun = false,
     verbose = true,
     isFormatted = false,
-    serviceName = "testService",
+    serviceName = testService,
     environment = "dev",
     singularity = "",
-    tag = "latest",
+    tag = "abcdef",
     force = true,
     deprecatedSoftGracePeriod = 10,
     deprecatedHardGracePeriod = 20
+  )
+
+  val ValidDockerEnvCliArgs=
+    s"docker-env ${testService} -e dev -t abcdef"
+      .split(" ")
+  val ValidDockerEnvCmd = Cmd(
+    action = DockerEnvAction,
+    isDryrun = DefaultValues.IsDryRun,
+    verbose = DefaultValues.Verbose,
+    isFormatted = DefaultValues.IsFormatted,
+    serviceName = "testService",
+    environment = "dev",
+    singularity = "",
+    tag = "abcdef",
+    force = false,
+    deprecatedSoftGracePeriod = DefaultValues.DeprecatedSoftGracePeriod,
+    deprecatedHardGracePeriod = DefaultValues.DeprecatedHardGracePeriod
   )
 
   lazy val ValidYamlConfig = {

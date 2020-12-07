@@ -33,6 +33,8 @@ Nmesos is a command line tool that leverages [Singularity](https://github.com/Hu
 
 ## Usage
 
+Note: You can run `nmesos` from the directory that got the config files in it or from any other directory, but then you need to let it know where the config files are by setting the `NMESOS_CONFIG_REPOSITORY` environment variable (e.g. `NMESOS_CONFIG_REPOSITORY=<some-dir> nmessos <rest-of-the-command-line`).
+
 ### Release a service
 
 The following command will read [example-service.yml](docs/examples/example-service.yml)
@@ -156,6 +158,14 @@ The date is the date, when you deprecated the `env_var`. `nmesos` checks the dat
 When the soft-limit is reached a warning is printed. When the hard-limit it reached an error is printed and the deploy is aborted.
 
 The default can be overriden with command line flags (see below or run `nmesos help`).
+
+## Support to run containers locally
+
+To run containers locally you can generate a `<service-name>.env` file and a `docker-compose.<service-name).yml` with the `docker-env` command.
+
+You can then start the service with `docker-compose --file docker-compose.<service-name>.yml` (to start it in the background just use the `--detach` flag).
+
+You can also have nmesos run `docker-compose` for you with the `docker-run` command (it will start the service in the background).
 
 ## Other Comands
 
