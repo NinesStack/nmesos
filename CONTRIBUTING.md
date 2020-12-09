@@ -29,7 +29,8 @@
 * Release a new version on the `master` branch (optional) ...
   * Bump the version in `build.sbt`
   * Build a new distributable `.tgz` with ...
-    * `sbt clean`
+    * `sbt nmesos-shared/clean` 
+    * `sbt nmesos-cli/clean` 
     * `sbt nmesos-shared/test` 
     * `sbt nmesos-cli/test` 
     * `sbt nmesos-cli/publishLocal`
