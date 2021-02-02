@@ -195,6 +195,18 @@ class YmlSpec extends Specification with YmlTestFixtures {
         .container
         .deploy_freeze shouldEqual None
     }
+
+    "return a value for command" in {
+      val parsed_with_command = YamlParser
+        .parse(YamlExampleWithCommand, InfoLogger)
+        .asInstanceOf[ValidYaml]
+
+      parsed_with_command.config.environments
+        .get("dev")
+        .get
+        .container
+        .command shouldEqual Some("echo 'hello world'")
+    }
   }
 }
 
@@ -300,4 +312,10 @@ trait YmlTestFixtures {
         )
       )
       .mkString
+
+  def YamlExampleWithCommand =
+    Source
+      .fromURL(getClass.getResource("/config/example-config-with-command.yml"))
+      .mkString
+
 }
