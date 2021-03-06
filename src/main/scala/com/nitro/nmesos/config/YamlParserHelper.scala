@@ -1,20 +1,7 @@
 package com.nitro.nmesos.config
 
 import com.nitro.nmesos.config.model._
-import net.jcazevedo.moultingyaml.{
-  DefaultYamlProtocol,
-  YamlArray,
-  YamlBoolean,
-  YamlDate,
-  YamlFormat,
-  YamlNull,
-  YamlNumber,
-  YamlObject,
-  YamlSet,
-  YamlString,
-  YamlValue,
-  deserializationError
-}
+import net.jcazevedo.moultingyaml._
 
 import scala.annotation.tailrec
 
@@ -36,7 +23,7 @@ object YamlParserHelper {
 
   // boilerplate to parse our custom case class
   object YamlCustomProtocol extends DefaultYamlProtocol {
-    implicit val PortMapYamlFormat = new YamlFormat[PortMap] {
+    implicit val PortMapYamlFormat: YamlFormat[PortMap] = new YamlFormat[PortMap] {
       override def read(yaml: YamlValue): PortMap =
         yaml match {
           case YamlNumber(_) => PortMap(yaml.convertTo[Int], None, None)
@@ -72,14 +59,14 @@ object YamlParserHelper {
       }
     }
 
-    implicit val resourcesFormat = yamlFormat3(Resources)
-    implicit val containerFormat = yamlFormat10(Container)
-    implicit val singularityFormat = yamlFormat16(SingularityConf)
-    implicit val executorFormat = yamlFormat2(ExecutorConf)
-    implicit val deployJobFormat = yamlFormat2(DeployJob)
-    implicit val afterDeployFormat = yamlFormat2(AfterDeployConf)
-    implicit val environmentFormat = yamlFormat5(Environment)
-    implicit val configFormat = yamlFormat2(Config)
+    implicit val resourcesFormat: YamlFormat[Resources] = yamlFormat3(Resources.apply)
+    implicit val containerFormat: YamlFormat[Container] = yamlFormat10(Container.apply)
+    implicit val singularityFormat: YamlFormat[SingularityConf] = yamlFormat16(SingularityConf.apply)
+    implicit val executorFormat: YamlFormat[ExecutorConf] = yamlFormat2(ExecutorConf.apply)
+    implicit val deployJobFormat: YamlFormat[DeployJob] = yamlFormat2(DeployJob.apply)
+    implicit val afterDeployFormat: YamlFormat[AfterDeployConf] = yamlFormat2(AfterDeployConf.apply)
+    implicit val environmentFormat: YamlFormat[Environment] = yamlFormat5(Environment.apply)
+    implicit val configFormat: YamlFormat[Config] = yamlFormat2(Config.apply)
   }
 
   /**
@@ -111,15 +98,15 @@ object YamlParserHelper {
       yaml.fields(YamlString("environments")).asYamlObject.fields
 
     // Add environments fields recursively
-    val updatedEnvironments = environments.mapValues { environment =>
-      smartMerge(common.fields, environment.asYamlObject)
+    val updatedEnvironments = environments.mapValues {
+      environment => smartMerge(common.fields, environment.asYamlObject)
     }
 
     // return new Yaml with commons and environments joined
-    val updatedFields = yaml.fields.filterKeys(_ != commonKey) + (YamlString(
-      "environments"
-    ) -> new YamlObject(updatedEnvironments))
-    new YamlObject(updatedFields)
+    val updatedFields =
+      yaml.fields.filterKeys(_ != commonKey)
+      + (YamlString("environments") -> new YamlObject(updatedEnvironments.toMap))
+    new YamlObject(updatedFields.toMap)
   }
 
   private def smartMerge(

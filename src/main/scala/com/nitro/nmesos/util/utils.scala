@@ -43,7 +43,7 @@ object VersionUtil {
   val VersionField = "nmesos_version"
 
   def tryExtractFromYaml(sourceYml: String): Try[Version] = {
-    val tryVersionLine = sourceYml.lines
+    val tryVersionLine = sourceYml.linesIterator
       .find(_.contains(VersionField))
       .toTry(s"$VersionField no present in the config file")
 

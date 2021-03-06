@@ -64,7 +64,7 @@ trait FetchEnvironment {
             .map(_.sanitizedHost)
             .distinct
             .map(desanitized)
-        containers = hosts.par.map(fetchContainers).seq.flatten
+        containers = hosts.map(fetchContainers).seq.flatten
         sidecars = fetchSidecarInfo(containers)
         info = EnvironmentInfo(requests, containers, sidecars)
       } yield info
@@ -86,7 +86,8 @@ trait FetchEnvironment {
       .map(_.host)
       .distinct
       .sorted
-    sidecarHosts.map(sidecar.getServices).flatMap(_.toOption.flatten.toSeq)
+    sidecarHosts.map(sidecar.getServices)
+      .flatMap(_.toOption.flatten.toSeq)
   }
 
   private def desanitized(sanitizedHost: String) =

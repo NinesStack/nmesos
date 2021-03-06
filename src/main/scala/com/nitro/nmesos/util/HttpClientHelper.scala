@@ -137,8 +137,7 @@ object CustomPicklers {
   object OptionPickler extends upickle.AttributeTagged {
 
     // Support for option of custom case classes
-    implicit val customSingularityRequestParentReader =
-      OptionR[Option[SingularityRequestParent]]
+    implicit val customSingularityRequestParentReader: Reader[Option[Option[SingularityRequestParent]]] = OptionR[Option[SingularityRequestParent]]
 
     override implicit def OptionW[T: Writer]: Writer[Option[T]] =
       Writer {
@@ -156,7 +155,7 @@ object CustomPicklers {
       * Hack to parse no standard json Long values.
       * Singularity doesn't return long as strings.
       */
-    implicit def long2Reader =
+    implicit def long2Reader: Reader[Long] =
       OptionPickler.Reader[Long] {
         case Js.Num(str) =>
           str.toLong
