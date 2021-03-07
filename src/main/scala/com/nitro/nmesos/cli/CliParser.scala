@@ -256,9 +256,10 @@ object CliParser {
       )
 
     checkConfig { cmd =>
-      val availableCommands = commands.map(_.fullName).mkString("|")
+      //val availableCommands = commands.map(_.fullName).mkString("|")
+      val availableCommands = "scale | release | check | verify | docker-env | docker-run"
       if (cmd.action != NilAction) success
-      else failure(s"A command is required. $availableCommands\n")
+      else failure(s"A command is required: ${availableCommands}\n")
     }
 
     override def showUsageOnError: Boolean = true
