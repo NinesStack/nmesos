@@ -137,7 +137,7 @@ object CustomPicklers {
   object OptionPickler extends upickle.AttributeTagged {
 
     // Support for option of custom case classes
-    implicit val customSingularityRequestParentReader: Reader[Option[Option[SingularityRequestParent]]] = OptionR[Option[SingularityRequestParent]]
+    implicit val customSingularityRequestParentReader = OptionR[Option[SingularityRequestParent]]
 
     override implicit def OptionW[T: Writer]: Writer[Option[T]] =
       Writer {
