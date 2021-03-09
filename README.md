@@ -1,5 +1,7 @@
 ![NMesos Logo](docs/nmesos_logo.png)
 
+# !!! NOTE: On Mar., 31st we will rename the `master` branch to `trunk` !!!
+
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
 
