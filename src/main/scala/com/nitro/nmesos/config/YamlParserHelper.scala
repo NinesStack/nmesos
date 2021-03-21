@@ -98,14 +98,14 @@ object YamlParserHelper {
       yaml.fields(YamlString("environments")).asYamlObject.fields
 
     // Add environments fields recursively
-    val updatedEnvironments = environments.mapValues {
+    val updatedEnvironments = environments.view.mapValues {
       environment => smartMerge(common.fields, environment.asYamlObject)
     }
 
     // return new Yaml with commons and environments joined
     val updatedFields =
-      yaml.fields.filterKeys(_ != commonKey)
-      + (YamlString("environments") -> new YamlObject(updatedEnvironments.toMap))
+      yaml.fields.view.filterKeys(_ != commonKey) ++
+        Map(YamlString("environments") -> new YamlObject(updatedEnvironments.toMap))
     new YamlObject(updatedFields.toMap)
   }
 
@@ -140,6 +140,8 @@ object YamlParserHelper {
             case YamlSet(values) =>
               val previousSet = mergedFields(key).asInstanceOf[YamlSet].set
               mergedFields + (key -> YamlSet(previousSet ++ values))
+
+            case _ => throw new RuntimeException("Unexpected case")
           }
         }
     }

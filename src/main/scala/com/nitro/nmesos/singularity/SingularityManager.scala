@@ -90,7 +90,7 @@ trait SingularityManager extends HttpClientHelper {
       )
       log <- logOp.toTry("Logs not found")
     } yield {
-      log.data.split("\n")
+      log.data.split("\n").toSeq
     }
 
   def getSingularityActiveTasks(): Try[Seq[SingularityTask]] = {

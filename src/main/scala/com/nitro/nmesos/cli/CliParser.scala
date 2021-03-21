@@ -262,7 +262,7 @@ object CliParser {
       else failure(s"A command is required: ${availableCommands}\n")
     }
 
-    override def showUsageOnError: Boolean = true
+    override def showUsageOnError: Option[Boolean] = Some(true)
   }
 
 }

@@ -64,7 +64,7 @@ trait FetchEnvironment {
             .map(_.sanitizedHost)
             .distinct
             .map(desanitized)
-        containers = hosts.map(fetchContainers).seq.flatten
+        containers = hosts.map(fetchContainers).flatten
         sidecars = fetchSidecarInfo(containers)
         info = EnvironmentInfo(requests, containers, sidecars)
       } yield info
@@ -73,7 +73,7 @@ trait FetchEnvironment {
   private def fetchContainers(host: String): Seq[Container] = {
     log.println(s"Fetching Docker container from $host...")
     SshDockerClient.fetchContainers(host)
-  }.seq
+  }
 
   /**
     * Recover Sidecar info if Sidecar container pressent
