@@ -1,39 +1,42 @@
 package com.nitro.nmesos.sidecar
 
-import org.specs2.mutable.Specification
+import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
+
 import com.nitro.nmesos.util.{Logger, CustomLogger}
 
-class SidecarUtilsSpec extends Specification {
+class SidecarUtilsSpec extends AnyFlatSpec with should.Matchers {
 
-  implicit val log = CustomLogger(ansiEnabled = true, verbose = true)
+  implicit val log: CustomLogger =
+    CustomLogger(ansiEnabled = true, verbose = true)
 
-  "Sidecar Utils" should {
-    "diff the infos right" in {
-      val containerNotDepoyedOnMesos = Seq()
-      val goodContainerInfo, goodSidecarInfo = Seq("image @ host")
-      val badContainerInfo, badSidecarInfo =
-        Seq("image @ host", "image @ host2")
+  "Sidecar Utils" should "diff the infos right" in {
+    val containerNotDepoyedOnMesos = Seq()
+    val goodContainerInfo, goodSidecarInfo = Seq("image @ host")
+    val badContainerInfo, badSidecarInfo =
+      Seq("image @ host", "image @ host2")
 
-      SidecarUtils.diffInfo(
-        goodContainerInfo,
-        goodSidecarInfo,
-        "service"
-      ) should beTrue
-      SidecarUtils.diffInfo(
-        containerNotDepoyedOnMesos,
-        goodSidecarInfo,
-        "service"
-      ) should beTrue
-      SidecarUtils.diffInfo(
-        goodContainerInfo,
-        badSidecarInfo,
-        "service"
-      ) should beFalse
-      SidecarUtils.diffInfo(
-        badContainerInfo,
-        goodSidecarInfo,
-        "service"
-      ) should beFalse
-    }
+    SidecarUtils.diffInfo(
+      goodContainerInfo,
+      goodSidecarInfo,
+      "service"
+    ) should be(true)
+    SidecarUtils.diffInfo(
+      containerNotDepoyedOnMesos,
+      goodSidecarInfo,
+      "service"
+    ) should be(true)
+    SidecarUtils.diffInfo(
+      goodContainerInfo,
+      badSidecarInfo,
+      "service"
+    ) should be(false)
+    SidecarUtils.diffInfo(
+      badContainerInfo,
+      goodSidecarInfo,
+      "service"
+    ) should be(false)
   }
+
 }
