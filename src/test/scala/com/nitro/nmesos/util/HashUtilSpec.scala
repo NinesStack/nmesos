@@ -1,14 +1,14 @@
 package com.nitro.nmesos.util
 
-import org.specs2.mutable.Specification
+import org.scalatest._
+import org.scalatest.flatspec._
+import org.scalatest.matchers._
 
-class HashUtilSpec extends Specification {
+class HashUtilSpec extends AnyFlatSpec with should.Matchers {
 
-  "Hash" should {
-
-    "build a short hash" in {
-      val hash = HashUtil.hash("test content")
-      hash must be equalTo "1eebdf4"
-    }
+  "Hash" should "build a short hash" in {
+    val hash = HashUtil.hash("test content")
+    hash should be("1eebdf4")
   }
+
 }
