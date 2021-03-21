@@ -13,5 +13,5 @@ lazy val root = project
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.5" % "test",
     libraryDependencies += "com.github.scopt" % "scopt_2.13" % "4.0.0",
     libraryDependencies += "org.scalaj" % "scalaj-http_2.13" % "2.4.2",
-    libraryDependencies += "com.lihaoyi" % "upickle_2.13" % "1.2.3",
+    libraryDependencies += "com.lihaoyi" %% "upickle" % "1.3.0",
   )

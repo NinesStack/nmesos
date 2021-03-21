@@ -5,15 +5,14 @@ import com.nitro.nmesos.singularity.model.SingularityRequestParent
 import scala.util.Try
 import scalaj.http._
 
+import CustomPicklers.OptionPickler._
+
 /**
   * HTTP boilerplate.
   * Note: Http connections are synchronous.
   */
 trait HttpClientHelper {
   def log: Logger
-
-  // Custom json reader/writer
-  import CustomPicklers.OptionPickler._
 
   protected def get[A: Reader](url: String): Try[Option[A]] =
     Try {
@@ -123,45 +122,6 @@ trait HttpClientHelper {
     log.debug(s"Response > ${response.code}: $msg...\n")
     sys.error(s"HTTP ${response.statusLine} - ${response.code}: $url\n $msg")
   }
-}
-
-/**
-  * Json boilerplate.
-  * - Parse scala Options.
-  * - Parse custom Long format from Singularity
-  */
-object CustomPicklers {
-
-  import upickle.Js
-
-  object OptionPickler extends upickle.AttributeTagged {
-
-    // Support for option of custom case classes
-    implicit val customSingularityRequestParentReader = OptionR[Option[SingularityRequestParent]]
-
-    override implicit def OptionW[T: Writer]: Writer[Option[T]] =
-      Writer {
-        case None    => Js.Null
-        case Some(s) => implicitly[Writer[T]].write(s)
-      }
-
-    override implicit def OptionR[T: Reader]: Reader[Option[T]] =
-      Reader {
-        case Js.Null     => None
-        case v: Js.Value => Some(implicitly[Reader[T]].read.apply(v))
-      }
-
-    /**
-      * Hack to parse no standard json Long values.
-      * Singularity doesn't return long as strings.
-      */
-    implicit def long2Reader: Reader[Long] =
-      OptionPickler.Reader[Long] {
-        case Js.Num(str) =>
-          str.toLong
-      }
-  }
-
 }
 
 object HttpClient extends BaseHttp(userAgent = s"nmesos") {
