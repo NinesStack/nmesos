@@ -89,6 +89,7 @@ object VersionUtil {
         case (required, installed) :: tail if (required < installed) => true
         case (required, installed) :: tail if (required == installed) =>
           compareVersions(tail)
+        case _ => throw new RuntimeException("Unexpected case")
       }
 
     compareVersions(zip)

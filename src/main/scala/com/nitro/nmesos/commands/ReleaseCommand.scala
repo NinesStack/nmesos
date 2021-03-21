@@ -95,6 +95,8 @@ case class ReleaseCommand(
         CommandError(s"Unable to deploy")
       case Failure(ex) =>
         CommandError(s"Unable to deploy - ${ex.getMessage}")
+      case _ =>
+        throw new RuntimeException("Unexpected case")
     }
   }
 }

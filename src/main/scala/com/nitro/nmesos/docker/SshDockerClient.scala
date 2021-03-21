@@ -49,7 +49,7 @@ object SshDockerClient {
     val linesByContainer = lines
       .filterNot(_.isEmpty)
       .groupBy(_.takeWhile(_ != ':').take(12)) // Group by short Container Id
-      .mapValues(_.map(_.dropWhile(_ != ':').drop(1))) // raw env vars as value
+      .view.mapValues(_.map(_.dropWhile(_ != ':').drop(1))) // raw env vars as value
 
     val envByContainer = linesByContainer.mapValues { lines =>
       lines
@@ -81,5 +81,6 @@ object SshDockerClient {
              |$psOutput
           """.stripMargin)
       }
+    .toSeq
   }
 }

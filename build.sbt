@@ -6,6 +6,10 @@ lazy val root = project
     name := "nmesos",
     version := "1.0.0",
     scalaVersion := scala3Version,
+    scalacOptions ++= Seq(
+      "-Xfatal-warnings"
+    ),
+
     libraryDependencies += "de.sciss" %% "log" % "0.1.1",
     libraryDependencies += "joda-time" % "joda-time" % "2.10.10",
     libraryDependencies += "net.jcazevedo" % "moultingyaml_2.13" % "0.4.2",
