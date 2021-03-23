@@ -5,10 +5,13 @@
 * Create an issue (to get agreement on what you want to add/change)
 * Fork the repo
 * Make the changes (inlcuding writing the test(s) to verify/validate the changes)
+<<<<<<< HEAD
 * Check that you have not decreased test-coverage
   * run `sbt clean coverage nmesos-shared/test nmesos-shared/coverageReport`
   * open `shared/target/scala-2.12/scoverage-report/index.html`
   * and/or run this for `nmesos-cli`
+=======
+>>>>>>> Make publish work (again).
 * Create a PR (linking back to the issue; explain what/why/how you changed the code)
 * Note: Please keep the `.gitignore` file clean of your personal build/IDE artifacts by using/setting up a global gitignore file on your side (probably a good idea/practice anyway; `git config --global core.excludesfile ~/.gitignore_global`)
 
@@ -16,15 +19,30 @@
 
 * Note: To publish a new release you need to get access to the S3 bucket ...
   * Contact one of the existing commiters/maintainers to get the aws keys
+<<<<<<< HEAD
   * `export AWS_DEFAULT_REGION=eu-west-1`
   * `export AWS_REGION=eu-west-1`
   * `export AWS_ACCESS_KEY_ID=<key id>`
   * `export AWS_SECRET_ACCESS_KEY=<key>`
+=======
+  * Add the following section to your `~/.aws/credentials` file ...
+    ```
+    [nmesos]
+    aws_access_key_id = <access>
+    aws_secret_access_key = <secret>    
+    ```
+  * And add the following section to your `~/.aws/config` file ...
+    ```
+    [nmesos]
+    region = eu-west-1
+    ```
+>>>>>>> Make publish work (again).
 * Review the PR (discussing the change/implementation; making changes as necessary)
 * Approve the PR
 * Merge the PR
 * Release a new version on the `master` branch (optional) ...
   * Bump the version in `build.sbt`
+<<<<<<< HEAD
   * Build a new distributable `.tgz` with ...
     * `sbt nmesos-shared/clean` 
     * `sbt nmesos-cli/clean` 
@@ -40,3 +58,9 @@
   * Add/Commit/Push to `master`
   * Tag the release (and push the tag)
 * Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases/nitro-public/repo/nitro/nmesos-cli/0.2.19/`).
+=======
+  * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish` 
+  * Add/Commit/Push to `master`
+  * Tag the release (and push the tag)
+* Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases/nitro-public/repo/nitro/nmesos/1.0.1`).
+>>>>>>> Make publish work (again).
