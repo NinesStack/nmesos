@@ -102,7 +102,7 @@ Note: Older version of Nmesos (up to 0.2.18) are available here:
 curl https://s3-us-west-2.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.1.2/nmesos-cli-0.1.2.tgz | tar -xz
 ```
 
-Alternatively on MacOS, you can also install it with brew:
+Alternatively on MacOS, you can also install it with `brew`:
 
 ```
 brew tap nitro/nmesos  git@github.com:Nitro/nmesos.git
@@ -120,6 +120,15 @@ Uninstall Nmesos cli:
 
 ```
 brew uninstall nmesos-cli
+```
+
+And or use `asdf`:
+
+```
+asdf plugin-add nmesos https://github.com/Nitro/nmesos.git
+asdf list-all nmesos
+asdf install nmesos <version>
+asdf global nmesos <version>
 ```
 
 ## Bash Completion support

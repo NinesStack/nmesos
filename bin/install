@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+bin=${ASDF_DOWNLOAD_PATH}/nmesos-cli-${ASDF_INSTALL_VERSION}/nmesos
+
+chmod 700 ${bin}
+mv ${bin} ${ASDF_INSTALL_PATH}
