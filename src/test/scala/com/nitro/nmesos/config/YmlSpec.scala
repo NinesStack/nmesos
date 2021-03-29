@@ -18,31 +18,33 @@ import scala.io.Source
 class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
 
   "Yml Parser" should "fail while reading an invalid YML file" in {
-    val ExpectedMessage =
+    val expectedMessage =
       "Invalid yaml file at line 9, column: 1\n     WTF!\n     ^"
-    YamlParser.parse(
+    val parseResult = YamlParser.parse(
       YamlInvalidRandom,
       InfoLogger
-    ) should be(InvalidYaml(ExpectedMessage))
+    )
+    parseResult should be(InvalidYaml(expectedMessage))
   }
 
   it should "fail while reading a valid YML file without version" in {
-    val ExpectedMessage =
+    val expectedMessage =
       "Parser error for field nmesos_version: YamlObject is missing required member 'nmesos_version'"
-    YamlParser.parse(
+    val parseResult = YamlParser.parse(
       YamlInvalidWithoutVersion,
       InfoLogger
-    ) should be(InvalidYaml(ExpectedMessage))
+    )
+    parseResult should be(InvalidYaml(expectedMessage))
   }
 
-  //it should "fail while reading a valid YML file without all the required config parameters" in {
-  ignore should "fail while reading a valid YML file without all the required config parameters" in {
-    val ExpectedMessage =
-      "Parser error for field nmesos_version: YamlObject is missing required member 'nmesos_version'"
-    YamlParser.parse(
+  it should "fail while reading a valid YML file without all the required config parameters" in {
+    val expectedMessage =
+      "Parser error for field : YAML object expected"
+    val parseResult = YamlParser.parse(
       YamlInvalidWithIncompleteConf,
       InfoLogger
-    ) should be(InvalidYaml(ExpectedMessage))
+    )
+    parseResult should be(InvalidYaml(expectedMessage))
   }
 
   it should "return a valid config from a valid Yaml file" in {
@@ -107,29 +109,19 @@ class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
     )
   }
 
-  //it should "parse the port config from a valid Yaml file" in {
-  ignore should "parse the port config from a valid Yaml file" in {
+  it should "parse the port config from a valid Yaml file" in {
     val parsedYaml = YamlParser.parse(YamlExamplePortConfig, InfoLogger)
     parsedYaml shouldBe a[ValidYaml]
-    /*
-      val conf = parsedYaml.asInstanceOf[ValidYaml].config
-      conf.environments("dev").container.ports must beSome.which(
-        _.map(portMap =>
-          portMap.hostPort match {
-            case Some(hostPort) =>
-              portMap should be equalTo PortMap(9000, Option(12000), None)
-            case None =>
-              portMap.protocols match {
-                case None => portMap.containerPort should be equalTo 8080
-                case Some(protocols) => {
-                  portMap.containerPort should be equalTo 6060
-                  protocols mustEqual "udp,tcp"
-                }
-              }
-          }
-        )
-      )
-     */
+
+    val conf = parsedYaml.asInstanceOf[ValidYaml].config
+    val expectedPorts = Some(List(
+      PortMap(6060,None,Some("udp,tcp")),
+      PortMap(8080,None,None),
+      PortMap(9000,Some(12000),None)
+    ))
+
+    val ports = conf.environments("dev").container.ports
+    ports should be(expectedPorts)
   }
 
   it should "parse the port config from a valid Yaml file and re-serialize it to Yaml" in {
