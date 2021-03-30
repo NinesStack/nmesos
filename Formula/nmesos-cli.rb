@@ -8,7 +8,7 @@ class NmesosCli < Formula
   desc "Nmesos is a CLI tool to deploy into Mesos."
   homepage "https://github.com/Nitro/nmesos"
   url "https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/0.2.23/nmesos-cli-0.2.23.tgz"
-  sha256 "01f0d3ac644e0539953d01be1a9b3d36f67bcdf34fc05cec2dba60c0218476d5"
+  sha256 "da16e0a61a95595a8d132be95fdb1bf30c797a62d6e23d0362b94a8eaafde42d"
 
   option "with-bash-completion", "Install bash-completion"
 
