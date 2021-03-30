@@ -62,7 +62,7 @@ object VersionUtil {
     }
 
   // Compare yaml required version vs installed version.
-  def isCompatible(requiredVersion: Version, log: Logger): Boolean = {
+  def isCompatible(requiredVersion: Version, log: Formatter): Boolean = {
     val resultTry = for {
       installed <- tryExtract(BuildInfo.version)
     } yield isCompatible(requiredVersion, installed)

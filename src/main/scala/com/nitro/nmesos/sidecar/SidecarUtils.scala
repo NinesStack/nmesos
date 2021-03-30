@@ -2,7 +2,7 @@ package com.nitro.nmesos.sidecar
 
 import com.nitro.nmesos.docker.model.Container
 import com.nitro.nmesos.singularity.model.SingularityRequestParent
-import com.nitro.nmesos.util.Logger
+import com.nitro.nmesos.util.Formatter
 
 case class EnvironmentInfo(
     requests: Seq[SingularityRequestParent],
@@ -17,7 +17,7 @@ object SidecarUtils {
     * @param info
     * @return
     */
-  def verifyInSync(info: EnvironmentInfo)(implicit log: Logger): Boolean = {
+  def verifyInSync(info: EnvironmentInfo)(implicit fmt: Formatter): Boolean = {
     info.sidecarsServices
       .sliding(2)
       .map {
@@ -27,14 +27,14 @@ object SidecarUtils {
             .diff(sidecarB.Services.values.toSeq.flatten.sortBy(_.ID))
           if (diff.nonEmpty) {
 
-            log.println(
-              s""" ${log.Fail} Sidecar is not in sync at ${sidecarB.hostName} for services ${diff
+            fmt.println(
+              s""" ${fmt.Fail} Sidecar is not in sync at ${sidecarB.hostName} for services ${diff
                 .map(_.Name)
                 .mkString(",")}"""
             )
           } else {
-            log.println(
-              s""" ${log.Ok} Sidecar running at ${sidecarA.hostName} in sync with ${sidecarB.hostName} """
+            fmt.println(
+              s""" ${fmt.Ok} Sidecar running at ${sidecarA.hostName} in sync with ${sidecarB.hostName} """
             )
           }
           diff.isEmpty
@@ -45,7 +45,7 @@ object SidecarUtils {
   /**
     * Verify the containers (integrated with Sidecar) and Sidecar state is in sync.
     */
-  def verifyServices(info: EnvironmentInfo)(implicit log: Logger): Boolean = {
+  def verifyServices(info: EnvironmentInfo)(implicit fmt: Formatter): Boolean = {
     // fetch all Containers where SidecarDiscover!=false
     val containersByServiceName = info.containers
       .filter(!_.env.exists {
@@ -85,30 +85,30 @@ object SidecarUtils {
       containerInfo: Seq[String],
       sidecarInfo: Seq[String],
       serviceName: String
-  )(implicit log: Logger): Boolean = {
+  )(implicit fmt: Formatter): Boolean = {
     if (containerInfo.sameElements(sidecarInfo)) {
-      log.println(
-        s""" ${log.Ok} Sidecar mapping for $serviceName match all containers running """
+      fmt.println(
+        s""" ${fmt.Ok} Sidecar mapping for $serviceName match all containers running """
       )
       sidecarInfo.foreach { info =>
-        log.info(s"\t\t$info")
+        fmt.info(s"\t\t$info")
       }
       true
     } else if (containerInfo.isEmpty) {
-      log.info("\tFound (in Sidecar, but not in mesos):")
+      fmt.info("\tFound (in Sidecar, but not in mesos):")
       sidecarInfo.foreach { info =>
-        log.info(s"\t\t$info")
+        fmt.info(s"\t\t$info")
       }
       true
     } else {
-      log.println(s""" ${log.Fail} Invalid Sidecar mapping for $serviceName""")
-      log.error("\tExpected (Containers running):")
+      fmt.println(s""" ${fmt.Fail} Invalid Sidecar mapping for $serviceName""")
+      fmt.error("\tExpected (Containers running):")
       containerInfo.foreach { info =>
-        log.error(s"\t\t$info")
+        fmt.error(s"\t\t$info")
       }
-      log.error("\tFound (in Sidecar):")
+      fmt.error("\tFound (in Sidecar):")
       sidecarInfo.foreach { info =>
-        log.error(s"\t\t$info")
+        fmt.error(s"\t\t$info")
       }
       false
     }

@@ -9,7 +9,7 @@ import com.nitro.nmesos.singularity.model.{
   SingularityRequest,
   SingularityResources
 }
-import com.nitro.nmesos.util.Logger
+import com.nitro.nmesos.util.Formatter
 import com.nitro.nmesos.singularity.ModelConversions._
 import com.nitro.nmesos.singularity.model.SingularityRequestParent.SingularityActiveDeployResponse
 
@@ -19,7 +19,7 @@ import scala.util.{Failure, Success, Try}
   * Command to scale up/down a service in Mesos.
   * Will change resources (cpu, memory, instances) but keeping the some version already deployed.
   */
-case class ScaleCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean)
+case class ScaleCommand(localConfig: CmdConfig, fmt: Formatter, isDryrun: Boolean)
     extends ScaleCommandHelper {
 
   def processCmd(): CommandResult = {
@@ -32,7 +32,7 @@ case class ScaleCommand(localConfig: CmdConfig, log: Logger, isDryrun: Boolean)
     // - create Request if needed
     // - check previous deploy
     // - deploy if needed
-    val tryScale: Try[String] = log.logBlock("Applying Scale Config!") {
+    val tryScale: Try[String] = fmt.fmtBlock("Applying Scale Config!") {
       for {
         remoteRequest <- getRemoteRequest(localRequest)
         updatedRequest <-
@@ -62,11 +62,11 @@ trait ScaleCommandHelper extends BaseCommand {
     */
   def scaleDeployIfNeeded(localRequest: SingularityRequest): Try[Unit] = {
 
-    log.debug(s"Checking if there is already an active deploy...")
+    fmt.debug(s"Checking if there is already an active deploy...")
 
     getActiveDeploy(localRequest).flatMap {
       case None =>
-        log.info(s"There is no active deploy for request: '${localRequest.id}'")
+        fmt.info(s"There is no active deploy for request: '${localRequest.id}'")
         Success(()) // no deploy to scale.
 
       case Some(
@@ -81,10 +81,10 @@ trait ScaleCommandHelper extends BaseCommand {
           remoteResources.numPorts != localResource.numPorts ||
           remoteResources.diskMb != localResource.diskMb
         ) {
-          log.info(
+          fmt.info(
             s" Current deploy '$remoteDeployId' is not using the required resources"
           )
-          log.info(
+          fmt.info(
             s""" Changes to apply:
                |   * memoryMb:  ${remoteResources.memoryMb}   -> ${localResource.memoryMb}
                |   * cpus:      ${remoteResources.cpus}     -> ${localResource.cpus}""".stripMargin
@@ -98,8 +98,8 @@ trait ScaleCommandHelper extends BaseCommand {
             .deploySingularityDeploy(localRequest, localDeploy, message)
             .map(_ => {})
         } else {
-          log.info(s" No need to update the active deploy '$remoteDeployId'")
-          log.info(s""" * memoryMb:  ${localResource.memoryMb}
+          fmt.info(s" No need to update the active deploy '$remoteDeployId'")
+          fmt.info(s""" * memoryMb:  ${localResource.memoryMb}
                | * cpus:      ${localResource.cpus}
                | """.stripMargin)
           Success(())

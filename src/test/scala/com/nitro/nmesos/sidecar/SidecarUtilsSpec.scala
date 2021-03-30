@@ -4,12 +4,12 @@ import org.scalatest._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 
-import com.nitro.nmesos.util.{Logger, CustomLogger}
+import com.nitro.nmesos.util.{Formatter, CustomFormatter}
 
 class SidecarUtilsSpec extends AnyFlatSpec with should.Matchers {
 
-  implicit val log: CustomLogger =
-    CustomLogger(ansiEnabled = true, verbose = true)
+  implicit val fmt: CustomFormatter =
+    CustomFormatter(ansiEnabled = true, verbose = true)
 
   "Sidecar Utils" should "diff the infos right" in {
     val containerNotDepoyedOnMesos = Seq()

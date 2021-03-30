@@ -3,7 +3,7 @@ package com.nitro.nmesos.singularity
 import com.nitro.nmesos.config.model.SingularityConf
 import com.nitro.nmesos.singularity.ModelConversions.DeployId
 import com.nitro.nmesos.singularity.model._
-import com.nitro.nmesos.util.{HttpClientHelper, InfoLogger, Logger}
+import com.nitro.nmesos.util.{HttpClientHelper, InfoFormatter, Formatter}
 import scala.util.{Success, Try}
 import com.nitro.nmesos.util.Conversions._
 
@@ -13,13 +13,13 @@ import com.nitro.nmesos.util.Conversions._
 object SingularityManager {
   def apply(
       conf: SingularityConf,
-      log: Logger,
+      fmt: Formatter,
       isDryrun: Boolean
   ): SingularityManager =
     if (isDryrun) {
-      DryrunSingularityManager(conf.url, log)
+      DryrunSingularityManager(conf.url, fmt)
     } else {
-      RealSingularityManager(conf, log)
+      RealSingularityManager(conf, fmt)
     }
 }
 
@@ -132,23 +132,23 @@ trait SingularityManager extends HttpClientHelper {
     ).map(_.getOrElse(Seq.empty))
   }
 
-  def withDisabledDebugLog(): SingularityManager
+  def withDisabledDebugFmt(): SingularityManager
 
 }
 
 /**
   * Singularity Manager in Dryrun mode.
   */
-case class DryrunSingularityManager(apiUrl: String, log: Logger)
+case class DryrunSingularityManager(apiUrl: String, fmt: Formatter)
     extends SingularityManager {
 
   def createSingularityRequest(newRequest: SingularityRequest) = {
     if (newRequest.schedule.isDefined) {
-      log.info(
+      fmt.info(
         s" [dryrun] Need to schedule a new Mesos Job with id: ${newRequest.id}"
       )
     } else {
-      log.info(
+      fmt.info(
         s" [dryrun] Need to create a new Mesos service with id: ${newRequest.id}, instances: ${newRequest.instances
           .getOrElse("0")}"
       )
@@ -160,7 +160,7 @@ case class DryrunSingularityManager(apiUrl: String, log: Logger)
       previous: SingularityRequest,
       request: SingularityRequest
   ) = {
-    log.info(s""" [dryrun] Need to scale from ${previous.instances.getOrElse(
+    fmt.info(s""" [dryrun] Need to scale from ${previous.instances.getOrElse(
       "0"
     )} to ${request.instances.getOrElse("0")} instances""")
     Success(SingularityUpdateResult(state = "ACTIVE"))
@@ -170,9 +170,9 @@ case class DryrunSingularityManager(apiUrl: String, log: Logger)
       previous: SingularityRequest,
       request: SingularityRequest
   ) = {
-    log.info(s" [dryrun] Need to update ${request.id}")
+    fmt.info(s" [dryrun] Need to update ${request.id}")
     if (previous.schedule != request.schedule) {
-      log.info(s""" [dryrun] Need to reschedule '${previous.schedule.getOrElse(
+      fmt.info(s""" [dryrun] Need to reschedule '${previous.schedule.getOrElse(
         ""
       )}' to '${previous.schedule.getOrElse("")}'""")
     }
@@ -187,9 +187,9 @@ case class DryrunSingularityManager(apiUrl: String, log: Logger)
   ): Try[SingularityRequestParent] = {
     val message =
       s" [dryrun] Need to deploy image '${newDeploy.containerInfo.docker.image}'"
-    log.info(message)
+    fmt.info(message)
     val detail = ModelConversions.describeDeploy(currentRequest, newDeploy)
-    log.info(s""" [dryrun] Deploy to apply:
+    fmt.info(s""" [dryrun] Deploy to apply:
          |${detail.mkString(
       "           * ",
       "\n           * ",
@@ -199,18 +199,18 @@ case class DryrunSingularityManager(apiUrl: String, log: Logger)
     Success(SingularityRequestParent(currentRequest, state = "ACTIVE"))
   }
 
-  def withDisabledDebugLog(): SingularityManager = this.copy(log = InfoLogger)
+  def withDisabledDebugFmt(): SingularityManager = this.copy(fmt = InfoFormatter)
 }
 
 /**
   * Singularity Manager with All write operations.
   */
-case class RealSingularityManager(conf: SingularityConf, log: Logger)
+case class RealSingularityManager(conf: SingularityConf, fmt: Formatter)
     extends SingularityManager {
   val apiUrl: String = conf.url
 
   def createSingularityRequest(newRequest: SingularityRequest) = {
-    log.debug("Creating Singularity Request...")
+    fmt.debug("Creating Singularity Request...")
     val response = post[SingularityRequest, SingularityRequestParent](
       s"$apiUrl/api/requests",
       newRequest
@@ -218,12 +218,12 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger)
 
     response.foreach {
       case response if (newRequest.schedule.isEmpty) =>
-        log.info(
+        fmt.info(
           s""" Created new Mesos service with Id: ${newRequest.id}, instances: ${newRequest.instances
             .getOrElse("0")}, state: ${response.state}"""
         )
       case response if (newRequest.schedule.isDefined) =>
-        log.info(
+        fmt.info(
           s""" Scheduled new Mesos job with Id: ${newRequest.id}, state: ${response.state}"""
         )
     }
@@ -239,7 +239,7 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger)
       s""" Scaling '${request.id}' from ${previous.instances.getOrElse(
         "0"
       )} to ${request.instances.getOrElse("0")} instances"""
-    log.info(message)
+    fmt.info(message)
     val scaleRequest = SingularityScaleRequest(message, request.instances)
 
     val response = put[SingularityScaleRequest, SingularityUpdateResult](
@@ -249,7 +249,7 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger)
 
     response.foreach {
       case response =>
-        log.info(s" ${request.id} scaled, instances: ${request.instances
+        fmt.info(s" ${request.id} scaled, instances: ${request.instances
           .getOrElse("0")}, state: ${response.state}")
     }
 
@@ -260,9 +260,9 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger)
       previous: SingularityRequest,
       request: SingularityRequest
   ) = {
-    log.info(s" Need to update ${request.id}")
+    fmt.info(s" Need to update ${request.id}")
     if (previous.schedule != request.schedule) {
-      log.info(s""" Rescheduling '${request.id}' cron from '${previous.schedule
+      fmt.info(s""" Rescheduling '${request.id}' cron from '${previous.schedule
         .getOrElse("")}' to '${request.schedule.getOrElse("")}'""")
     }
     post[SingularityRequest, SingularityUpdateResult](
@@ -276,8 +276,8 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger)
       newDeploy: SingularityDeploy,
       message: String
   ) = {
-    log.info(message)
-    log.debug(
+    fmt.info(message)
+    fmt.debug(
       s" [requestId: ${newDeploy.requestId}, deployId: ${newDeploy.id}]"
     )
 
@@ -294,7 +294,7 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger)
 
     response.foreach { _ =>
       val detail = ModelConversions.describeDeploy(currentRequest, newDeploy)
-      log.info(s""" Deploy applied:
+      fmt.info(s""" Deploy applied:
            |${detail.mkString("   * ", "\n   * ", "")}""".stripMargin)
 
     }
@@ -302,8 +302,8 @@ case class RealSingularityManager(conf: SingularityConf, log: Logger)
     response
   }
 
-  // Some behaviour debug logs disabled.
-  def withDisabledDebugLog(): SingularityManager = {
-    this.copy(log = InfoLogger)
+  // Some behaviour debug fmts disabled.
+  def withDisabledDebugFmt(): SingularityManager = {
+    this.copy(fmt = InfoFormatter)
   }
 }

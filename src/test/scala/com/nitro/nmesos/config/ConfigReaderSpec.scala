@@ -5,7 +5,7 @@ import org.scalatest.flatspec._
 import org.scalatest.matchers._
 
 import com.nitro.nmesos.config.YamlParser.ValidYaml
-import com.nitro.nmesos.util.InfoLogger
+import com.nitro.nmesos.util.InfoFormatter
 
 import scala.io.Source
 
@@ -17,7 +17,7 @@ class ConfigReaderSpec extends AnyFlatSpec with should.Matchers with YmlTestFixt
         "test" -> Set("only_dev", "only_prod", "dev_and_prod")
       )
       val parsed = YamlParser
-        .parse(YamlExampleWithMissingEnvVars, InfoLogger)
+        .parse(YamlExampleWithMissingEnvVars, InfoFormatter)
         .asInstanceOf[ValidYaml]
       val missingEnvVarKeys =
         ConfigReader.findMissingContainerEnvVarKeys(parsed.config)
@@ -26,7 +26,7 @@ class ConfigReaderSpec extends AnyFlatSpec with should.Matchers with YmlTestFixt
 
     it should "return an empty map when there are no missing env_var keys" in {
       val parsed = YamlParser
-        .parse(YamlExampleWithValidEnvVars, InfoLogger)
+        .parse(YamlExampleWithValidEnvVars, InfoFormatter)
         .asInstanceOf[ValidYaml]
       val missingEnvVarKeys =
         ConfigReader.findMissingContainerEnvVarKeys(parsed.config)

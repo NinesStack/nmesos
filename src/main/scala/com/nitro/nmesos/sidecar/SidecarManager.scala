@@ -1,6 +1,6 @@
 package com.nitro.nmesos.sidecar
 
-import com.nitro.nmesos.util.{HttpClientHelper, Logger}
+import com.nitro.nmesos.util.{HttpClientHelper, Formatter}
 import com.nitro.nmesos.util.CustomPicklers.OptionPickler.{ReadWriter => RW, macroRW}
 
 case class Service(
@@ -24,7 +24,7 @@ object SidecarServices {
   implicit val rw: RW[SidecarServices] = macroRW
 }
 
-case class SidecarManager(log: Logger) extends HttpClientHelper {
+case class SidecarManager(fmt: Formatter) extends HttpClientHelper {
 
   def getServices(host: String) = {
     get[SidecarServices](s"http://$host:7777/services.json")

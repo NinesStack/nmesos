@@ -4,7 +4,7 @@ import org.scalatest._
 import org.scalatest.flatspec._
 import org.scalatest.matchers._
 
-import com.nitro.nmesos.util.InfoLogger
+import com.nitro.nmesos.util.InfoFormatter
 import com.nitro.nmesos.config.YamlParser._
 import com.nitro.nmesos.config.YamlParserHelper.YamlCustomProtocol._
 import com.nitro.nmesos.config.model._
@@ -22,7 +22,7 @@ class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
       "Invalid yaml file at line 9, column: 1\n     WTF!\n     ^"
     val parseResult = YamlParser.parse(
       YamlInvalidRandom,
-      InfoLogger
+      InfoFormatter
     )
     parseResult should be(InvalidYaml(expectedMessage))
   }
@@ -32,7 +32,7 @@ class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
       "Parser error for field nmesos_version: YamlObject is missing required member 'nmesos_version'"
     val parseResult = YamlParser.parse(
       YamlInvalidWithoutVersion,
-      InfoLogger
+      InfoFormatter
     )
     parseResult should be(InvalidYaml(expectedMessage))
   }
@@ -42,30 +42,30 @@ class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
       "Parser error for field : YAML object expected"
     val parseResult = YamlParser.parse(
       YamlInvalidWithIncompleteConf,
-      InfoLogger
+      InfoFormatter
     )
     parseResult should be(InvalidYaml(expectedMessage))
   }
 
   it should "return a valid config from a valid Yaml file" in {
     YamlParser
-      .parse(YamlExampleValid, InfoLogger) shouldBe a[ValidYaml]
+      .parse(YamlExampleValid, InfoFormatter) shouldBe a[ValidYaml]
   }
 
   it should "return a valid config from a valid Yaml with optional singularity config missing" in {
     YamlParser
-      .parse(YamlJobExampleValid, InfoLogger) shouldBe a[ValidYaml]
+      .parse(YamlJobExampleValid, InfoFormatter) shouldBe a[ValidYaml]
   }
 
   it should "return a valid config from a valid Yaml with optional envar config being empty" in {
     YamlParser.parse(
       YamlEnvVarExampleValid,
-      InfoLogger
+      InfoFormatter
     ) shouldBe a[ValidYaml]
   }
 
   it should "parse the executor configuration in a valid Yaml file" in {
-    val conf = YamlParser.parse(YamlExampleExecutorEnvs, InfoLogger)
+    val conf = YamlParser.parse(YamlExampleExecutorEnvs, InfoFormatter)
     conf shouldBe a[ValidYaml]
 
     val ExpectedConf = Some(
@@ -93,7 +93,7 @@ class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
   }
 
   it should "parse the mesos slaves required and allowed attributes in a valid Yaml file" in {
-    val conf = YamlParser.parse(YamlMesosAttributeConfig, InfoLogger)
+    val conf = YamlParser.parse(YamlMesosAttributeConfig, InfoFormatter)
     conf shouldBe a[ValidYaml]
     val singularity =
       conf.asInstanceOf[ValidYaml].config.environments("dev").singularity
@@ -110,7 +110,7 @@ class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
   }
 
   it should "parse the port config from a valid Yaml file" in {
-    val parsedYaml = YamlParser.parse(YamlExamplePortConfig, InfoLogger)
+    val parsedYaml = YamlParser.parse(YamlExamplePortConfig, InfoFormatter)
     parsedYaml shouldBe a[ValidYaml]
 
     val conf = parsedYaml.asInstanceOf[ValidYaml].config
@@ -126,7 +126,7 @@ class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
 
   it should "parse the port config from a valid Yaml file and re-serialize it to Yaml" in {
     val parsedYaml =
-      YamlParser.parse(YamlExamplePortConfigAllVariations, InfoLogger)
+      YamlParser.parse(YamlExamplePortConfigAllVariations, InfoFormatter)
     parsedYaml shouldBe a[ValidYaml]
 
     parsedYaml
@@ -139,7 +139,7 @@ class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
   it should "fail while parsing an invalid port specification" in {
     val ExpectedMessage =
       "Parser error for field environments/container/ports: Failed to deserialize the port specification"
-    YamlParser.parse(YamlInvalidPortConfig, InfoLogger) should be(
+    YamlParser.parse(YamlInvalidPortConfig, InfoFormatter) should be(
       InvalidYaml(
         ExpectedMessage
       )
@@ -147,7 +147,7 @@ class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
   }
 
   it should "parse the after deploy configuration in a valid Yaml file" in {
-    val conf = YamlParser.parse(YamlExampleAfterDeploy, InfoLogger)
+    val conf = YamlParser.parse(YamlExampleAfterDeploy, InfoFormatter)
     conf shouldBe a[ValidYaml]
 
     val modelConfig = conf.asInstanceOf[ValidYaml].config
@@ -171,10 +171,10 @@ class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
 
   it should "return a value for deploy_freeze" in {
     val parsed_deploy_freeze = YamlParser
-      .parse(YamlExampleWithDeployFreeze, InfoLogger)
+      .parse(YamlExampleWithDeployFreeze, InfoFormatter)
       .asInstanceOf[ValidYaml]
     val parsed_without_deploy_freeze = YamlParser
-      .parse(YamlExampleWithoutDeployFreeze, InfoLogger)
+      .parse(YamlExampleWithoutDeployFreeze, InfoFormatter)
       .asInstanceOf[ValidYaml]
 
     parsed_deploy_freeze.config.environments

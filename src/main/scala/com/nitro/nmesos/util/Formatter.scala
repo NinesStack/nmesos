@@ -3,9 +3,9 @@ package com.nitro.nmesos.util
 import scala.annotation.tailrec
 
 /**
-  * Basic terminal output for the CLI app.
+  * Format basic terminal output for the CLI app.
   */
-trait Logger extends AnsiLogger with Animations {
+trait Formatter extends AnsiFormatter with Animations {
 
   def error(msg: => Any): Unit = println(errorColor(msg))
   def info(msg: => Any): Unit = println(infoColor(msg))
@@ -14,7 +14,7 @@ trait Logger extends AnsiLogger with Animations {
 
   private val SeparatorLine = "-" * 80
 
-  def logBlock[A](title: => String)(body: => A): A = {
+  def fmtBlock[A](title: => String)(body: => A): A = {
     val separator = SeparatorLine.drop(title.size + 1)
     println(separatorColor(s"$title $separator"))
     val result = body
@@ -25,18 +25,18 @@ trait Logger extends AnsiLogger with Animations {
 }
 
 /**
-  * Default terminal output with verbose disabled and ansi colors disabled.
+  * Format default terminal output with verbose disabled and ansi colors disabled.
   */
-object InfoLogger extends CustomLogger(ansiEnabled = false, verbose = false)
+object InfoFormatter extends CustomFormatter(ansiEnabled = false, verbose = false)
 
 /**
-  * Terminal output with verbose enabled and ansi colors enabled.
+  * Format terminal output with verbose enabled and ansi colors enabled.
   */
-case class CustomLogger(ansiEnabled: Boolean, verbose: Boolean) extends Logger {
+case class CustomFormatter(ansiEnabled: Boolean, verbose: Boolean) extends Formatter {
   def debug(msg: => Any): Unit = if (verbose) println(s" [debug] $msg") else {}
 }
 
-trait AnsiLogger {
+trait AnsiFormatter {
   def ansiEnabled: Boolean
 
   // Default colors mapping
@@ -76,7 +76,7 @@ trait AnsiLogger {
   }
 }
 
-trait Animations extends AnsiLogger {
+trait Animations extends AnsiFormatter {
 
   private val Sleep = 300
   private val frames = "|/-\\".toCharArray
