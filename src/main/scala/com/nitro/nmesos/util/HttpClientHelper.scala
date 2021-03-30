@@ -12,7 +12,7 @@ import CustomPicklers.OptionPickler._
   * Note: Http connections are synchronous.
   */
 trait HttpClientHelper {
-  def log: Logger
+  def fmt: Formatter
 
   protected def get[A: Reader](url: String): Try[Option[A]] =
     Try {
@@ -67,18 +67,18 @@ trait HttpClientHelper {
 
   /**
     * Try to parse or return a clean error.
-    * In verbose mode: log response and errors in console
+    * In verbose mode: fmt response and errors in console
     */
   private def parseBody[A: Reader](
       url: String,
       response: HttpResponse[String]
   ) = {
     try {
-      log.debug(s"Response code: ${response.code}, body: ${response.body}\n")
+      fmt.debug(s"Response code: ${response.code}, body: ${response.body}\n")
       read[A](response.body)
     } catch {
       case ex: Exception =>
-        log.debug(s"Parser error: $ex")
+        fmt.debug(s"Parser error: $ex")
         sys.error(s"Unable to parse HTTP response - $url")
     }
   }
@@ -98,7 +98,7 @@ trait HttpClientHelper {
   ): Unit = {
 
     jsonOpt.foreach { data =>
-      log.debug(s"data to send: $data\n")
+      fmt.debug(s"data to send: $data\n")
     }
 
     def data = {
@@ -110,7 +110,7 @@ trait HttpClientHelper {
         .getOrElse("")
     }
 
-    log.debug(s"curl -v -X $method $url $data\n")
+    fmt.debug(s"curl -v -X $method $url $data\n")
   }
 
   /**
@@ -119,7 +119,7 @@ trait HttpClientHelper {
   private def failure(url: String, response: HttpResponse[String]) = {
     //show only a few lines. plain error can be a large html
     val msg = response.body.take(500)
-    log.debug(s"Response > ${response.code}: $msg...\n")
+    fmt.debug(s"Response > ${response.code}: $msg...\n")
     sys.error(s"HTTP ${response.statusLine} - ${response.code}: $url\n $msg")
   }
 }

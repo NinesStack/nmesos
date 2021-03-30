@@ -1,7 +1,7 @@
 package com.nitro.nmesos.config
 
 import com.nitro.nmesos.config.model._
-import com.nitro.nmesos.util.Logger
+import com.nitro.nmesos.util.Formatter
 import java.{util => ju, text => jt}
 import java.time.{temporal => jtt}
 import java.time.LocalDate
@@ -164,13 +164,13 @@ trait ValidationHelper {
       Warning(name, msg)
     }
 
-  def logResult(checks: Seq[Validation], log: Logger) =
+  def fmtResult(checks: Seq[Validation], fmt: Formatter) =
     checks.foreach {
-      case Ok(name) => log.println(s""" - ${log.infoColor("[OK]")}: $name""")
+      case Ok(name) => fmt.println(s""" - ${fmt.infoColor("[OK]")}: $name""")
       case Warning(name, msg) =>
-        log.println(s""" - ${log.errorColor("[Warning]")}: $name - $msg""")
+        fmt.println(s""" - ${fmt.errorColor("[Warning]")}: $name - $msg""")
       case Fail(name, msg) =>
-        log.println(s""" - ${log.errorColor("[Failure]")}: $name - $msg""")
+        fmt.println(s""" - ${fmt.errorColor("[Failure]")}: $name - $msg""")
     }
 
   def isValidPort(port: PortMap): Boolean =

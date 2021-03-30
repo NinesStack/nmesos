@@ -14,7 +14,7 @@ import com.nitro.nmesos.config.ConfigReader.ValidConfig
 import com.nitro.nmesos.config.model.CmdConfig
 import com.nitro.nmesos.singularity.ModelConversions.toSingularityRequest
 import com.nitro.nmesos.singularity.{RealSingularityManager, SingularityManager}
-import com.nitro.nmesos.util.InfoLogger
+import com.nitro.nmesos.util.InfoFormatter
 
 class CliSpec extends AnyFlatSpec with should.Matchers with CliSpecFixtures {
 
@@ -75,7 +75,7 @@ class CliSpec extends AnyFlatSpec with should.Matchers with CliSpecFixtures {
     )
 
     val (commandChainOnSuccess, commandOnFailure) =
-      CliManager.getCommandChain(cmd, InfoLogger).getOrElse(fail("Unexpected Either"))
+      CliManager.getCommandChain(cmd, InfoFormatter).getOrElse(fail("Unexpected Either"))
 
     commandChainOnSuccess.zip(expectedCommandChainOnSuccess).foreach {
       case (command, expectedCommand) =>
@@ -104,7 +104,7 @@ class CliSpec extends AnyFlatSpec with should.Matchers with CliSpecFixtures {
       tag = "latest"
     )
     val (commandChainOnSuccess, commandOnFailure) =
-      CliManager.getCommandChain(cmd, InfoLogger).getOrElse(fail("Unexpected Either"))
+      CliManager.getCommandChain(cmd, InfoFormatter).getOrElse(fail("Unexpected Either"))
 
     val expectedCommand = (
       cmd.copy(
@@ -133,7 +133,7 @@ class CliSpec extends AnyFlatSpec with should.Matchers with CliSpecFixtures {
     val cmd = ValidCmd.copy(serviceName =
       "src/test/resources/config/example-deploy-chain-service-cyclic-0"
     )
-    val commandChain = CliManager.getCommandChain(cmd, InfoLogger)
+    val commandChain = CliManager.getCommandChain(cmd, InfoFormatter)
 
     commandChain.swap.getOrElse(fail("Unexpected Either")).msg should be(
       "Job appearing more than once in job chain"
@@ -144,7 +144,7 @@ class CliSpec extends AnyFlatSpec with should.Matchers with CliSpecFixtures {
     val cmd = ValidCmd.copy(serviceName =
       "src/test/resources/config/example-deploy-chain-self-referencing"
     )
-    val commandChain = CliManager.getCommandChain(cmd, InfoLogger)
+    val commandChain = CliManager.getCommandChain(cmd, InfoFormatter)
 
     commandChain.swap.getOrElse(fail("Unexpected Either")).msg should be(
       "Job appearing more than once in job chain"
@@ -215,7 +215,7 @@ trait CliSpecFixtures {
     val yml = new File(
       getClass.getResource("/config/example-config.yml").getFile
     )
-    val config = ConfigReader.parseEnvironment(yml, "dev", InfoLogger) match {
+    val config = ConfigReader.parseEnvironment(yml, "dev", InfoFormatter) match {
       case v: ValidConfig => Some(v)
       case _              => None
     }
@@ -226,7 +226,7 @@ trait CliSpecFixtures {
     val yml = new File(
       getClass.getResource(s"/config/${serviceName}.yml").getFile
     )
-    val config = ConfigReader.parseEnvironment(yml, "dev", InfoLogger) match {
+    val config = ConfigReader.parseEnvironment(yml, "dev", InfoFormatter) match {
       case v: ValidConfig => Some(v)
       case _              => None
     }

@@ -8,7 +8,7 @@ import com.nitro.nmesos.singularity.model.{
   SingularityResources,
   SingularityUpdateResult
 }
-import com.nitro.nmesos.util.Logger
+import com.nitro.nmesos.util.Formatter
 
 import scala.util.{Failure, Success, Try}
 
@@ -26,12 +26,12 @@ trait Command {
 
 trait BaseCommand extends Command {
   val localConfig: CmdConfig
-  val log: Logger
+  val fmt: Formatter
   val isDryrun: Boolean
 
   val manager = SingularityManager(
     localConfig.environment.singularity,
-    log,
+    fmt,
     isDryrun = isDryrun
   )
 
@@ -60,8 +60,8 @@ trait BaseCommand extends Command {
   }
 
   protected def showCommand() = {
-    log.logBlock("Deploying Config") {
-      log.info(
+    fmt.fmtBlock("Deploying Config") {
+      fmt.info(
         s""" Service Name: ${localConfig.serviceName}
            | Config File:  ${localConfig.file.getAbsolutePath}
            | environment:  ${localConfig.environmentName}
@@ -76,14 +76,14 @@ trait BaseCommand extends Command {
   def getRemoteRequest(
       localRequest: SingularityRequest
   ): Try[Option[SingularityRequest]] = {
-    log.debug("Fetching the remote request configuration...")
+    fmt.debug("Fetching the remote request configuration...")
     manager.getSingularityRequest(localRequest.id).map(_.map(_.request))
   }
 
   def getActiveDeploy(
       localRequest: SingularityRequest
   ): Try[Option[SingularityActiveDeployResponse]] = {
-    log.debug("Fetching the remote active deploy...")
+    fmt.debug("Fetching the remote active deploy...")
     manager
       .getSingularityRequest(localRequest.id)
       .map(_.flatMap(_.activeDeploy))
@@ -96,10 +96,10 @@ trait BaseCommand extends Command {
       remoteOpt: Option[SingularityRequest],
       local: SingularityRequest
   ) = {
-    log.debug("Comparing remote and local configuration...")
+    fmt.debug("Comparing remote and local configuration...")
     remoteOpt match {
       case None =>
-        log.info(s" No Mesos config found with id: '${local.id}'")
+        fmt.info(s" No Mesos config found with id: '${local.id}'")
         manager.createSingularityRequest(local).map(_ => local)
 
       case Some(remote) if (remote != local) =>
@@ -109,7 +109,7 @@ trait BaseCommand extends Command {
       case Some(other) =>
         // Remote Singularity Request is up to date, nothing to do here!
         Success(
-          log.info(
+          fmt.info(
             s" The request configuration for '${localConfig.serviceName}' is up to date! [requestId: ${other.id}]"
           )
         )
@@ -126,7 +126,7 @@ trait BaseCommand extends Command {
       local: SingularityRequest
   ): Try[SingularityRequest] = {
 
-    log.debug("Comparing remote and local configuration...")
+    fmt.debug("Comparing remote and local configuration...")
 
     remoteOpt match {
       case None =>
@@ -146,7 +146,7 @@ trait BaseCommand extends Command {
       case Some(other) =>
         // Remote Singularity Request is up to date, nothing to do here!
         Success(
-          log.info(
+          fmt.info(
             s" The request configuration for '${localConfig.serviceName}' is up to date! [requestId: ${other.id}]"
           )
         )
@@ -155,7 +155,7 @@ trait BaseCommand extends Command {
   }
 
   def dryWarning =
-    if (isDryrun) log.importantColor(" [dry-run true] use --dry-run false")
+    if (isDryrun) fmt.importantColor(" [dry-run true] use --dry-run false")
     else ""
 
 }

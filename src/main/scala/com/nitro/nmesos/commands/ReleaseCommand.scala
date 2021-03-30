@@ -6,7 +6,7 @@ import com.nitro.nmesos.singularity.model._
 
 import scala.util.{Failure, Success, Try}
 import com.nitro.nmesos.singularity.ModelConversions._
-import com.nitro.nmesos.util.{Logger, WaitUtil}
+import com.nitro.nmesos.util.{Formatter, WaitUtil}
 import com.nitro.nmesos.util.Conversions._
 
 import scala.annotation.tailrec
@@ -23,20 +23,20 @@ import scala.annotation.tailrec
   */
 case class ReleaseCommand(
     localConfig: CmdConfig,
-    log: Logger,
+    fmt: Formatter,
     isDryrun: Boolean,
     deprecatedSoftGracePeriod: Int,
     deprecatedHardGracePeriod: Int
 ) extends DeployCommandHelper {
 
   def verifyCommand(): Try[Unit] =
-    log.logBlock("Verifying") {
+    fmt.fmtBlock("Verifying") {
       val checks = Validations.checkAll(
         localConfig,
         (deprecatedSoftGracePeriod, deprecatedHardGracePeriod)
       )
       val errors = checks.collect { case f: Fail => f }
-      Validations.logResult(checks, log)
+      Validations.fmtResult(checks, fmt)
       if (errors.isEmpty) Success(())
       else Failure(new Exception(s"Invalid Config"))
     }
@@ -53,7 +53,7 @@ case class ReleaseCommand(
     // - create Request if needed
     // - check previous deploy
     // - deploy if needed
-    val tryDeployId: Try[DeployId] = log.logBlock("Applying config!") {
+    val tryDeployId: Try[DeployId] = fmt.fmtBlock("Applying config!") {
       for {
         _ <- isValid
         remoteRequest <- getRemoteRequest(localRequest)
@@ -109,11 +109,11 @@ trait DeployCommandHelper extends BaseCommand {
   def deployVersionIfNeeded(local: SingularityRequest): Try[DeployId] = {
     val defaultId = defaultDeployId(localConfig)
 
-    log.debug(s"Checking if a deploy with id '$defaultId' already exist...")
+    fmt.debug(s"Checking if a deploy with id '$defaultId' already exist...")
 
     manager.getSingularityDeployHistory(local.id, defaultId).flatMap {
       case None =>
-        log.debug(s"There is no deploy with id '$defaultId'")
+        fmt.debug(s"There is no deploy with id '$defaultId'")
         val localDeploy = toSingularityDeploy(localConfig, defaultId)
         val newImage = localDeploy.containerInfo.docker.image
         val message = s" Deploying version '$newImage'"
@@ -127,7 +127,7 @@ trait DeployCommandHelper extends BaseCommand {
           val deployId = generateRandomDeployId(defaultId)
           val localDeploy = toSingularityDeploy(localConfig, deployId)
 
-          log.info(
+          fmt.info(
             s" There is already a deploy with id $defaultId , forcing deploy with new id '$deployId'"
           )
           val newImage = localDeploy.containerInfo.docker.image
@@ -138,7 +138,7 @@ trait DeployCommandHelper extends BaseCommand {
             .map(_ => localDeploy.id)
 
         } else {
-          log.info(
+          fmt.info(
             s" There is already a deploy with same id '$defaultId' for request '${local.id}'"
           )
           Failure(
@@ -157,19 +157,19 @@ trait DeployCommandHelper extends BaseCommand {
       request: SingularityRequest,
       deployId: DeployId
   ): Try[Boolean] = {
-    log.logBlock("Mesos Tasks Info") {
-      log.info(
+    fmt.fmtBlock("Mesos Tasks Info") {
+      fmt.info(
         s" Deploy progress at ${localConfig.environment.singularity.url}/request/${request.id}/deploy/$deployId"
       )
 
-      val managerWithoutLogger = manager.withDisabledDebugLog()
+      val managerWithoutFmtger = manager.withDisabledDebugFmt()
 
       ///////////////////////////////////////////////////////
       // Wait until the pending task are executed.
       def fetchMessage() = {
         for {
           pending <-
-            managerWithoutLogger
+            managerWithoutFmtger
               .getSingularityPendingDeploy(request.id, deployId)
               .getOrElse(None)
         } yield {
@@ -180,11 +180,11 @@ trait DeployCommandHelper extends BaseCommand {
         }
       }
 
-      log.showAnimated(fetchMessage)
+      fmt.showAnimated(fetchMessage)
 
       // hack, need to wait until Singularity move the deploy result to History.
       WaitUtil.waitUntil {
-        log.debug(s"Waiting for the deploy result...")
+        fmt.debug(s"Waiting for the deploy result...")
         for {
           deployInfo <-
             manager.getSingularityDeployHistory(request.id, deployId)
@@ -198,7 +198,7 @@ trait DeployCommandHelper extends BaseCommand {
       // Show relevant information
       for {
         deployInfo <- manager.getSingularityDeployHistory(request.id, deployId)
-        activeTasks <- managerWithoutLogger.getActiveTasks(request)
+        activeTasks <- managerWithoutFmtger.getActiveTasks(request)
       } yield {
         val deploy =
           deployInfo.getOrElse(sys.error(s"Unable to find deployId $deployId"))
@@ -212,10 +212,10 @@ trait DeployCommandHelper extends BaseCommand {
             val successfulTasks = activeTasks
               .filter(_.taskId.deployId == deployId)
               .filterNot(task => failureTasksId.contains(task.taskId.id))
-            logTaskInfo(deployResult, successfulTasks)
+            fmtTaskInfo(deployResult, successfulTasks)
           case Some(schedule) =>
             // job task
-            logJobInfo(request, deployResult, schedule)
+            fmtJobInfo(request, deployResult, schedule)
         }
 
         deployResult.deployState.equalsIgnoreCase("SUCCEEDED")
@@ -223,40 +223,40 @@ trait DeployCommandHelper extends BaseCommand {
     }
   }
 
-  private def logJobInfo(
+  private def fmtJobInfo(
       request: SingularityRequest,
       deployResult: SingularityDeployResult,
       schedule: String
   ) = {
-    log.println(s""" Scheduled Mesos Job State: ${log.importantColor(
+    fmt.println(s""" Scheduled Mesos Job State: ${fmt.importantColor(
       deployResult.deployState
     )}""")
-    log.println(
+    fmt.println(
       s"   * History: ${localConfig.environment.singularity.url}/request/${request.id}"
     )
-    log.println(s"   * Cron:    '$schedule'")
+    fmt.println(s"   * Cron:    '$schedule'")
   }
 
-  private def logTaskInfo(
+  private def fmtTaskInfo(
       deployResult: SingularityDeployResult,
       successfulTasks: Seq[SingularityTask]
   ) = {
     val message = deployResult.message.map(msg => s" - $msg").getOrElse("")
-    log.println(s""" Deploy Mesos Deploy State: ${log.importantColor(
+    fmt.println(s""" Deploy Mesos Deploy State: ${fmt.importantColor(
       deployResult.deployState
     )}$message""")
 
     deployResult.deployFailures.sortBy(_.taskId.instanceNo).foreach { failure =>
-      log.println(s"   * TaskId: ${log.infoColor(failure.taskId.id)}")
-      log.println(s"      - Reason:  ${log.importantColor(failure.reason)}")
-      failure.message.foreach(msg => log.println(s"      - Message: $msg"))
-      log.println(s"      - Host:    ${failure.taskId.host}")
+      fmt.println(s"   * TaskId: ${fmt.infoColor(failure.taskId.id)}")
+      fmt.println(s"      - Reason:  ${fmt.importantColor(failure.reason)}")
+      failure.message.foreach(msg => fmt.println(s"      - Message: $msg"))
+      fmt.println(s"      - Host:    ${failure.taskId.host}")
     }
 
     successfulTasks.foreach { task =>
-      log.println(s"""   * TaskId: ${log.infoColor(task.taskId.id)}""")
+      fmt.println(s"""   * TaskId: ${fmt.infoColor(task.taskId.id)}""")
       task.mesosTask.container.docker.portMappings.foreach { port =>
-        log.println(
+        fmt.println(
           s"""     - ${task.offer.hostname}:${port.hostPort}  -> ${port.containerPort}"""
         )
       }
@@ -276,7 +276,7 @@ trait DeployCommandHelper extends BaseCommand {
     }
   }.recover {
     case ex => // Ignore error while fetching logs.
-      log.debug(s"Unable to fetch logs -  ${ex.getMessage}")
+      fmt.debug(s"Unable to fetch logs -  ${ex.getMessage}")
       ()
   }
 
@@ -287,11 +287,11 @@ trait DeployCommandHelper extends BaseCommand {
     val logsStdErr =
       manager.getLogs(taskId = taskId.id, path = "stderr").getOrElse(Seq.empty)
 
-    log.logBlock("Log - stderr") {
-      logsStdErr.foreach(line => log.println(s" $line"))
+    fmt.fmtBlock("Log - stderr") {
+      logsStdErr.foreach(line => fmt.println(s" $line"))
     }
-    log.logBlock("Log - stdout") {
-      logsStdOut.foreach(line => log.println(s" $line"))
+    fmt.fmtBlock("Log - stdout") {
+      logsStdOut.foreach(line => fmt.println(s" $line"))
     }
   }
 }

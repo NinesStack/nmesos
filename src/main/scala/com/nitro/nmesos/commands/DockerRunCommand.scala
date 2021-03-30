@@ -1,7 +1,7 @@
 package com.nitro.nmesos.commands
 
 import com.nitro.nmesos.config.model.CmdConfig
-import com.nitro.nmesos.util.Logger
+import com.nitro.nmesos.util.Formatter
 import com.nitro.nmesos.config.{Fail, Validations, Warning}
 
 import sys.process._
@@ -13,7 +13,7 @@ import scala.language.postfixOps
   */
 case class DockerRunCommand(
     localConfig: CmdConfig,
-    log: Logger,
+    fmt: Formatter,
     isDryrun: Boolean    
 ) extends BaseCommand {
 
@@ -23,7 +23,7 @@ case class DockerRunCommand(
   }
 
   override protected def processCmd(): CommandResult = {
-    log.logBlock("Starting service ...") {
+    fmt.fmtBlock("Starting service ...") {
       val (_, composeFilename) = DockerEnvCommand.createDockerFiles(localConfig)
 
       val dockerCommand = s"docker-compose --file ${composeFilename} up --detach"

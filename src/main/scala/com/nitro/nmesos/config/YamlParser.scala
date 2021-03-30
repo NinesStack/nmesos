@@ -2,7 +2,7 @@ package com.nitro.nmesos.config
 
 import com.nitro.nmesos.config.YamlParserHelper._
 import com.nitro.nmesos.config.model._
-import com.nitro.nmesos.util.{HashUtil, Logger}
+import com.nitro.nmesos.util.{HashUtil, Formatter}
 import net.jcazevedo.moultingyaml._
 import org.yaml.snakeyaml.parser.ParserException
 
@@ -22,8 +22,8 @@ object YamlParser {
   /**
     * Try to parse a yaml.
     */
-  def parse(sourceContent: String, logger: Logger): ParserResult =
-    tryParse(sourceContent, logger) match {
+  def parse(sourceContent: String, fmt: Formatter): ParserResult =
+    tryParse(sourceContent, fmt) match {
 
       case Success(config) =>
         ValidYaml(config, HashUtil.hash(sourceContent))
@@ -43,20 +43,20 @@ object YamlParser {
         )
 
       case Failure(ex) =>
-        logger.debug(ex.getStackTrace.mkString("\n"))
+        fmt.debug(ex.getStackTrace.mkString("\n"))
         InvalidYaml(s"Unexpected error: ${ex.getMessage}")
 
     }
 
   // Parse and merge default into environments.
-  private def tryParse(source: String, logger: Logger) =
+  private def tryParse(source: String, fmt: Formatter) =
     Try {
       import YamlCustomProtocol._
       val yaml = source.parseYaml
 
       // Custom merge to extend Yaml merge
       val smartYaml = mergeCommonsIntoEnvironments(yaml.asYamlObject)
-      logger.debug(s"Yaml evaluated content:\n ${smartYaml.prettyPrint}")
+      fmt.debug(s"Yaml evaluated content:\n ${smartYaml.prettyPrint}")
 
       smartYaml.convertTo[Config]
     }

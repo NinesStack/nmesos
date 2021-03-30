@@ -3,7 +3,7 @@ package com.nitro.nmesos.config
 import java.io.{File, FileNotFoundException}
 
 import com.nitro.nmesos.BuildInfo
-import com.nitro.nmesos.util.{Logger, VersionUtil}
+import com.nitro.nmesos.util.{Formatter, VersionUtil}
 import com.nitro.nmesos.config.model._
 import com.nitro.nmesos.config.YamlParser._
 import com.nitro.nmesos.util.VersionUtil.Version
@@ -29,18 +29,18 @@ object ConfigReader {
   def parseEnvironment(
       file: File,
       environmentName: String,
-      logger: Logger
+      fmt: Formatter
   ): ConfigResult = {
-    parse(file, logger) match {
+    parse(file, fmt) match {
       case InvalidYaml(msg) =>
         ConfigError(msg, file)
 
       case ValidYaml(config, hash) =>
         val envVarDifferences = findMissingContainerEnvVarKeys(config)
         if (envVarDifferences.nonEmpty) {
-          logger.logBlock("Environment env_var keys not equal") {
+          fmt.fmtBlock("Environment env_var keys not equal") {
             for (diff <- envVarDifferences) {
-              logger.error(
+              fmt.error(
                 s"Environment ${diff._1}: Missing env_var keys: ${diff._2.mkString(", ")}"
               )
             }
@@ -83,8 +83,8 @@ object ConfigReader {
   /**
     *  Try to read a Yaml file.
     */
-  private def parse(file: File, logger: Logger): ParserResult = {
-    logger.debug(s"Reading file ${file.getAbsolutePath}")
+  private def parse(file: File, fmt: Formatter): ParserResult = {
+    fmt.debug(s"Reading file ${file.getAbsolutePath}")
     tryRead(file) match {
       case Failure(ex: FileNotFoundException) =>
         InvalidYaml(s"Config file not found at '${file.getAbsoluteFile}'")
@@ -95,7 +95,7 @@ object ConfigReader {
         )
 
       case Success((yamlContent, version))
-          if (!VersionUtil.isCompatible(version, logger)) =>
+          if (!VersionUtil.isCompatible(version, fmt)) =>
         InvalidYaml(msg = s"""
              |A newer version of nmesos is required.
              |Installed: ${BuildInfo.version}, required: ${version
@@ -103,7 +103,7 @@ object ConfigReader {
              |Instructions at https://github.com/Nitro/nmesos/blob/master/README.md
           """.stripMargin)
       case Success((yamlContent, version)) =>
-        YamlParser.parse(yamlContent, logger)
+        YamlParser.parse(yamlContent, fmt)
     }
   }
 

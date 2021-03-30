@@ -5,7 +5,7 @@ import com.nitro.nmesos.docker.model.Container
 import com.nitro.nmesos.sidecar._
 import com.nitro.nmesos.singularity.DryrunSingularityManager
 import com.nitro.nmesos.singularity.model.SingularityRequestParent
-import com.nitro.nmesos.util.Logger
+import com.nitro.nmesos.util.Formatter
 
 import scala.Option.option2Iterable
 import scala.util.{Failure, Success}
@@ -13,7 +13,7 @@ import scala.util.{Failure, Success}
 /**
   * Verify a complete Cluster comparing Singularity, Mesos, Docker and Sidecar State.
   */
-case class VerifyEnvCommand(singularityUrl: String, log: Logger)
+case class VerifyEnvCommand(singularityUrl: String, fmt: Formatter)
     extends Command
     with VerifyRequests
     with VerifyContainers
@@ -48,13 +48,13 @@ case class VerifyEnvCommand(singularityUrl: String, log: Logger)
   */
 trait FetchEnvironment {
   def singularityUrl: String
-  def log: Logger
+  def fmt: Formatter
 
-  var manager = DryrunSingularityManager(singularityUrl, log)
-  var sidecar = SidecarManager(log)
+  var manager = DryrunSingularityManager(singularityUrl, fmt)
+  var sidecar = SidecarManager(fmt)
 
   def fetchInfo() =
-    log.logBlock(s"Analyzing: $singularityUrl") {
+    fmt.fmtBlock(s"Analyzing: $singularityUrl") {
       for {
         requests <- manager.getSingularityActiveRequests()
         hosts =
@@ -71,7 +71,7 @@ trait FetchEnvironment {
     }
 
   private def fetchContainers(host: String): Seq[Container] = {
-    log.println(s"Fetching Docker container from $host...")
+    fmt.println(s"Fetching Docker container from $host...")
     SshDockerClient.fetchContainers(host)
   }
 
@@ -96,13 +96,13 @@ trait FetchEnvironment {
 }
 
 trait VerifyContainers {
-  def log: Logger
+  def fmt: Formatter
 
   /**
     * Verify all containers running in the cluster belong to a Singularity Requests.
     */
   def verifyOrphanContainers(info: EnvironmentInfo) = {
-    log.logBlock(s"Verifying containers") {
+    fmt.fmtBlock(s"Verifying containers") {
 
       val mesosTasksId = info.requests
         .flatMap(_.taskIds)
@@ -125,11 +125,11 @@ trait VerifyContainers {
       orphans: Seq[String]
   ) = {
     if (orphans.isEmpty) {
-      log.println(
-        s" ${log.Ok} All containers belong to a Mesos Task [${info.containers.length} containers, ${mesosTasksId.length} tasks]"
+      fmt.println(
+        s" ${fmt.Ok} All containers belong to a Mesos Task [${info.containers.length} containers, ${mesosTasksId.length} tasks]"
       )
     } else {
-      log.error(s" Probably orphan containers:")
+      fmt.error(s" Probably orphan containers:")
 
       orphans.foreach { taskId =>
         val containerInfo = info.containers
@@ -137,20 +137,20 @@ trait VerifyContainers {
           .fold(s"$taskId")(c =>
             s"   at ${c.host} [containerId: ${c.id}, image: ${c.image}, name: ${c.name}]"
           )
-        log.error(s" ${log.Fail} $containerInfo")
+        fmt.error(s" ${fmt.Fail} $containerInfo")
       }
     }
   }
 }
 
 trait VerifyRequests {
-  def log: Logger
+  def fmt: Formatter
 
   /**
     * Verify all requests
     */
   def verifyRequests(info: EnvironmentInfo) = {
-    log.logBlock(s"Verifying requests") {
+    fmt.fmtBlock(s"Verifying requests") {
       info.requests
         .map(verifyRequest(_, info))
         .forall(identity)
@@ -208,39 +208,39 @@ trait VerifyRequests {
         .map(c => s" at ${c.host} [containerId: ${c.id}]")
         .mkString("\n\t\t\t")
 
-      log.error(s""" ${log.Fail} $requestId: $tasksCount tasks, ${log
-        .errorColor(foundContainers.length)} containers found, ${log.errorColor(
+      fmt.error(s""" ${fmt.Fail} $requestId: $tasksCount tasks, ${fmt
+        .errorColor(foundContainers.length)} containers found, ${fmt.errorColor(
         orphanContainers.length
       )} unexpected containers
-           |  orphans:\t${log.errorColor(orphasInfo)}
-           |  valid:\t${log.infoColor(validInfo)}
+           |  orphans:\t${fmt.errorColor(orphasInfo)}
+           |  valid:\t${fmt.infoColor(validInfo)}
         """.stripMargin)
     } else {
-      log.println(
-        s" ${log.Ok} $requestId: $tasksCount tasks, ${log.infoColor(foundContainers.length)} containers found"
+      fmt.println(
+        s" ${fmt.Ok} $requestId: $tasksCount tasks, ${fmt.infoColor(foundContainers.length)} containers found"
       )
     }
   }
 }
 
 trait VerifySidecar {
-  implicit val log: Logger
+  implicit val fmt: Formatter
 
   def verifySidecar(info: EnvironmentInfo): Boolean = {
 
     if (info.sidecarsServices.nonEmpty) {
-      log.logBlock(s"Verifying Sidecar") {
+      fmt.fmtBlock(s"Verifying Sidecar") {
         val allHost = info.containers.map(_.host).distinct.sorted
         val sidecarHosts = info.sidecarsServices.map(_.hostName).distinct.sorted
 
         // All host are running sidecar
         if (allHost == sidecarHosts) {
-          log.println(
-            s" ${log.Ok} ${sidecarHosts.size} Sidecar instances running "
+          fmt.println(
+            s" ${fmt.Ok} ${sidecarHosts.size} Sidecar instances running "
           )
         } else {
-          log.println(
-            s" ${log.Fail} ${sidecarHosts.size} Sidecar instances running [${allHost.size} expected]"
+          fmt.println(
+            s" ${fmt.Fail} ${sidecarHosts.size} Sidecar instances running [${allHost.size} expected]"
           )
         }
 

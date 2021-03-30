@@ -1,7 +1,7 @@
 package com.nitro.nmesos.commands
 
 import com.nitro.nmesos.config.model.CmdConfig
-import com.nitro.nmesos.util.Logger
+import com.nitro.nmesos.util.Formatter
 import com.nitro.nmesos.config.{Fail, Validations, Warning}
 import com.nitro.nmesos.singularity.ModelConversions
 
@@ -11,7 +11,7 @@ import com.nitro.nmesos.singularity.ModelConversions
   */
 case class DockerEnvCommand(
     localConfig: CmdConfig,
-    log: Logger,
+    fmt: Formatter,
     isDryrun: Boolean
 ) extends BaseCommand {
 
@@ -21,7 +21,7 @@ case class DockerEnvCommand(
   }
 
   override protected def processCmd(): CommandResult = {
-    log.logBlock("Creating files ...") {
+    fmt.fmtBlock("Creating files ...") {
       val (_, composeFilename) = DockerEnvCommand.createDockerFiles(localConfig)
 
       CommandSuccess(
