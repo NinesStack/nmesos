@@ -1,0 +1,28 @@
+<configuration>
+  <property name="NMESOS_LOG_LEVEL" value="${NMESOS_LOG_LEVEL:-off}" />
+  <property name="NMESOS_LOG_APPENDER" value="${NMESOS_LOG_APPENDER:-stdout}" />
+
+  <if condition='property("NMESOS_LOG_APPENDER").equalsIgnoreCase("stdout")'><then>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+      <encoder>
+        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      </encoder>
+    </appender>
+  </then></if>
+  
+  <if condition='property("NMESOS_LOG_APPENDER").equalsIgnoreCase("file")'><then>
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+      <file>nmesos.log</file>
+ 
+      <encoder>
+        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+      </encoder>
+    </appender>
+  </then></if>
+
+  <logger name="com.nitro.nmesos" level="${NMESOS_LOG_LEVEL}" />
+
+  <root level="off">
+    <appender-ref ref="${NMESOS_LOG_APPENDER}" />
+  </root>
+</configuration>

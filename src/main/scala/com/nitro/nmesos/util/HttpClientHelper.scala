@@ -86,7 +86,7 @@ trait HttpClientHelper {
   private def send(request: HttpRequest): HttpResponse[String] =
     Try {
       request.asString
-    }.getOrElse(sys.error(s"Unable to connect to ${request.url}"))
+    }.getOrElse(sys.error(s"Unable to connect - ${request.url}"))
 
   /**
     * Log HTTP request in verbose mode
