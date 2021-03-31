@@ -24,8 +24,9 @@ object SingularityManager {
 }
 
 trait SingularityManager extends HttpClientHelper {
+  private val logger = org.log4s.getLogger
+
   val apiUrl: String
-  //import com.nitro.nmesos.util.CustomPicklers.OptionPickler._
 
   def createSingularityRequest(
       newRequest: SingularityRequest
@@ -48,6 +49,7 @@ trait SingularityManager extends HttpClientHelper {
   ): Try[SingularityRequestParent]
 
   def ping(): Try[Unit] = {
+    logger.info(apiUrl)
     get[Unit](s"$apiUrl/api/requests").map(_.getOrElse(()))
   }
 

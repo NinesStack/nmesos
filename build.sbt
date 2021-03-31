@@ -44,6 +44,8 @@ lazy val common = Seq(
 )
 
 lazy val libs = Seq(
+  libraryDependencies += "org.codehaus.janino" % "janino" % "3.1.3",
+  libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3",
   libraryDependencies += "org.log4s" %% "log4s" % "1.10.0-M5",
   libraryDependencies += "joda-time" % "joda-time" % "2.10.10",
   libraryDependencies += "net.jcazevedo" % "moultingyaml_2.13" % "0.4.2",
