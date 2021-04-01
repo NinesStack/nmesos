@@ -172,7 +172,7 @@ trait CliSpecFixtures {
 
   val testService = "testService"
   val ValidCliArgs =
-    s"release ${testService} -v -d -e dev -t abcdef -S 10 -H 20 -f -n false"
+    s"release ${testService} -V -d -e dev -t abcdef -S 10 -H 20 -f -n false"
       .split(" ")
   val ValidCliArgsLong =
     s"release ${testService} --verbose --noformat --environment dev --tag abcdef --deprecated-soft-grace-period 10 --deprecated-hard-grace-period 20 --force --dry-run false"
