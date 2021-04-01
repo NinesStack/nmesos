@@ -24,8 +24,6 @@ object SingularityManager {
 }
 
 trait SingularityManager extends HttpClientHelper {
-  private val logger = org.log4s.getLogger
-
   val apiUrl: String
 
   def createSingularityRequest(
@@ -49,8 +47,7 @@ trait SingularityManager extends HttpClientHelper {
   ): Try[SingularityRequestParent]
 
   def ping(): Try[Unit] = {
-    logger.info(apiUrl)
-    get[Unit](s"$apiUrl/api/requests").map(_.getOrElse(()))
+    ping(s"$apiUrl/api/requests").map(_.getOrElse(()))
   }
 
   def getSingularityRequest(

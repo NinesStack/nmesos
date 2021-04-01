@@ -14,6 +14,21 @@ import CustomPicklers.OptionPickler._
 trait HttpClientHelper {
   def fmt: Formatter
 
+  protected def ping(url: String): Try[Option[Unit]] =
+    Try {
+      logRequest("GET", url)
+
+      val response = send(HttpClient(url))
+
+      if (response.isSuccess) {
+        Some(())
+      } else if (response.is4xx) {
+        None // NotFound
+      } else {
+        failure(url, response)
+      }
+    }
+
   protected def get[A: Reader](url: String): Try[Option[A]] =
     Try {
       logRequest("GET", url)
