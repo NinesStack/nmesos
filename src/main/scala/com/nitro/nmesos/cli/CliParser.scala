@@ -36,7 +36,7 @@ object CliParser {
 
   private val cmdParser = new scopt.OptionParser[Cmd]("nmesos") {
     opt[Unit]("verbose")
-      .abbr("v")
+      .abbr("V")
       .text("More verbose output")
       .optional()
       .action((_, c) => c.copy(verbose = true))

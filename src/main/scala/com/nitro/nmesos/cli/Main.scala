@@ -31,7 +31,11 @@ object CliManager {
   import com.nitro.nmesos.config.ConfigReader.{ConfigError, ValidConfig}
   import com.nitro.nmesos.config.model.CmdConfig
 
+  private val logger = org.log4s.getLogger
+
   def process(args: Array[String]) = {
+    logger.info(s"Commandline args: ${args.toList}")
+
     CliParser.parse(args) match {
       case None =>
       // Invalid args, nothing to do
@@ -44,6 +48,8 @@ object CliManager {
     * Process the CLI input command and verify configuration.
     */
   def processCmd(cmd: Cmd) = {
+    logger.info(s"Commandline: ${cmd}")
+
     val fmt = CustomFormatter(verbose = cmd.verbose, ansiEnabled = cmd.isFormatted)
 
     cmd.action match {
