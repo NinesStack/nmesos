@@ -12,6 +12,7 @@ import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 object ConfigReader {
+  private val logger = org.log4s.getLogger
 
   sealed trait ConfigResult
 
@@ -84,7 +85,7 @@ object ConfigReader {
     *  Try to read a Yaml file.
     */
   private def parse(file: File, fmt: Formatter): ParserResult = {
-    fmt.debug(s"Reading file ${file.getAbsolutePath}")
+    logger.info(s"Reading file ${file.getAbsolutePath}")
     tryRead(file) match {
       case Failure(ex: FileNotFoundException) =>
         InvalidYaml(s"Config file not found at '${file.getAbsoluteFile}'")

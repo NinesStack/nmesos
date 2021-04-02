@@ -55,6 +55,7 @@ case class ScaleCommand(localConfig: CmdConfig, fmt: Formatter, isDryrun: Boolea
 }
 
 trait ScaleCommandHelper extends BaseCommand {
+  private val logger = org.log4s.getLogger
 
   /**
     * Compare remote deploy running and desired deploy,
@@ -62,7 +63,7 @@ trait ScaleCommandHelper extends BaseCommand {
     */
   def scaleDeployIfNeeded(localRequest: SingularityRequest): Try[Unit] = {
 
-    fmt.debug(s"Checking if there is already an active deploy...")
+    logger.info(s"Checking if there is already an active deploy...")
 
     getActiveDeploy(localRequest).flatMap {
       case None =>

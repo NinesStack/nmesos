@@ -12,6 +12,8 @@ import CustomPicklers.OptionPickler._
   * Note: Http connections are synchronous.
   */
 trait HttpClientHelper {
+  private val logger = org.log4s.getLogger
+  
   def fmt: Formatter
 
   protected def ping(url: String): Try[Option[Unit]] =
@@ -89,11 +91,11 @@ trait HttpClientHelper {
       response: HttpResponse[String]
   ) = {
     try {
-      fmt.debug(s"Response code: ${response.code}, body: ${response.body}\n")
+      logger.info(s"Response code: ${response.code}, body: ${response.body}\n")
       read[A](response.body)
     } catch {
       case ex: Exception =>
-        fmt.debug(s"Parser error: $ex")
+        logger.info(s"Parser error: $ex")
         sys.error(s"Unable to parse HTTP response - $url")
     }
   }
@@ -113,7 +115,7 @@ trait HttpClientHelper {
   ): Unit = {
 
     jsonOpt.foreach { data =>
-      fmt.debug(s"data to send: $data\n")
+      logger.info(s"data to send: $data\n")
     }
 
     def data = {
@@ -125,7 +127,7 @@ trait HttpClientHelper {
         .getOrElse("")
     }
 
-    fmt.debug(s"curl -v -X $method $url $data\n")
+    logger.info(s"curl -v -X $method $url $data\n")
   }
 
   /**
@@ -134,7 +136,7 @@ trait HttpClientHelper {
   private def failure(url: String, response: HttpResponse[String]) = {
     //show only a few lines. plain error can be a large html
     val msg = response.body.take(500)
-    fmt.debug(s"Response > ${response.code}: $msg...\n")
+    logger.info(s"Response > ${response.code}: $msg...\n")
     sys.error(s"HTTP ${response.statusLine} - ${response.code}: $url\n $msg")
   }
 }

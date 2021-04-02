@@ -12,6 +12,7 @@ import scala.util.{Failure, Success, Try}
   * Yaml conf file to models
   */
 object YamlParser {
+  private val logger = org.log4s.getLogger
 
   sealed trait ParserResult
 
@@ -43,7 +44,7 @@ object YamlParser {
         )
 
       case Failure(ex) =>
-        fmt.debug(ex.getStackTrace.mkString("\n"))
+        logger.info(ex.getStackTrace.mkString("\n"))
         InvalidYaml(s"Unexpected error: ${ex.getMessage}")
 
     }
@@ -56,7 +57,7 @@ object YamlParser {
 
       // Custom merge to extend Yaml merge
       val smartYaml = mergeCommonsIntoEnvironments(yaml.asYamlObject)
-      fmt.debug(s"Yaml evaluated content:\n ${smartYaml.prettyPrint}")
+      logger.info(s"Yaml evaluated content:\n ${smartYaml.prettyPrint}")
 
       smartYaml.convertTo[Config]
     }
