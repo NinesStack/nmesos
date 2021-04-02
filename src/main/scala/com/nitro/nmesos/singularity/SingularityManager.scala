@@ -206,10 +206,12 @@ case class DryrunSingularityManager(apiUrl: String, fmt: Formatter)
   */
 case class RealSingularityManager(conf: SingularityConf, fmt: Formatter)
     extends SingularityManager {
+  private val logger = org.log4s.getLogger
+
   val apiUrl: String = conf.url
 
   def createSingularityRequest(newRequest: SingularityRequest) = {
-    fmt.debug("Creating Singularity Request...")
+    logger.info("Creating Singularity Request...")
     val response = post[SingularityRequest, SingularityRequestParent](
       s"$apiUrl/api/requests",
       newRequest
@@ -276,7 +278,7 @@ case class RealSingularityManager(conf: SingularityConf, fmt: Formatter)
       message: String
   ) = {
     fmt.info(message)
-    fmt.debug(
+    logger.info(
       s" [requestId: ${newDeploy.requestId}, deployId: ${newDeploy.id}]"
     )
 

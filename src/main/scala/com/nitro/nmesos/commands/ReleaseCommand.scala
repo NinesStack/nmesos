@@ -102,6 +102,7 @@ case class ReleaseCommand(
 }
 
 trait DeployCommandHelper extends BaseCommand {
+  private val logger = org.log4s.getLogger
 
   /**
     * Compare remote deploy running and desired deploy, deploying a new Singularity Deploy if needed.
@@ -109,11 +110,11 @@ trait DeployCommandHelper extends BaseCommand {
   def deployVersionIfNeeded(local: SingularityRequest): Try[DeployId] = {
     val defaultId = defaultDeployId(localConfig)
 
-    fmt.debug(s"Checking if a deploy with id '$defaultId' already exist...")
+    logger.info(s"Checking if a deploy with id '$defaultId' already exist...")
 
     manager.getSingularityDeployHistory(local.id, defaultId).flatMap {
       case None =>
-        fmt.debug(s"There is no deploy with id '$defaultId'")
+        logger.info(s"There is no deploy with id '$defaultId'")
         val localDeploy = toSingularityDeploy(localConfig, defaultId)
         val newImage = localDeploy.containerInfo.docker.image
         val message = s" Deploying version '$newImage'"
@@ -184,7 +185,7 @@ trait DeployCommandHelper extends BaseCommand {
 
       // hack, need to wait until Singularity move the deploy result to History.
       WaitUtil.waitUntil {
-        fmt.debug(s"Waiting for the deploy result...")
+        logger.info(s"Waiting for the deploy result...")
         for {
           deployInfo <-
             manager.getSingularityDeployHistory(request.id, deployId)
@@ -276,7 +277,7 @@ trait DeployCommandHelper extends BaseCommand {
     }
   }.recover {
     case ex => // Ignore error while fetching logs.
-      fmt.debug(s"Unable to fetch logs -  ${ex.getMessage}")
+      logger.info(s"Unable to fetch logs -  ${ex.getMessage}")
       ()
   }
 

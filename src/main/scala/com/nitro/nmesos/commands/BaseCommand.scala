@@ -25,6 +25,8 @@ trait Command {
 }
 
 trait BaseCommand extends Command {
+  private val logger = org.log4s.getLogger
+  
   val localConfig: CmdConfig
   val fmt: Formatter
   val isDryrun: Boolean
@@ -76,14 +78,14 @@ trait BaseCommand extends Command {
   def getRemoteRequest(
       localRequest: SingularityRequest
   ): Try[Option[SingularityRequest]] = {
-    fmt.debug("Fetching the remote request configuration...")
+    logger.info("Fetching the remote request configuration...")
     manager.getSingularityRequest(localRequest.id).map(_.map(_.request))
   }
 
   def getActiveDeploy(
       localRequest: SingularityRequest
   ): Try[Option[SingularityActiveDeployResponse]] = {
-    fmt.debug("Fetching the remote active deploy...")
+    logger.info("Fetching the remote active deploy...")
     manager
       .getSingularityRequest(localRequest.id)
       .map(_.flatMap(_.activeDeploy))
@@ -96,7 +98,7 @@ trait BaseCommand extends Command {
       remoteOpt: Option[SingularityRequest],
       local: SingularityRequest
   ) = {
-    fmt.debug("Comparing remote and local configuration...")
+    logger.info("Comparing remote and local configuration...")
     remoteOpt match {
       case None =>
         fmt.info(s" No Mesos config found with id: '${local.id}'")
@@ -126,7 +128,7 @@ trait BaseCommand extends Command {
       local: SingularityRequest
   ): Try[SingularityRequest] = {
 
-    fmt.debug("Comparing remote and local configuration...")
+    logger.info("Comparing remote and local configuration...")
 
     remoteOpt match {
       case None =>
