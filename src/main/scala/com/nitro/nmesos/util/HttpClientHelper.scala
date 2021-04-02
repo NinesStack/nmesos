@@ -13,7 +13,7 @@ import CustomPicklers.OptionPickler._
   */
 trait HttpClientHelper {
   private val logger = org.log4s.getLogger
-  
+
   def fmt: Formatter
 
   protected def ping(url: String): Try[Option[Unit]] =
@@ -84,7 +84,6 @@ trait HttpClientHelper {
 
   /**
     * Try to parse or return a clean error.
-    * In verbose mode: fmt response and errors in console
     */
   private def parseBody[A: Reader](
       url: String,
@@ -106,7 +105,7 @@ trait HttpClientHelper {
     }.getOrElse(sys.error(s"Unable to connect - ${request.url}"))
 
   /**
-    * Log HTTP request in verbose mode
+    * Log HTTP request
     */
   private def logRequest(
       method: String,
@@ -131,7 +130,7 @@ trait HttpClientHelper {
   }
 
   /**
-    * Log HTTP response in verbose mode return clean error
+    * Log HTTP response
     */
   private def failure(url: String, response: HttpResponse[String]) = {
     //show only a few lines. plain error can be a large html

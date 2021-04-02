@@ -10,7 +10,6 @@ trait Formatter extends AnsiFormatter with Animations {
   def error(msg: => Any): Unit = println(errorColor(msg))
   def info(msg: => Any): Unit = println(infoColor(msg))
   def println(msg: => Any): Unit = Console.println(msg)
-  def debug(msg: => Any): Unit
 
   private val SeparatorLine = "-" * 80
 
@@ -27,14 +26,12 @@ trait Formatter extends AnsiFormatter with Animations {
 /**
   * Format default terminal output with verbose disabled and ansi colors disabled.
   */
-object InfoFormatter extends CustomFormatter(ansiEnabled = false, verbose = false)
+object InfoFormatter extends CustomFormatter(ansiEnabled = false)
 
 /**
   * Format terminal output with verbose enabled and ansi colors enabled.
   */
-case class CustomFormatter(ansiEnabled: Boolean, verbose: Boolean) extends Formatter {
-  def debug(msg: => Any): Unit = if (verbose) println(s" [debug] $msg") else {}
-}
+case class CustomFormatter(ansiEnabled: Boolean) extends Formatter
 
 trait AnsiFormatter {
   def ansiEnabled: Boolean

@@ -50,7 +50,7 @@ object CliManager {
   def processCmd(cmd: Cmd) = {
     logger.info(s"Commandline: ${cmd}")
 
-    val fmt = CustomFormatter(verbose = cmd.verbose, ansiEnabled = cmd.isFormatted)
+    val fmt = CustomFormatter(ansiEnabled = cmd.isFormatted)
 
     cmd.action match {
       case VerifyAction =>

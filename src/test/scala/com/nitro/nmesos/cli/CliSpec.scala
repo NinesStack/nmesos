@@ -172,10 +172,10 @@ trait CliSpecFixtures {
 
   val testService = "testService"
   val ValidCliArgs =
-    s"release ${testService} -V -d -e dev -t abcdef -S 10 -H 20 -f -n false"
+    s"release ${testService} -d -e dev -t abcdef -S 10 -H 20 -f -n false"
       .split(" ")
   val ValidCliArgsLong =
-    s"release ${testService} --verbose --noformat --environment dev --tag abcdef --deprecated-soft-grace-period 10 --deprecated-hard-grace-period 20 --force --dry-run false"
+    s"release ${testService} --noformat --environment dev --tag abcdef --deprecated-soft-grace-period 10 --deprecated-hard-grace-period 20 --force --dry-run false"
       .split(" ")
   val InvalidCliArgs =
     s"release ${testService} -e dev -t"
@@ -183,7 +183,6 @@ trait CliSpecFixtures {
   val ValidCmd = Cmd(
     action = ReleaseAction,
     isDryrun = false,
-    verbose = true,
     isFormatted = false,
     serviceName = testService,
     environment = "dev",
@@ -200,7 +199,6 @@ trait CliSpecFixtures {
   val ValidDockerEnvCmd = Cmd(
     action = DockerEnvAction,
     isDryrun = DefaultValues.IsDryRun,
-    verbose = DefaultValues.Verbose,
     isFormatted = DefaultValues.IsFormatted,
     serviceName = "testService",
     environment = "dev",

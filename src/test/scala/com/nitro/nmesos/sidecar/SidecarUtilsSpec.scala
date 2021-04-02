@@ -9,7 +9,7 @@ import com.nitro.nmesos.util.{Formatter, CustomFormatter}
 class SidecarUtilsSpec extends AnyFlatSpec with should.Matchers {
 
   implicit val fmt: CustomFormatter =
-    CustomFormatter(ansiEnabled = true, verbose = true)
+    CustomFormatter(ansiEnabled = true)
 
   "Sidecar Utils" should "diff the infos right" in {
     val containerNotDepoyedOnMesos = Seq()
