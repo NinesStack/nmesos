@@ -21,7 +21,6 @@ object CliParser {
     val nilCommand = Cmd(
       action = NilAction,
       isDryrun = DefaultValues.IsDryRun,
-      verbose = DefaultValues.Verbose,
       isFormatted = DefaultValues.IsFormatted,
       serviceName = "",
       singularity = "",
@@ -35,12 +34,6 @@ object CliParser {
   }
 
   private val cmdParser = new scopt.OptionParser[Cmd]("nmesos") {
-    opt[Unit]("verbose")
-      .abbr("V")
-      .text("More verbose output")
-      .optional()
-      .action((_, c) => c.copy(verbose = true))
-
     opt[Unit]("noformat")
       .abbr("d")
       .text("Disable ansi codes in the output")

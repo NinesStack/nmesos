@@ -7,7 +7,6 @@ object model {
 
   case class Cmd(
       isDryrun: Boolean,
-      verbose: Boolean,
       isFormatted: Boolean,
       serviceName: String,
       environment: String,
@@ -21,7 +20,6 @@ object model {
 
   object DefaultValues {
     val IsDryRun = true
-    val Verbose = false
     val IsFormatted = true
     val DeprecatedSoftGracePeriod = 14
     val DeprecatedHardGracePeriod = 28
