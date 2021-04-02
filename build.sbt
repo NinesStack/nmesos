@@ -1,8 +1,15 @@
 name := "nmesos"
-version := "1.0.1"
+version := scala.io.Source.fromFile("VERSION.txt").getLines().next
 maintainer := "roland@tritsch.org"
 organization := "nitro"
 scalaVersion := "3.0.0-RC1"
+
+// --- generate build info ---
+enablePlugins(BuildInfoPlugin)
+lazy val buildInfoSettings = Seq(
+  buildInfoPackage := "com.nitro.nmesos",
+  buildInfoKeys := Seq[BuildInfoKey](version)
+)
 
 // --- assembly ---
 val execJava = Seq[String](
@@ -37,26 +44,35 @@ publishTo := Some(
 )
 
 // --- build ---
-lazy val common = Seq(
+lazy val commonSettings = Seq(
   scalacOptions ++= Seq(
     "-Xfatal-warnings"
   )
 )
 
-lazy val libs = Seq(
+lazy val libsLogging = Seq(
   libraryDependencies += "org.codehaus.janino" % "janino" % "3.1.3",
   libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3",
-  libraryDependencies += "org.log4s" %% "log4s" % "1.10.0-M5",
+  libraryDependencies += "org.log4s" %% "log4s" % "1.10.0-M5"
+)
+
+lazy val libsTesting = Seq(
+  libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.5",
+  libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.5" % "test"
+)
+
+lazy val libs = Seq(
   libraryDependencies += "joda-time" % "joda-time" % "2.10.10",
   libraryDependencies += "net.jcazevedo" % "moultingyaml_2.13" % "0.4.2",
-  libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.5",
-  libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.5" % "test",
   libraryDependencies += "com.github.scopt" % "scopt_2.13" % "4.0.0",
   libraryDependencies += "org.scalaj" % "scalaj-http_2.13" % "2.4.2",
-  libraryDependencies += "com.lihaoyi" %% "upickle" % "1.3.0",
+  libraryDependencies += "com.lihaoyi" %% "upickle" % "1.3.0"
 )
 
 lazy val root = project
   .in(file("."))
-  .settings(common)
+  .settings(buildInfoSettings)
+  .settings(commonSettings)
+  .settings(libsLogging)
+  .settings(libsTesting)
   .settings(libs)
