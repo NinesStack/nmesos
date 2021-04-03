@@ -47,7 +47,11 @@ publishTo := Some(
 lazy val commonSettings = Seq(
   scalacOptions ++= Seq(
     "-Xfatal-warnings"
-  )
+  ),
+  excludeLintKeys in Global += artifacts in Universal,
+  excludeLintKeys in Global += configuration in Universal,
+  excludeLintKeys in Global += publishMavenStyle in Universal,
+  excludeLintKeys in Global += pushRemoteCacheArtifact in Universal
 )
 
 lazy val libsLogging = Seq(
