@@ -27,6 +27,7 @@ object model {
 
   sealed trait Action
   case object NilAction extends Action
+  case object VersionAction extends Action
   case object ReleaseAction extends Action
   case object ScaleAction extends Action
   case object CheckAction extends Action

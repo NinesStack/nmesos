@@ -41,6 +41,7 @@
 * Approve the PR
 * Merge the PR
 * Release a new version on the `master` branch (optional) ...
+<<<<<<< HEAD
   * Bump the version in `build.sbt`
 <<<<<<< HEAD
   * Build a new distributable `.tgz` with ...
@@ -59,6 +60,9 @@
   * Tag the release (and push the tag)
 * Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases/nitro-public/repo/nitro/nmesos-cli/0.2.19/`).
 =======
+=======
+  * Bump the version in `VERSION.txt`
+>>>>>>> Adding the version command.
   * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish` 
   * Add/Commit/Push to `master`
   * Tag the release (and push the tag)
