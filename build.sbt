@@ -33,6 +33,7 @@ mappings in Universal in packageZipTarball := {
     file((assemblyOutputPath in assembly).value.getPath) -> "nmesos"
   )
 }
+mappings in (Compile, packageDoc) := Seq()
 
 import com.typesafe.sbt.packager.SettingsHelper._
 makeDeploymentSettings(Universal, packageZipTarball, "tgz")

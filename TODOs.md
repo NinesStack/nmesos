@@ -1,5 +1,6 @@
 # TODOs
 
+* make verify work
 * deploy digits/test with digits
 * add more logging
 * allow deploy to overwrite S3
