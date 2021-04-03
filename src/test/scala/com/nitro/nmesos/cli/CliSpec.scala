@@ -18,7 +18,7 @@ import com.nitro.nmesos.util.InfoFormatter
 
 class CliSpec extends AnyFlatSpec with should.Matchers with CliSpecFixtures {
 
-  "Cli Main" should "sanizied an serviceName that contains a file paths " in {
+  "Cli Main" should "sanitize a serviceName that contains a file paths " in {
     val cmd = ValidCmd.copy(serviceName = "config/test")
     val cmdConfig = CliManager.toServiceConfig(cmd, ValidYamlConfig)
 

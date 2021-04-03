@@ -27,7 +27,7 @@
 * Approve the PR
 * Merge the PR
 * Release a new version on the `master` branch (optional) ...
-  * Bump the version in `build.sbt`
+  * Bump the version in `VERSION.txt`
   * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish` 
   * Add/Commit/Push to `master`
   * Tag the release (and push the tag)

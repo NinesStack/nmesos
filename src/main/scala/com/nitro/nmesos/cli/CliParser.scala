@@ -1,7 +1,6 @@
 package com.nitro.nmesos.cli
 
 import com.nitro.nmesos.cli.model._
-import com.nitro.nmesos.BuildInfo
 
 /**
   * CLI parser from `args` to `Cmd`.
@@ -46,9 +45,19 @@ object CliParser {
 
     note("\n")
 
+    cmd("version")
+      .text(
+        " Show nmesos version."
+      )
+      .required()
+      .action((_, params) => params.copy(action = VersionAction))
+
+    note("\n")
+
     cmd("release")
       .text(
-        "Release the a new version of the service.\n Usage:  nmesos release service-name --environment dev --tag 0.0.1"
+        " Release the a new version of the service.\n" ++
+          "Usage: nmesos release <service-name> --environment <env> --tag <tag>"
       )
       .required()
       .action((_, params) => params.copy(action = ReleaseAction))
@@ -110,7 +119,8 @@ object CliParser {
 
     cmd("scale")
       .text(
-        " Update the Environment.\n Usage: nmesos scale service-name --environment dev"
+        " Update the Environment.\n" ++
+          "Usage: nmesos scale <service-name> --environment <env>"
       )
       .required()
       .action((_, params) => params.copy(action = ScaleAction))
@@ -124,11 +134,6 @@ object CliParser {
           .text("The environment to use")
           .required()
           .action((input, params) => params.copy(environment = input)),
-        opt[Boolean]("dryrun")
-          .abbr("x")
-          .text("Deprecated. Will be removed soon.")
-          .optional()
-          .action((input, params) => params.copy(isDryrun = input)),
         opt[Boolean]("dry-run")
           .abbr("n")
           .text(s"Is this a dry run? Default: ${DefaultValues.IsDryRun}")
@@ -140,7 +145,8 @@ object CliParser {
 
     cmd("check")
       .text(
-        " Check the environment conf without running it.\n Usage: nmesos check service-name --environment dev"
+        " Check the environment conf without running it.\n" ++
+          "Usage: nmesos check <service-name> --environment <dev>"
       )
       .required()
       .action((_, params) => params.copy(action = CheckAction))
@@ -178,14 +184,16 @@ object CliParser {
 
     cmd("verify")
       .text(
-        " Verify a complete Singularity server by comparing the expected Singularity state with the Mesos state and docker state\n Usage: nmesos verify --singularity http://url/singularity"
+        " Verify a complete Singularity server by comparing " ++
+          "the expected Singularity state with the Mesos state and docker state\n" ++
+          "Usage: nmesos verify --singularity <url>"
       )
       .required()
       .action((_, params) => params.copy(action = VerifyAction))
       .children(
         opt[String]("singularity")
           .abbr("s")
-          .text("The environment to use")
+          .text("The url to the Singularity server")
           .required()
           .action((input, params) => params.copy(singularity = input))
       )
@@ -194,7 +202,9 @@ object CliParser {
 
     cmd("docker-env")
       .text(
-        " Create a <service-name>.env/docker-compose.<service-name>.yml file (to run a/the docker container locally).\n Usage: nmesos docker-env service-name --environment dev --tag tag"
+        " Create a <service-name>.env/docker-compose.<service-name>.yml file " ++
+          "(to run a/the docker container locally).\n" ++
+          "Usage: nmesos docker-env <service-name> --environment <env> --tag <tag>"
       )
       .required()
       .action((_, params) => params.copy(action = DockerEnvAction))
@@ -210,20 +220,21 @@ object CliParser {
           .action((input, params) => params.copy(environment = input)),
         opt[String]("tag")
           .abbr("t")
-          .text("Tag/Version to create")
+          .text("Tag to use/create")
           .required()
           .validate(tag =>
             if (tag.isEmpty) Left("Tag is required")
             else Right(())
           )
-          .action((input, params) => params.copy(tag = input)),
+          .action((input, params) => params.copy(tag = input))
       )
 
     note("\n")
 
     cmd("docker-run")
       .text(
-        " Run a/the docker container locally.\n Usage: nmesos docker-run service-name --environment dev --tag tag"
+        " Run a/the docker container locally.\n" ++
+          "Usage: nmesos docker-run <service-name> --environment <dev> --tag <tag>"
       )
       .required()
       .action((_, params) => params.copy(action = DockerRunAction))
@@ -239,18 +250,19 @@ object CliParser {
           .action((input, params) => params.copy(environment = input)),
         opt[String]("tag")
           .abbr("t")
-          .text("Tag/Version to start")
+          .text("Tag to start")
           .required()
           .validate(tag =>
             if (tag.isEmpty) Left("Tag is required")
             else Right(())
           )
-          .action((input, params) => params.copy(tag = input)),
+          .action((input, params) => params.copy(tag = input))
       )
 
     checkConfig { cmd =>
       //val availableCommands = commands.map(_.fullName).mkString("|")
-      val availableCommands = "scale | release | check | verify | docker-env | docker-run"
+      val availableCommands =
+        "version | check | release | scale | verify | docker-env | docker-run"
       if (cmd.action != NilAction) success
       else failure(s"A command is required: ${availableCommands}\n")
     }

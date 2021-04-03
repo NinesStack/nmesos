@@ -1,35 +1,20 @@
 package com.nitro.nmesos.cli
 
-import com.nitro.nmesos.BuildInfo
-import com.nitro.nmesos.commands.{
-  CheckCommand,
-  CommandResult,
-  ScaleCommand,
-  VerifyEnvCommand,
-  DockerEnvCommand,
-  DockerRunCommand
-}
-import com.nitro.nmesos.config.ConfigReader.ConfigResult
-import com.nitro.nmesos.config.model.DeployJob
-
 object Main {
   def main(args: Array[String]): Unit = {
-    println("NMesos Deploy tool")
-    println(s"version: ${BuildInfo.version}")
     CliManager.process(args)
   }
 }
 
 object CliManager {
+  import com.nitro.nmesos.cli.model._
+  import com.nitro.nmesos.commands._
+  import com.nitro.nmesos.config._
+  import com.nitro.nmesos.config.model._
+  import com.nitro.nmesos.config.ConfigReader._
+  import com.nitro.nmesos.util._
 
   import java.io.File
-  import com.nitro.nmesos.cli.model._
-  import com.nitro.nmesos.commands.{CommandError, CommandSuccess}
-  import com.nitro.nmesos.util.{Formatter, CustomFormatter}
-  import com.nitro.nmesos.commands.ReleaseCommand
-  import com.nitro.nmesos.config.ConfigReader
-  import com.nitro.nmesos.config.ConfigReader.{ConfigError, ValidConfig}
-  import com.nitro.nmesos.config.model.CmdConfig
 
   private val logger = org.log4s.getLogger
 
@@ -53,6 +38,9 @@ object CliManager {
     val fmt = CustomFormatter(ansiEnabled = cmd.isFormatted)
 
     cmd.action match {
+      case VersionAction =>
+        val result = VersionCommand().run()
+        exit(fmt, result)
       case VerifyAction =>
         val result = VerifyEnvCommand(cmd.singularity, fmt).run()
         exit(fmt, result)
