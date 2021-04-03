@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+cd ${ASDF_DOWNLOAD_PATH}
+curl https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos/${ASDF_INSTALL_VERSION}/nmesos-${ASDF_INSTALL_VERSION}.tgz | tar -xz
+

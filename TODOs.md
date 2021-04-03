@@ -3,11 +3,14 @@
 * make verify work
 * deploy digits/test with digits
 * add more logging
-* allow deploy to overwrite S3
-* make circleci work
-  * including tagging/deploying when merging to master (with deploy flag/prefix)
-* make asdf work
-  * make uninstall work
+* make github actions work
+  * push/commit triggers build/test
+    * PRs can only be merged after build/test was successful
+  * push/commit with label release triggers ...
+    * build/test
+    * assembly/packageZipTarball
+    * push/upload tgz to GitHub releases (With changelog/list of PRs that got merged)
+    * tag the commit with what is in VERSION.txt (overwriting/removing old tag, if it exists)
 * make brew work
 * update/finish README
 * add scoverage
