@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
 
+<<<<<<< HEAD
 echo "0.2.21 0.2.22 0.2.23"
+=======
+echo "1.0.0 1.0.1"
+>>>>>>> Make asdf work.
