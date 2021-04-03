@@ -6,6 +6,7 @@ scalaVersion := "3.0.0-RC1"
 
 // --- generate build info ---
 enablePlugins(BuildInfoPlugin)
+
 lazy val buildInfoSettings = Seq(
   buildInfoPackage := "com.nitro.nmesos",
   buildInfoKeys := Seq[BuildInfoKey](version)
@@ -17,31 +18,37 @@ val execJava = Seq[String](
   """exec java -Djava.compiler=NONE -noverify -jar "$0" "$@""""
 )
 
-mainClass in assembly := Some("com.nitro.nmesos.cli.Main")
-assemblyOption in assembly := (assemblyOption in assembly)
-  .value
-  .copy(prependShellScript = Some(execJava))
-assemblyJarName in assembly := "nmesos"
+lazy val assemblySettings = Seq(
+  mainClass in assembly := Some("com.nitro.nmesos.cli.Main"),
+  assemblyOption in assembly := (assemblyOption in assembly)
+    .value
+    .copy(prependShellScript = Some(execJava)
+  ),
+  assemblyJarName in assembly := "nmesos"
+)
 
 // --- sbt-native-packager ---
 enablePlugins(UniversalPlugin)
 enablePlugins(JavaAppPackaging)
 
-mappings in Universal in packageZipTarball := {
-  Seq(
+lazy val packerSettings = Seq(
+  mappings in Universal in packageZipTarball := Seq(
     file("README.md") -> "README.md",
     file((assemblyOutputPath in assembly).value.getPath) -> "nmesos"
-  )
-}
-mappings in (Compile, packageDoc) := Seq()
+  ),
+  mappings in (Compile, packageDoc) := Seq()  
+)
 
 import com.typesafe.sbt.packager.SettingsHelper._
 makeDeploymentSettings(Universal, packageZipTarball, "tgz")
 
 // --- aws-s3-resolver ---
-awsProfile := Some("nmesos")
-publishTo := Some(
-  s3resolver.value("nmesos-releases", s3("nmesos-releases/nitro-public/repo"))
+lazy val resolverSettings = Seq(
+  awsProfile := Some("nmesos"),
+  publishTo := Some(
+    s3resolver.value("nmesos-releases", s3("nmesos-releases/nitro-public/repo"))
+  ),
+  s3overwrite := true
 )
 
 // --- build ---
@@ -77,6 +84,9 @@ lazy val libs = Seq(
 lazy val root = project
   .in(file("."))
   .settings(buildInfoSettings)
+  .settings(assemblySettings)
+  .settings(resolverSettings)
+  .settings(packerSettings)
   .settings(commonSettings)
   .settings(libsLogging)
   .settings(libsTesting)
