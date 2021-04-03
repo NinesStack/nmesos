@@ -1,12 +1,6 @@
 # TODOs
 
-* cleanup sbt warnings
 * deploy digits/test with digits
-* add VERSION.txt
-  * make build info work
-  * make brew work
-  * make asdf work
-  * add --version
 * add more logging
 * allow deploy to overwrite S3
 * make circleci work
