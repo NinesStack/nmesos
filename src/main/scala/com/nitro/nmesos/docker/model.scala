@@ -9,9 +9,7 @@ object model {
       host: String,
       env: Map[String, String]
   ) {
-
     def envTaskId = env.get("TASK_ID")
-
     def taskId = envTaskId.getOrElse(name.replace("mesos-", ""))
   }
 

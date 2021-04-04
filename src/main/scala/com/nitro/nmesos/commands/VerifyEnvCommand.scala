@@ -20,7 +20,10 @@ case class VerifyEnvCommand(singularityUrl: String, fmt: Formatter)
     with VerifySidecar
     with FetchEnvironment {
 
+  private val logger = org.log4s.getLogger
+
   def run(): CommandResult = {
+    logger.info(s"singularityUrl: ${singularityUrl}")
 
     val tryVerify = for {
       info <- fetchInfo()
@@ -33,7 +36,7 @@ case class VerifyEnvCommand(singularityUrl: String, fmt: Formatter)
 
     tryVerify match {
       case Failure(ex) =>
-        CommandError(s"Unable to connect - ${ex.getMessage}")
+        CommandError(s"Unable to connect - ${ex}")
       case Success(true) =>
         CommandSuccess(s"Successfully Verified")
       case Success(false) =>

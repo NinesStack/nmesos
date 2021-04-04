@@ -10,41 +10,49 @@ import sys.process._
   * Run Remote Docker commands through ssh to inspect the containers running.
   */
 object SshDockerClient {
+  private val logger = org.log4s.getLogger
 
   /**
     * Docker ps and inspect all containers in the host.
     */
   def fetchContainers(host: String): Seq[Container] = {
-    val containers = parseOutput(dockerPs(host), host)
-    fetchContainersEnv(host, containers)
+    val delimiter = "~"
+    val containers = parseOutput(dockerPs(host, delimiter), host, delimiter)
+    fetchContainersEnv(host, containers, delimiter)
   }
 
-  // Docker ps
-  private def dockerPs(host: String) = {
-    s"""ssh -oStrictHostKeyChecking=no $host  docker ps --format "{{.ID}}\\t{{.Image}}\\t{{.Names}}" """ !!
+  private def dockerPs(host: String, delimiter: String) = {
+    val format = s""" '{{.ID}}\\${delimiter}{{.Image}}\\${delimiter}{{.Names}}' """
+    val command = s""" ssh -oStrictHostKeyChecking=no ${host} docker ps --format ${format} """
+    logger.info(s"command: ${command}")
+    command !!
   }
 
-  // Docker inspect
-  // Fetch labels and environments var
-  private def dockerInspectEnv(host: String, containersId: Seq[String]) = {
-    s"""ssh -oStrictHostKeyChecking=no $host docker inspect ${containersId
-      .mkString(
-        " "
-      )} --format '{{range .Config.Env }}{{ $$.ID}}:{{.}}~{{end}}~{{range  $$key, $$value := .Config.Labels}}{{ $$.ID}}:{{$$key}}={{$$value}}~{{end}}' """ !!
+  private def parseOutput(psOutput: String, host: String, delimiter: String): Seq[Container] = {
+    val result = psOutput.trim
+      .split("\n")
+      .map(_.split(delimiter).toList)
+      .map {
+        case (id :: image :: name :: Nil) =>
+          Container(id, image, name, host, Map.empty)
+        case _ =>
+          sys.error(s"Unable to parse Docker output: ${psOutput}")
+      }
+      .toSeq
+    logger.info(s"result: ${result}")
+    result
   }
 
   /**
     * For each container fetch the environment vars
     */
   private def fetchContainersEnv(
-      host: String,
-      containers: Seq[Container]
+    host: String,
+    containers: Seq[Container],
+    delimiter: String
   ): Seq[Container] = {
-
-    val output = dockerInspectEnv(host, containers.map(_.id))
-
-    val lines = output.trim
-      .split("\n|~")
+    val output = dockerInspectEnv(host, containers.map(_.id), delimiter)
+    val lines = output.trim.split(s"\n|${delimiter}")
 
     val linesByContainer = lines
       .filterNot(_.isEmpty)
@@ -57,10 +65,19 @@ object SshDockerClient {
         .toMap
     }
 
-    containers.map { c =>
+    val result = containers.map { c =>
       c.copy(env = envByContainer.get(c.id).getOrElse(Map.empty))
     }
+    logger.info(s"result: ${result}")
+    result
+  }
 
+  private def dockerInspectEnv(host: String, containersId: Seq[String], delimiter: String) = {
+    val cids = containersId.mkString(" ")
+    val format = s"""  '{{range .Config.Env}}{{$$.ID}}:{{.}}${delimiter}{{end}}${delimiter}{{range \\$$key, \\$$value := .Config.Labels}}{{$$.ID}}:{{\\$$key}}={{\\$$value}}${delimiter}{{end}}' """
+    val command = s""" ssh -oStrictHostKeyChecking=no ${host} docker inspect ${cids} --format ${format} """
+    logger.info(s"command: ${command}")
+    command !!
   }
 
   private def parseTaskId(inspectOutput: String) = {
@@ -68,19 +85,5 @@ object SshDockerClient {
       .split(" ")
       .find(_.startsWith("TASK_ID="))
       .map(_.dropWhile(_ != '=').drop(1))
-  }
-
-  private def parseOutput(psOutput: String, host: String): Seq[Container] = {
-    psOutput.trim
-      .split("\n")
-      .map(_.split("\t").toList)
-      .map {
-        case (id :: image :: name :: Nil) =>
-          Container(id, image, name, host, Map.empty)
-        case _ => sys.error(s"""Unable to parse Docker output:
-             |$psOutput
-          """.stripMargin)
-      }
-    .toSeq
   }
 }
