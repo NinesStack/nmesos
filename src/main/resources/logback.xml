@@ -5,7 +5,7 @@
   <if condition='property("NMESOS_LOG_APPENDER").equalsIgnoreCase("stdout")'><then>
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
       <encoder>
-        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        <pattern>%date{HH:mm:ss.SSS} [%thread] %-5level %logger{36} \(%method\) - %message%n</pattern>
       </encoder>
     </appender>
   </then></if>
@@ -15,7 +15,7 @@
       <file>nmesos.log</file>
  
       <encoder>
-        <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        <pattern>%date{HH:mm:ss.SSS} [%thread] %-5level %logger{36} \(%method\) - %message%n</pattern>
       </encoder>
     </appender>
   </then></if>
