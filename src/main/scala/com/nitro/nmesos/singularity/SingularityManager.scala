@@ -24,6 +24,8 @@ object SingularityManager {
 }
 
 trait SingularityManager extends HttpClientHelper {
+  private val logger = org.log4s.getLogger
+
   val apiUrl: String
 
   def createSingularityRequest(
@@ -126,9 +128,9 @@ trait SingularityManager extends HttpClientHelper {
 
   // Retrieve the list of active requests
   def getSingularityActiveRequests(): Try[Seq[SingularityRequestParent]] = {
-    get[Seq[SingularityRequestParent]](
-      s"$apiUrl/api/requests/active?includeFullRequestData=true"
-    ).map(_.getOrElse(Seq.empty))
+    val request = s"${apiUrl}/api/requests/active?includeFullRequestData=true"
+    logger.info(s"request: ${request}")
+    get[Seq[SingularityRequestParent]](request).map(_.getOrElse(Seq.empty))
   }
 
   def withDisabledDebugFmt(): SingularityManager
