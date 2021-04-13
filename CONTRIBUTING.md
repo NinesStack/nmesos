@@ -62,9 +62,14 @@
 =======
 =======
   * Bump the version in `VERSION.txt`
+<<<<<<< HEAD
 >>>>>>> Adding the version command.
   * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish` 
   * Add/Commit/Push to `master`
+=======
+  * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish updateBrew` 
+  * Add/Commit/Push to `trunk`
+>>>>>>> Adding support for brew install (again).
   * Tag the release (and push the tag)
 * Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases/nitro-public/repo/nitro/nmesos/1.0.1`).
 >>>>>>> Make publish work (again).
