@@ -1,5 +1,10 @@
 # TODOs
 
+* add build badges
+  * build status
+  * version
+  * code coverage
+  * number of issues
 * make verify work
 * deploy digits/test with digits
 * add more logging
