@@ -28,7 +28,7 @@
 * Merge the PR
 * Release a new version on the `master` branch (optional) ...
   * Bump the version in `VERSION.txt`
-  * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish` 
-  * Add/Commit/Push to `master`
+  * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish updateBrew` 
+  * Add/Commit/Push to `trunk`
   * Tag the release (and push the tag)
 * Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases/nitro-public/repo/nitro/nmesos/1.0.1`).

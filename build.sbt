@@ -4,6 +4,14 @@ maintainer := "roland@tritsch.org"
 organization := "nitro"
 scalaVersion := "3.0.0-RC1"
 
+// --- add task to update the brew formula ---
+import scala.sys.process._
+lazy val updateBrew = taskKey[Unit]("Update the brew formula")
+updateBrew := {
+  val log = streams.value.log
+  s"./Formula/update.sh ${version.value}" ! log
+}
+
 // --- generate build info ---
 enablePlugins(BuildInfoPlugin)
 
