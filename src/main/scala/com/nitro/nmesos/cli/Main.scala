@@ -209,9 +209,6 @@ object CliManager {
           deprecatedSoftGracePeriod = cmd.deprecatedSoftGracePeriod,
           deprecatedHardGracePeriod = cmd.deprecatedHardGracePeriod
         ).run()
-      case ScaleAction =>
-        val serviceConfig = toServiceConfig(cmd, config)
-        ScaleCommand(serviceConfig, fmt, isDryrun = cmd.isDryrun).run()
       case CheckAction =>
         val serviceConfig = toServiceConfig(cmd, config)
         CheckCommand(
