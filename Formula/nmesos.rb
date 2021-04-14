@@ -7,8 +7,8 @@ require 'formula'
 class Nmesos < Formula
   desc "Nmesos is a command line tool to deploy into Mesos."
   homepage "https://github.com/Nitro/nmesos"
-  url "https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos/3.0.1/nmesos-3.0.1.tgz"
-  sha256 "1f5aaa62348ce97837d99861d051052f33d144dcf0febc32e1fe053af81c0b88"
+  url "https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos/3.0.2/nmesos-3.0.2.tgz"
+  sha256 "c9b9ba32c8fd8caab89fe36e4767ba57266969fb7073344b32fb469ee5333a78"
 
   def install
     bin.install 'nmesos'
