@@ -4,12 +4,20 @@ maintainer := "roland@tritsch.org"
 organization := "nitro"
 scalaVersion := "3.0.0-RC1"
 
+// --- add task to update the asdf versions ---
+import scala.sys.process._
+lazy val updateAsdf = taskKey[Unit]("Update the asdf versions")
+updateAsdf := {
+  val log = streams.value.log
+  s"./bin/updateAsdfSbt.sh ${version.value}" ! log
+}
+
 // --- add task to update the brew formula ---
 import scala.sys.process._
 lazy val updateBrew = taskKey[Unit]("Update the brew formula")
 updateBrew := {
   val log = streams.value.log
-  s"./Formula/update.sh ${version.value}" ! log
+  s"./Formula/updateBrewSbt.sh ${version.value}" ! log
 }
 
 // --- generate build info ---
