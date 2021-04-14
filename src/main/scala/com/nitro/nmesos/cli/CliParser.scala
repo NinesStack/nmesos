@@ -117,32 +117,6 @@ object CliParser {
 
     note("\n")
 
-    cmd("scale")
-      .text(
-        " Update the Environment.\n" ++
-          "Usage: nmesos scale <service-name> --environment <env>"
-      )
-      .required()
-      .action((_, params) => params.copy(action = ScaleAction))
-      .children(
-        arg[String]("service-name")
-          .text("Name of the service to scale")
-          .required()
-          .action((input, params) => params.copy(serviceName = input)),
-        opt[String]("environment")
-          .abbr("e")
-          .text("The environment to use")
-          .required()
-          .action((input, params) => params.copy(environment = input)),
-        opt[Boolean]("dry-run")
-          .abbr("n")
-          .text(s"Is this a dry run? Default: ${DefaultValues.IsDryRun}")
-          .optional()
-          .action((input, params) => params.copy(isDryrun = input))
-      )
-
-    note("\n")
-
     cmd("check")
       .text(
         " Check the environment conf without running it.\n" ++

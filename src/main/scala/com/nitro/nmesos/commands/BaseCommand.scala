@@ -119,43 +119,6 @@ trait BaseCommand extends Command {
     }
   }
 
-  /**
-    * Scale the resources of the Singularity request based on the diff between local and remote.
-    * Note: Only the number of instances will be updated.
-    */
-  def scaleSingularityRequestIfNeeded(
-      remoteOpt: Option[SingularityRequest],
-      local: SingularityRequest
-  ): Try[SingularityRequest] = {
-
-    logger.info("Comparing remote and local configuration...")
-
-    remoteOpt match {
-      case None =>
-        Failure(new Exception(s" No Mesos config found with id: '${local.id}'"))
-
-      case Some(SingularityRequest(_, _, "SPREAD_ALL_SLAVES", _, _, _, _, _)) =>
-        Failure(
-          new Exception(
-            s" Unable to scale to a fix number of instances. Using auto-scale [slavePlacement: SPREAD_ALL_SLAVES]"
-          )
-        )
-
-      case Some(remote) if (remote.instances != local.instances) =>
-        // Remote Singularity request exist but num instances need to be scaled
-        manager.scaleSingularityRequest(remote, local).map(_ => local)
-
-      case Some(other) =>
-        // Remote Singularity Request is up to date, nothing to do here!
-        Success(
-          fmt.info(
-            s" The request configuration for '${localConfig.serviceName}' is up to date! [requestId: ${other.id}]"
-          )
-        )
-        Success(local)
-    }
-  }
-
   def dryWarning =
     if (isDryrun) fmt.importantColor(" [dry-run true] use --dry-run false")
     else ""
