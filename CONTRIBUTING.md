@@ -63,11 +63,15 @@
 =======
   * Bump the version in `VERSION.txt`
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> Adding the version command.
   * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish` 
   * Add/Commit/Push to `master`
 =======
   * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish updateBrew` 
+=======
+  * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish updateAsdf updateBrew`
+>>>>>>> Add updateAsdf task.
   * Add/Commit/Push to `trunk`
 >>>>>>> Adding support for brew install (again).
   * Tag the release (and push the tag)
