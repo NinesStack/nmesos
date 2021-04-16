@@ -31,7 +31,6 @@ mappings in Universal in packageZipTarball := {
 import com.typesafe.sbt.packager.SettingsHelper._
 makeDeploymentSettings(Universal, packageZipTarball, "tgz")
 
-//awsProfile := Some("nmesos")
 publishTo := Some(
   s3resolver.value("nmesos-releases", s3("nmesos-releases/nitro-public/repo"))
 )
