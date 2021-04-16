@@ -16,17 +16,10 @@
 
 * Note: To publish a new release you need to get access to the S3 bucket ...
   * Contact one of the existing commiters/maintainers to get the aws keys
-  * Add the following section to your `~/.aws/credentials` file ...
-    ```
-    [nmesos]
-    aws_access_key_id = <access>
-    aws_secret_access_key = <secret>    
-    ```
-  * And add the following section to your `~/.aws/config` file ...
-    ```
-    [nmesos]
-    region = eu-west-1
-    ```
+  * `export AWS_DEFAULT_REGION=eu-west-1`
+  * `export AWS_REGION=eu-west-1`
+  * `export AWS_ACCESS_KEY_ID=<key id>`
+  * `export AWS_SECRET_ACCESS_KEY=<key>`
 * Review the PR (discussing the change/implementation; making changes as necessary)
 * Approve the PR
 * Merge the PR
