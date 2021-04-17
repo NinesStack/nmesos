@@ -22,8 +22,8 @@ object SshDockerClient {
   }
 
   private def dockerPs(host: String, delimiter: String) = {
-    val format = s""" '{{.ID}}\\${delimiter}{{.Image}}\\${delimiter}{{.Names}}' """
-    val command = s""" ssh -oStrictHostKeyChecking=no ${host} docker ps --format ${format} """
+    val format = s""" '{{.ID}}${delimiter}{{.Image}}${delimiter}{{.Names}}' """
+    val command = s""" ssh -oStrictHostKeyChecking=no ${host} "docker ps --format ${format}" """
     logger.info(s"command: ${command}")
     command !!
   }
@@ -74,8 +74,8 @@ object SshDockerClient {
 
   private def dockerInspectEnv(host: String, containersId: Seq[String], delimiter: String) = {
     val cids = containersId.mkString(" ")
-    val format = s"""  '{{range .Config.Env}}{{$$.ID}}:{{.}}${delimiter}{{end}}${delimiter}{{range \\$$key, \\$$value := .Config.Labels}}{{$$.ID}}:{{\\$$key}}={{\\$$value}}${delimiter}{{end}}' """
-    val command = s""" ssh -oStrictHostKeyChecking=no ${host} docker inspect ${cids} --format ${format} """
+    val format = s""" '{{range .Config.Env}}{{$$.ID}}:{{.}}${delimiter}{{end}}${delimiter}{{range $$key, $$value := .Config.Labels}}{{$$.ID}}:{{$$key}}={{$$value}}${delimiter}{{end}}' """
+    val command = s""" ssh -oStrictHostKeyChecking=no ${host} "docker inspect ${cids} --format ${format}" """
     logger.info(s"command: ${command}")
     command !!
   }
