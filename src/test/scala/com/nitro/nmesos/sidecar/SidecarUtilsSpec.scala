@@ -22,10 +22,23 @@ class SidecarUtilsSpec extends AnyFlatSpec with should.Matchers {
       "service"
     ) should be(true)
 
-    // this is the weird case. It is ok to find containers in sidecar,
+    // these 2 are the weird cases. It is ok to find containers in sidecar,
     // that are not deployed with/through nmesos
     SidecarUtils.diffInfo(
       subsetContainerInfo,
+      sidecarInfo,
+      "service"
+    ) should be(true)
+
+    SidecarUtils.diffInfo(
+      containerInfo,
+      supersetSidecarInfo,
+      "service"
+    ) should be(true)
+
+    // also test for the ultimate subset :)
+    SidecarUtils.diffInfo(
+      Seq.empty,
       sidecarInfo,
       "service"
     ) should be(true)
@@ -39,12 +52,6 @@ class SidecarUtilsSpec extends AnyFlatSpec with should.Matchers {
     SidecarUtils.diffInfo(
       containerInfo,
       subsetSidecarInfo,
-      "service"
-    ) should be(false)
-
-    SidecarUtils.diffInfo(
-      containerInfo,
-      supersetSidecarInfo,
       "service"
     ) should be(false)
 

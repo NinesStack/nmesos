@@ -86,29 +86,39 @@ object SidecarUtils {
       sidecarInfo: Seq[String],
       serviceName: String
   )(implicit fmt: Formatter): Boolean = {
-    if (containerInfo.sameElements(sidecarInfo)) {
+    val moreContainerInfos = containerInfo.diff(sidecarInfo) 
+    val moreSidecarInfos = sidecarInfo.diff(containerInfo)
+
+    if (moreContainerInfos.isEmpty && moreSidecarInfos.isEmpty) {
       fmt.println(
-        s""" ${fmt.Ok} Sidecar mapping for $serviceName match all containers running """
+        s""" ${fmt.Ok} Sidecar mapping for ${serviceName} match all containers running """
       )
-      sidecarInfo.foreach { info =>
-        fmt.info(s"\t\t$info")
+      containerInfo.foreach { info =>
+        fmt.info(s"\t\t${info}")
       }
       true
-    } else if (containerInfo.isEmpty) {
-      fmt.info("\tFound (in Sidecar, but not in mesos):")
-      sidecarInfo.foreach { info =>
-        fmt.info(s"\t\t$info")
+    } else if (moreContainerInfos.isEmpty && !moreSidecarInfos.isEmpty) {
+      fmt.println(
+        s""" ${fmt.Ok} Sidecar mapping for ${serviceName} matches all containers running """
+      )
+      containerInfo.foreach { info =>
+        fmt.info(s"\t\t${info}}")
+      }
+     
+      fmt.warn("\tFound (in Sidecar, but not in Mesos):")
+      moreSidecarInfos.foreach { info =>
+        fmt.warn(s"\t\t${info}")
       }
       true
     } else {
-      fmt.println(s""" ${fmt.Fail} Invalid Sidecar mapping for $serviceName""")
+      fmt.println(s""" ${fmt.Fail} Invalid Sidecar mapping for ${serviceName} """)
       fmt.error("\tExpected (Containers running):")
       containerInfo.foreach { info =>
-        fmt.error(s"\t\t$info")
+        fmt.error(s"\t\t${info}")
       }
       fmt.error("\tFound (in Sidecar):")
       sidecarInfo.foreach { info =>
-        fmt.error(s"\t\t$info")
+        fmt.error(s"\t\t${info}")
       }
       false
     }
