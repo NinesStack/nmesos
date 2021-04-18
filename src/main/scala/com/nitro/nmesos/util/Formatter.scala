@@ -8,6 +8,7 @@ import scala.annotation.tailrec
 trait Formatter extends AnsiFormatter with Animations {
 
   def error(msg: => Any): Unit = println(errorColor(msg))
+  def warn(msg: => Any): Unit = println(warnColor(msg))
   def info(msg: => Any): Unit = println(infoColor(msg))
   def println(msg: => Any): Unit = Console.println(msg)
 
@@ -38,6 +39,7 @@ trait AnsiFormatter {
 
   // Default colors mapping
   val InfoColor = Console.GREEN
+  val WarnColor = Console.YELLOW
   val ErrorColor = Console.RED
   val ResetColor = Console.RESET
   val SeparatorColor = Console.BLUE
@@ -54,6 +56,10 @@ trait AnsiFormatter {
 
   def infoColor(body: => Any) = {
     if (ansiEnabled) s"$InfoColor$body$ResetColor" else body
+  }
+
+  def warnColor(body: => Any) = {
+    if (ansiEnabled) s"$WarnColor$body$ResetColor" else body
   }
 
   def errorColor(body: => Any) = {
