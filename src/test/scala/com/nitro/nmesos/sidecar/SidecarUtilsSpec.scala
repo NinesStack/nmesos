@@ -12,31 +12,42 @@ class SidecarUtilsSpec extends AnyFlatSpec with should.Matchers {
     CustomFormatter(ansiEnabled = true)
 
   "Sidecar Utils" should "diff the infos right" in {
-    val containerNotDepoyedOnMesos = Seq()
-    val goodContainerInfo, goodSidecarInfo = Seq("image @ host")
-    val badContainerInfo, badSidecarInfo =
-      Seq("image @ host", "image @ host2")
+    val containerInfo, sidecarInfo = Seq("image @ host", "image @ host2")
+    val subsetContainerInfo, subsetSidecarInfo = containerInfo.take(1)
+    val supersetContainerInfo, supersetSidecarInfo = containerInfo ++ List("image @ host3")
 
     SidecarUtils.diffInfo(
-      goodContainerInfo,
-      goodSidecarInfo,
+      containerInfo,
+      sidecarInfo,
       "service"
     ) should be(true)
+
+    // this is the weird case. It is ok to find containers in sidecar,
+    // that are not deployed with/through nmesos
     SidecarUtils.diffInfo(
-      containerNotDepoyedOnMesos,
-      goodSidecarInfo,
+      subsetContainerInfo,
+      sidecarInfo,
       "service"
     ) should be(true)
+
     SidecarUtils.diffInfo(
-      goodContainerInfo,
-      badSidecarInfo,
+      supersetContainerInfo,
+      sidecarInfo,
       "service"
     ) should be(false)
+
     SidecarUtils.diffInfo(
-      badContainerInfo,
-      goodSidecarInfo,
+      containerInfo,
+      subsetSidecarInfo,
       "service"
     ) should be(false)
+
+    SidecarUtils.diffInfo(
+      containerInfo,
+      supersetSidecarInfo,
+      "service"
+    ) should be(false)
+
   }
 
 }
