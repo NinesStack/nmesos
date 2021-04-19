@@ -74,7 +74,7 @@ trait FetchEnvironment {
     }
 
   private def fetchContainers(host: String): Seq[Container] = {
-    fmt.println(s"Fetching Docker container from $host...")
+    fmt.println(s"Fetching Docker containers from ${host}...")
     SshDockerClient.fetchContainers(host)
   }
 
