@@ -1,0 +1,51 @@
+## Example config for integration testing
+nmesos_version: '0.1.0' ## Min nmesos required to execute this config
+
+common:
+
+  resources:
+    instances: 1 # Number of instances to deploy
+    cpus: 0.1
+    memoryMb: 128
+
+  container:
+
+    image: hubspot/singularity-test-service # Docker repo/image without the tag
+    #forcePullImage: true                    # Optional to force pull (default false)
+
+    ports:
+      - 8080               # Exposed port by the container (Mesos will auto assign a external port)
+      - 9000:12000         # Require Mesos to assign a specific fixed port (<container_port>:<host_port>)
+                           # Note: you may notice that Singularity automatically allocates an extra
+                           #       external port for each requested fixed port. This seems to be a
+                           #       bug in Singularity.
+      - 9100/udp           # /udp instructs the executor to open this port for the UDP protocol instead of the default (TCP)
+      - 9101/tcp,udp       # Accept both TCP and UDP protocols
+      - 9102:13000/tcp,udp # This also works
+
+    volumes:
+      - /tmp/foo:/tmp/foo  #  (HOST:CONTAINER) with default rw or (HOST:CONTAINER:rw)
+
+    labels:
+      ServiceName: "exampleServer"
+
+    env_vars:
+      NEW_RELIC_LICENSE_KEY: "xxxxx"
+      JAVA_OPTS: -Xmx64m
+
+  singularity:
+    deployInstanceCountPerStep: 1   # Number of instances deployed at once.
+    autoAdvanceDeploySteps: true    # false to have Canary deployments.
+    deployStepWaitTimeMs: 1000      # Time to wait between deployments
+    healthcheckUri: "/hello"        # Used for singularity to determine if a deploy was success
+    healthcheckPortIndex: 1         # (Optional) Specify the zero-based index of the exposed port
+                                    #   which should be used for the health check. Otherwise,
+                                    #   Singularity will use the first available one
+
+environments:
+  dev:
+    singularity:
+      url: "http://localhost:7099/singularity"
+  prod:
+    singularity:
+      url: "http://prod-singularity/singularity"

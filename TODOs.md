@@ -1,13 +1,5 @@
 # TODOs
 
-## Before merge ...
-
-* make verify work
-* remove the state command (done)
-* deploy digits/test with digits
-* make brew work (done)
-* update/finish README/CONTRIBUTING
-
 ## After merge ...
 
 * add sbt-release (to automate the release process)
