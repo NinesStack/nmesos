@@ -60,7 +60,6 @@ makeDeploymentSettings(Universal, packageZipTarball, "tgz")
 
 // --- aws-s3-resolver ---
 lazy val resolverSettings = Seq(
-  awsProfile := Some("nmesos"),
   publishTo := Some(
     s3resolver.value("nmesos-releases", s3("nmesos-releases/nitro-public/repo"))
   ),
