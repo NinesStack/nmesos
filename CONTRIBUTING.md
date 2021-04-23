@@ -20,10 +20,14 @@
 * Note: To publish a new release you need to get access to the S3 bucket ...
   * Contact one of the existing commiters/maintainers to get the aws keys
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> Add Change Log.
   * `export AWS_DEFAULT_REGION=eu-west-1`
   * `export AWS_REGION=eu-west-1`
   * `export AWS_ACCESS_KEY_ID=<key id>`
   * `export AWS_SECRET_ACCESS_KEY=<key>`
+<<<<<<< HEAD
 =======
   * Add the following section to your `~/.aws/credentials` file ...
     ```
@@ -70,10 +74,22 @@
 =======
   * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish updateBrew` 
 =======
+=======
+* Review the PR (discussing the change/implementation; making changes as necessary)
+* Approve the PR
+* Merge the PR
+* Release a new version on the `trunk` branch (optional) ...
+  * Bump the version in `VERSION.txt`
+  * Update `CHANGELOG.md`
+>>>>>>> Add Change Log.
   * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish updateAsdf updateBrew`
 >>>>>>> Add updateAsdf task.
   * Add/Commit/Push to `trunk`
 >>>>>>> Adding support for brew install (again).
   * Tag the release (and push the tag)
+<<<<<<< HEAD
 * Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases/nitro-public/repo/nitro/nmesos/1.0.1`).
 >>>>>>> Make publish work (again).
+=======
+* Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases/nitro-public/repo/nitro/nmesos/<version>`).
+>>>>>>> Add Change Log.
