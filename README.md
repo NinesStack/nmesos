@@ -23,11 +23,13 @@ asdf uninstall nmesos <version>
 Using brew ...
 
 ``` bash
-brew -v tap nitro/nmesos https://github.com/Nitro/nmesos.git
+brew tap nitro/nmesos https://github.com/Nitro/nmesos.git
 brew install nmesos
 brew upgrade nmesos
 brew uninstall nmesos
 ```
+
+**Note: If you are upgrading from `0.2.*` you have to run `brew untab nitro/nmesos` first and then (re)install the new tab**
 
 Using curl ...
 
