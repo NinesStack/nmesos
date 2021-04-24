@@ -29,7 +29,7 @@ brew upgrade nmesos
 brew uninstall nmesos
 ```
 
-**Note: If you are upgrading from `0.2.*` you have to run `brew untab nitro/nmesos` first and then (re)install the new tab**
+**Note: If you are upgrading from `0.2.*` you have to run `brew untab nitro/nmesos` first and then (re)install the new tab.**
 
 Using curl ...
 
