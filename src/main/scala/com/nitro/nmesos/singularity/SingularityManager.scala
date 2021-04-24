@@ -175,7 +175,7 @@ case class DryrunSingularityManager(apiUrl: String, fmt: Formatter)
     if (previous.schedule != request.schedule) {
       fmt.info(s""" [dryrun] Need to reschedule '${previous.schedule.getOrElse(
         ""
-      )}' to '${previous.schedule.getOrElse("")}'""")
+      )}' to '${request.schedule.getOrElse("")}'""")
     }
 
     Success(SingularityUpdateResult(state = "ACTIVE"))
