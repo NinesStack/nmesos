@@ -39,6 +39,14 @@ chmod 755 nmesos-<version>/nmesos
 mv nmesos-<version>/nmesos <to-dir-on-your-path>
 ```
 
+Note: You can also install older versions of nmesos (`0.2.23` and older) with ...
+
+``` bash
+curl https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/<version>/nmesos-cli-<version>.tgz | tar -xz
+chmod 755 nmesos-cli-<version>/nmesos
+mv nmesos-cli-<version>/nmesos <to-dir-on-your-path>
+```
+
 ## Usage
 
 There are example configurations in the `example` directory.
