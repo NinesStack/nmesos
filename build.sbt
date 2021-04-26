@@ -1,44 +1,108 @@
-name in ThisBuild := "nmesos"
-organization in ThisBuild := "com.gonitro"
-version in ThisBuild := "0.2.23"
-scalaVersion in ThisBuild := "2.12.10"
+name := "nmesos"
+version := scala.io.Source.fromFile("VERSION.txt").getLines().next
+maintainer := "roland@tritsch.org"
+organization := "nitro"
+scalaVersion := "3.0.0-RC1"
 
-scalacOptions in ThisBuild ++= Seq(
-  "-unchecked",
-  "-deprecation",
-  "-feature",
-  "-Xfatal-warnings"
-)
+// --- add task to update the asdf versions ---
+import scala.sys.process._
+lazy val updateAsdf = taskKey[Unit]("Update the asdf versions")
+updateAsdf := {
+  val log = streams.value.log
+  s"./bin/updateAsdfSbt.sh ${version.value}" ! log
+}
 
-lazy val cli = Project("nmesos-cli", file("cli"))
-  .dependsOn(shared)
-  .configs(IntegrationTest)
-  .settings(Defaults.itSettings: _*)
-
-lazy val shared = Project("nmesos-shared", file("shared"))
-  .enablePlugins(BuildInfoPlugin)
-  .configs(IntegrationTest)
-  .settings(Defaults.itSettings: _*)
-  .settings(
-    buildInfoPackage := "com.nitro.nmesos",
-    crossScalaVersions := Seq("2.12.10", "2.12.1", "2.10.6"),
-    parallelExecution in Test := false,
-    libraryDependencies ++= Seq(
-      "net.jcazevedo" %% "moultingyaml" % "0.3.1",
-      "com.lihaoyi" %% "upickle" % "0.4.4",
-      "org.scalaj" %% "scalaj-http" % "2.3.0",
-      "org.specs2" %% "specs2-core" % "3.8.6" % "it,test"
-    )
-  )
-
-lazy val root =
-  project
-    .in(file("."))
-    .dependsOn(cli)
-
+// --- add task to update the brew formula ---
 import scala.sys.process._
 lazy val updateBrew = taskKey[Unit]("Update the brew formula")
 updateBrew := {
   val log = streams.value.log
-  s"./Formula/update.sh ${version.value}" ! log
+  s"./Formula/updateBrewSbt.sh ${version.value}" ! log
 }
+
+// --- generate build info ---
+enablePlugins(BuildInfoPlugin)
+
+lazy val buildInfoSettings = Seq(
+  buildInfoPackage := "com.nitro.nmesos",
+  buildInfoKeys := Seq[BuildInfoKey](version)
+)
+
+// --- assembly ---
+val execJava = Seq[String](
+  "#!/usr/bin/env sh",
+  """exec java -Djava.compiler=NONE -noverify -jar "$0" "$@""""
+)
+
+lazy val assemblySettings = Seq(
+  mainClass in assembly := Some("com.nitro.nmesos.cli.Main"),
+  assemblyOption in assembly := (assemblyOption in assembly)
+    .value
+    .copy(prependShellScript = Some(execJava)
+  ),
+  assemblyJarName in assembly := "nmesos"
+)
+
+// --- sbt-native-packager ---
+enablePlugins(UniversalPlugin)
+enablePlugins(JavaAppPackaging)
+
+lazy val packerSettings = Seq(
+  mappings in Universal in packageZipTarball := Seq(
+    file("README.md") -> "README.md",
+    file((assemblyOutputPath in assembly).value.getPath) -> "nmesos"
+  ),
+  mappings in (Compile, packageDoc) := Seq()  
+)
+
+import com.typesafe.sbt.packager.SettingsHelper._
+makeDeploymentSettings(Universal, packageZipTarball, "tgz")
+
+// --- aws-s3-resolver ---
+lazy val resolverSettings = Seq(
+  publishTo := Some(
+    s3resolver.value("nmesos-releases", s3("nmesos-releases/nitro-public/repo"))
+  ),
+  s3overwrite := true
+)
+
+// --- build ---
+lazy val commonSettings = Seq(
+  scalacOptions ++= Seq(
+    "-Xfatal-warnings"
+  ),
+  excludeLintKeys in Global += artifacts in Universal,
+  excludeLintKeys in Global += configuration in Universal,
+  excludeLintKeys in Global += publishMavenStyle in Universal,
+  excludeLintKeys in Global += pushRemoteCacheArtifact in Universal
+)
+
+lazy val libsLogging = Seq(
+  libraryDependencies += "org.codehaus.janino" % "janino" % "3.1.3",
+  libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3",
+  libraryDependencies += "org.log4s" %% "log4s" % "1.10.0-M5"
+)
+
+lazy val libsTesting = Seq(
+  libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.5",
+  libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.5" % "test"
+)
+
+lazy val libs = Seq(
+  libraryDependencies += "joda-time" % "joda-time" % "2.10.10",
+  libraryDependencies += "net.jcazevedo" % "moultingyaml_2.13" % "0.4.2",
+  libraryDependencies += "com.github.scopt" % "scopt_2.13" % "4.0.0",
+  libraryDependencies += "org.scalaj" % "scalaj-http_2.13" % "2.4.2",
+  libraryDependencies += "com.lihaoyi" %% "upickle" % "1.3.0"
+)
+
+lazy val root = project
+  .in(file("."))
+  .settings(buildInfoSettings)
+  .settings(assemblySettings)
+  .settings(resolverSettings)
+  .settings(packerSettings)
+  .settings(commonSettings)
+  .settings(libsLogging)
+  .settings(libsTesting)
+  .settings(libs)
