@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
-<<<<<<< HEAD
-bin=${ASDF_DOWNLOAD_PATH}/nmesos-cli-${ASDF_INSTALL_VERSION}/nmesos
-=======
 bin=${ASDF_DOWNLOAD_PATH}/nmesos-${ASDF_INSTALL_VERSION}/nmesos
->>>>>>> Make asdf work.
 bin_dir=${ASDF_INSTALL_PATH}/bin
 
 chmod 700 ${bin}
