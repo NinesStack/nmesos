@@ -27,11 +27,7 @@ jobs:
         java-version: "adopt@1.8"
 
     - name: Test
-<<<<<<< HEAD
-      run: sbt nmesos-shared/test nmesos-cli/test
-=======
       run: sbt test
->>>>>>> Make CI/CD work (Github Actions).
 
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
