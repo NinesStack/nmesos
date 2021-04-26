@@ -11,6 +11,7 @@
 * Fixed `verify` command
 * Retired `verbose` flag
 * Added support for proper logging
+* Fixed issue #63 (wrong schedule message)
 
 ## 0.2.23 (2021-01-01)
 
