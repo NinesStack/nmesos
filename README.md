@@ -20,6 +20,8 @@ asdf global nmesos <version>
 asdf uninstall nmesos <version>
 ```
 
+**Note: For this to work you need to have `asdf 0.8` installed. `0.7` will not work.**
+
 Using brew ...
 
 ``` bash
