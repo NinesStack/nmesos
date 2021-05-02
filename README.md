@@ -1,3 +1,5 @@
+**Note: This repository is deprecated. Nmesos is developed/maintained on [NinesStack](https://github.com/NinesStack).**
+
 ![Logo](assets/logo.png)
 
 # Nmesos
