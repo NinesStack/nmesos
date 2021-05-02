@@ -1,7 +1,7 @@
 
 
 common: &common
-  image: gonitro/test
+  image: ninesstack/test
   resources:
     instances: 2 # Number of instances to deploy
     cpus: 0.5

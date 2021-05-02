@@ -2,7 +2,7 @@
 
 # Nmesos
 
-![Build Status](https://github.com/nitro/nmesos/actions/workflows/ci.yml/badge.svg)
+![Build Status](https://github.com/ninesstack/nmesos/actions/workflows/ci.yml/badge.svg)
 
 Nmesos is a command line tool that leverages the [Singularity](https://github.com/HubSpot/Singularity) API to deploy services and schedule jobs in a [Apache Mesos](http://mesos.apache.org/) cluster.
 
@@ -13,7 +13,7 @@ Nmesos is a command line tool that leverages the [Singularity](https://github.co
 Using asdf ...
 
 ``` bash
-asdf plugin-add nmesos https://github.com/Nitro/nmesos.git
+asdf plugin-add nmesos https://github.com/NinesStack/nmesos.git
 asdf list-all nmesos
 asdf install nmesos <version>
 asdf global nmesos <version>
@@ -25,28 +25,18 @@ asdf uninstall nmesos <version>
 Using brew ...
 
 ``` bash
-brew tap nitro/nmesos https://github.com/Nitro/nmesos.git
+brew tap ninesstack/nmesos https://github.com/NinesStack/nmesos.git
 brew install nmesos
 brew upgrade nmesos
 brew uninstall nmesos
 ```
 
-**Note: If you are upgrading from `0.2.*` you have to run `brew untab nitro/nmesos` first and then (re)install the new tab.**
-
 Using curl ...
 
 ``` bash
-curl https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos/<version>/nmesos-<version>.tgz | tar -xz
+curl https://nmesos-releases.s3-eu-west-1.amazonaws.com/public/ninesstack/nmesos/<version>/nmesos-<version>.tgz | tar -xz
 chmod 755 nmesos-<version>/nmesos
 mv nmesos-<version>/nmesos <to-dir-on-your-path>
-```
-
-Note: You can also install older versions of nmesos (`0.2.23` and older) with ...
-
-``` bash
-curl https://nmesos-releases.s3-eu-west-1.amazonaws.com/nitro-public/repo/nitro/nmesos-cli/<version>/nmesos-cli-<version>.tgz | tar -xz
-chmod 755 nmesos-cli-<version>/nmesos
-mv nmesos-cli-<version>/nmesos <to-dir-on-your-path>
 ```
 
 ## Usage

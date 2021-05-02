@@ -1,7 +1,7 @@
 name := "nmesos"
 version := scala.io.Source.fromFile("VERSION.txt").getLines().next
 maintainer := "roland@tritsch.org"
-organization := "nitro"
+organization := "ninesstack"
 scalaVersion := "3.0.0-RC1"
 
 // --- add task to update the asdf versions ---
@@ -24,7 +24,7 @@ updateBrew := {
 enablePlugins(BuildInfoPlugin)
 
 lazy val buildInfoSettings = Seq(
-  buildInfoPackage := "com.nitro.nmesos",
+  buildInfoPackage := "ninesstack.nmesos",
   buildInfoKeys := Seq[BuildInfoKey](version)
 )
 
@@ -35,7 +35,7 @@ val execJava = Seq[String](
 )
 
 lazy val assemblySettings = Seq(
-  mainClass in assembly := Some("com.nitro.nmesos.cli.Main"),
+  mainClass in assembly := Some("ninesstack.nmesos.cli.Main"),
   assemblyOption in assembly := (assemblyOption in assembly)
     .value
     .copy(prependShellScript = Some(execJava)
@@ -61,7 +61,7 @@ makeDeploymentSettings(Universal, packageZipTarball, "tgz")
 // --- aws-s3-resolver ---
 lazy val resolverSettings = Seq(
   publishTo := Some(
-    s3resolver.value("nmesos-releases", s3("nmesos-releases/nitro-public/repo"))
+    s3resolver.value("nmesos-releases", s3("nmesos-releases/public"))
   ),
   s3overwrite := true
 )
