@@ -20,7 +20,7 @@
     </appender>
   </then></if>
 
-  <logger name="com.nitro.nmesos" level="${NMESOS_LOG_LEVEL}" />
+  <logger name="ninesstack.nmesos" level="${NMESOS_LOG_LEVEL}" />
 
   <root level="off">
     <appender-ref ref="${NMESOS_LOG_APPENDER}" />

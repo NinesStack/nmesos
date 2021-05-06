@@ -25,4 +25,4 @@
   * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish updateAsdf updateBrew`
   * Add/Commit/Push to `trunk`
   * Tag the release (and push the tag)
-* Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases/nitro-public/repo/nitro/nmesos/<version>`).
+* Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --profile nmesos s3 rm --recursive s3://nmesos-releases/public/ninesstack/nmesos/<version>`).

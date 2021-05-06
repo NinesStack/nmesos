@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.4 (2021-05-03)
+
+* Moving the repo to [NinesStack](https://github.com/NinesStack)
+
 ## 3.0.3 (2021-05-01)
 
 * Migrate codebase to Scala3
