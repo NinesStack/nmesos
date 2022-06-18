@@ -1,8 +1,8 @@
 name := "nmesos"
 version := scala.io.Source.fromFile("VERSION.txt").getLines().next
-maintainer := "roland@tritsch.org"
+maintainer := "roland@tritsch.email"
 organization := "ninesstack"
-scalaVersion := "3.0.0-RC1"
+scalaVersion := "3.1.2"
 
 // --- add task to update the asdf versions ---
 import scala.sys.process._
@@ -35,12 +35,9 @@ val execJava = Seq[String](
 )
 
 lazy val assemblySettings = Seq(
-  mainClass in assembly := Some("ninesstack.nmesos.cli.Main"),
-  assemblyOption in assembly := (assemblyOption in assembly)
-    .value
-    .copy(prependShellScript = Some(execJava)
-  ),
-  assemblyJarName in assembly := "nmesos"
+  assembly / mainClass := Some("ninesstack.nmesos.cli.Main"),
+  assembly / assemblyPrependShellScript := Some(execJava),
+  assembly / assemblyJarName := "nmesos"
 )
 
 // --- sbt-native-packager ---
@@ -48,11 +45,11 @@ enablePlugins(UniversalPlugin)
 enablePlugins(JavaAppPackaging)
 
 lazy val packerSettings = Seq(
-  mappings in Universal in packageZipTarball := Seq(
+  Universal / packageZipTarball / mappings := Seq(
     file("README.md") -> "README.md",
-    file((assemblyOutputPath in assembly).value.getPath) -> "nmesos"
+    file((assembly / assemblyOutputPath).value.getPath) -> "nmesos"
   ),
-  mappings in (Compile, packageDoc) := Seq()  
+  Compile / packageDoc / mappings := Seq()  
 )
 
 import com.typesafe.sbt.packager.SettingsHelper._
@@ -68,32 +65,33 @@ lazy val resolverSettings = Seq(
 
 // --- build ---
 lazy val commonSettings = Seq(
+  versionScheme := Some("semver-spec"),
   scalacOptions ++= Seq(
     "-Xfatal-warnings"
   ),
-  excludeLintKeys in Global += artifacts in Universal,
-  excludeLintKeys in Global += configuration in Universal,
-  excludeLintKeys in Global += publishMavenStyle in Universal,
-  excludeLintKeys in Global += pushRemoteCacheArtifact in Universal
+  Global / excludeLintKeys += Universal / artifacts,
+  Global / excludeLintKeys += Universal / configuration,
+  Global / excludeLintKeys += Universal / publishMavenStyle,
+  Global / excludeLintKeys += Universal / pushRemoteCacheArtifact
 )
 
 lazy val libsLogging = Seq(
-  libraryDependencies += "org.codehaus.janino" % "janino" % "3.1.3",
-  libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3",
-  libraryDependencies += "org.log4s" %% "log4s" % "1.10.0-M5"
+  libraryDependencies += "org.codehaus.janino" % "janino" % "3.1.7",
+  libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.11",
+  libraryDependencies += "org.log4s" %% "log4s" % "1.10.0"
 )
 
 lazy val libsTesting = Seq(
-  libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.5",
-  libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.5" % "test"
+  libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.12",
+  libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.12" % "test"
 )
 
 lazy val libs = Seq(
-  libraryDependencies += "joda-time" % "joda-time" % "2.10.10",
+  libraryDependencies += "joda-time" % "joda-time" % "2.10.14",
   libraryDependencies += "net.jcazevedo" % "moultingyaml_2.13" % "0.4.2",
   libraryDependencies += "com.github.scopt" % "scopt_2.13" % "4.0.0",
   libraryDependencies += "org.scalaj" % "scalaj-http_2.13" % "2.4.2",
-  libraryDependencies += "com.lihaoyi" %% "upickle" % "1.3.0"
+  libraryDependencies += "com.lihaoyi" %% "upickle" % "2.0.0"
 )
 
 lazy val root = project

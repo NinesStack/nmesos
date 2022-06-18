@@ -1,5 +1,11 @@
 # Contributing
 
+## Building it/Testing it
+
+* You need to run `Java 8` (otherwise you will see errors like `java.lang.NoClassDefFoundError: javax/xml/bind/JAXBException` and/or `com.amazonaws.SdkClientException: Unable to execute HTTP request: sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target`
+* run `sbt compile` and/or `sbt test`
+* run `sbt assembly` and `./target/scala-<-scala-version>/nmesos`
+
 ## Contributor
 
 * Create an issue (to get agreement on what you want to add/change)
@@ -12,7 +18,6 @@
 
 * Note: To publish a new release you need to get access to the S3 bucket ...
   * Contact one of the existing commiters/maintainers to get the aws keys
-  * `export AWS_DEFAULT_REGION=eu-west-1`
   * `export AWS_REGION=eu-west-1`
   * `export AWS_ACCESS_KEY_ID=<key id>`
   * `export AWS_SECRET_ACCESS_KEY=<key>`
