@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.0.5 (2022-06-20)
+
+* Upgrade to Scala 3.1.2
+* Upgrade to Sbt 1.6.2
+
 ## 3.0.4 (2021-05-03)
 
 * Moving the repo to [NinesStack](https://github.com/NinesStack)
