@@ -229,6 +229,10 @@ case class RealSingularityManager(conf: SingularityConf, fmt: Formatter)
         fmt.info(
           s""" Scheduled new Mesos job with Id: ${newRequest.id}, state: ${response.state}"""
         )
+
+      case _ =>
+        logger.error("createSingularityRequest: Unexpected case")
+        System.exit(1)
     }
 
     response
