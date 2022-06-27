@@ -191,7 +191,7 @@ class ValidationsSpec extends AnyFlatSpec with should.Matchers {
   it should "fail, if a badly formed line needs to get processes" in {
     val line =
       "OLD_ENV_VAR_10: \"old value\" # @deprecated-on-bad 10-Jan-2020"
-    an[scala.MatchError] should be thrownBy Validations.processLine(line)
+    an[java.lang.AssertionError] should be thrownBy Validations.processLine(line)
   }
 
   it should "fail, if a badly formed date needs to get processes" in {
