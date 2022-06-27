@@ -16,7 +16,7 @@ object CliManager {
 
   import java.io.File
 
-  private val logger = org.log4s.getLogger
+  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
 
   def process(args: Array[String]) = {
     logger.info(s"Commandline args: ${args.toList}")

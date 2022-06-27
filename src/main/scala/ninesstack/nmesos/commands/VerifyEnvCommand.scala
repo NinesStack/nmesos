@@ -20,7 +20,7 @@ case class VerifyEnvCommand(singularityUrl: String, fmt: Formatter)
     with VerifySidecar
     with FetchEnvironment {
 
-  private val logger = org.log4s.getLogger
+  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
 
   def run(): CommandResult = {
     logger.info(s"singularityUrl: ${singularityUrl}")

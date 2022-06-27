@@ -25,7 +25,7 @@ trait Command {
 }
 
 trait BaseCommand extends Command {
-  private val logger = org.log4s.getLogger
+  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
   
   val localConfig: CmdConfig
   val fmt: Formatter

@@ -12,7 +12,7 @@ import CustomPicklers.OptionPickler._
   * Note: Http connections are synchronous.
   */
 trait HttpClientHelper {
-  private val logger = org.log4s.getLogger
+  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
 
   def fmt: Formatter
 

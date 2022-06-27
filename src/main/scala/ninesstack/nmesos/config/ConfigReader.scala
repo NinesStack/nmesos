@@ -12,7 +12,7 @@ import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 object ConfigReader {
-  private val logger = org.log4s.getLogger
+  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
 
   sealed trait ConfigResult
 
