@@ -12,7 +12,7 @@ import scala.util.{Failure, Success, Try}
   * Yaml conf file to models
   */
 object YamlParser {
-  private val logger = org.log4s.getLogger
+  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
 
   sealed trait ParserResult
 

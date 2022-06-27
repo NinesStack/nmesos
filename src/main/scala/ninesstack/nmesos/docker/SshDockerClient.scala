@@ -10,7 +10,7 @@ import sys.process._
   * Run Remote Docker commands through ssh to inspect the containers running.
   */
 object SshDockerClient {
-  private val logger = org.log4s.getLogger
+  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
 
   /**
     * Docker ps and inspect all containers in the host.

@@ -67,6 +67,7 @@ lazy val commonSettings = Seq(
   scalacOptions ++= Seq(
     "-Xfatal-warnings"
   ),
+
   Global / excludeLintKeys += Universal / artifacts,
   Global / excludeLintKeys += Universal / configuration,
   Global / excludeLintKeys += Universal / publishMavenStyle,
@@ -74,9 +75,7 @@ lazy val commonSettings = Seq(
 )
 
 lazy val libsLogging = Seq(
-  libraryDependencies += "org.codehaus.janino" % "janino" % "3.1.7",
-  libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.11",
-  libraryDependencies += "org.log4s" %% "log4s" % "1.10.0"
+  libraryDependencies += "log4j" % "log4j" % "1.2.17"
 )
 
 lazy val libsTesting = Seq(

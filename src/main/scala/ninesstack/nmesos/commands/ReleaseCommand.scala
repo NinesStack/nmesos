@@ -102,7 +102,7 @@ case class ReleaseCommand(
 }
 
 trait DeployCommandHelper extends BaseCommand {
-  private val logger = org.log4s.getLogger
+  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
 
   /**
     * Compare remote deploy running and desired deploy, deploying a new Singularity Deploy if needed.
