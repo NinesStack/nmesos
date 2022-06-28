@@ -1,5 +1,7 @@
 package ninesstack.nmesos.config
 
+import org.apache.log4j.Logger
+
 import java.io.{File, FileNotFoundException}
 
 import ninesstack.nmesos.BuildInfo
@@ -12,7 +14,7 @@ import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 object ConfigReader {
-  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
+  private val logger = Logger.getLogger(this.getClass.getName)
 
   sealed trait ConfigResult
 

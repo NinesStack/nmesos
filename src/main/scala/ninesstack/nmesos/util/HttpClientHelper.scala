@@ -1,5 +1,7 @@
 package ninesstack.nmesos.util
 
+import org.apache.log4j.Logger
+
 import ninesstack.nmesos.singularity.model.SingularityRequestParent
 
 import scala.util.Try
@@ -12,7 +14,7 @@ import CustomPicklers.OptionPickler._
   * Note: Http connections are synchronous.
   */
 trait HttpClientHelper {
-  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
+  private val logger = Logger.getLogger(this.getClass.getName)
 
   def fmt: Formatter
 

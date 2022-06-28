@@ -1,5 +1,7 @@
 package ninesstack.nmesos.docker
 
+import org.apache.log4j.Logger
+
 import ninesstack.nmesos.docker.model.Container
 
 import scala.language.postfixOps
@@ -10,7 +12,7 @@ import sys.process._
   * Run Remote Docker commands through ssh to inspect the containers running.
   */
 object SshDockerClient {
-  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
+  private val logger = Logger.getLogger(this.getClass.getName)
 
   /**
     * Docker ps and inspect all containers in the host.

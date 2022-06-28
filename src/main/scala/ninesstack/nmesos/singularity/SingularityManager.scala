@@ -1,5 +1,7 @@
 package ninesstack.nmesos.singularity
 
+import org.apache.log4j.Logger
+
 import ninesstack.nmesos.config.model.SingularityConf
 import ninesstack.nmesos.singularity.ModelConversions.DeployId
 import ninesstack.nmesos.singularity.model._
@@ -24,7 +26,7 @@ object SingularityManager {
 }
 
 trait SingularityManager extends HttpClientHelper {
-  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
+  private val logger = Logger.getLogger(this.getClass.getName)
 
   val apiUrl: String
 
@@ -208,7 +210,7 @@ case class DryrunSingularityManager(apiUrl: String, fmt: Formatter)
   */
 case class RealSingularityManager(conf: SingularityConf, fmt: Formatter)
     extends SingularityManager {
-  private val logger = org.apache.log4j.Logger.getLogger(this.getClass.getName)
+  private val logger = Logger.getLogger(this.getClass.getName)
 
   val apiUrl: String = conf.url
 
