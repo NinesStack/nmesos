@@ -1,6 +1,6 @@
 package ninesstack.nmesos.cli
 
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.LogManager
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -18,7 +18,7 @@ object CliManager {
 
   import java.io.File
 
-  private val logger = Logger.getLogger(this.getClass.getName)
+  private val logger = LogManager.getLogger(this.getClass.getName)
 
   def process(args: Array[String]) = {
     logger.info(s"Commandline args: ${args.toList}")

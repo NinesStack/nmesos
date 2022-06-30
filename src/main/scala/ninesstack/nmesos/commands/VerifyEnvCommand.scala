@@ -1,6 +1,6 @@
 package ninesstack.nmesos.commands
 
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.LogManager
 
 import ninesstack.nmesos.docker.SshDockerClient
 import ninesstack.nmesos.docker.model.Container
@@ -22,7 +22,7 @@ case class VerifyEnvCommand(singularityUrl: String, fmt: Formatter)
     with VerifySidecar
     with FetchEnvironment {
 
-  private val logger = Logger.getLogger(this.getClass.getName)
+  private val logger = LogManager.getLogger(this.getClass.getName)
 
   def run(): CommandResult = {
     logger.info(s"singularityUrl: ${singularityUrl}")
