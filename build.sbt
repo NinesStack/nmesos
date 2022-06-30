@@ -75,7 +75,8 @@ lazy val commonSettings = Seq(
 )
 
 lazy val libsLogging = Seq(
-  libraryDependencies += "log4j" % "log4j" % "1.2.17"
+  libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.2",
+  libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.17.2"
 )
 
 lazy val libsTesting = Seq(

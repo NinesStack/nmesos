@@ -1,6 +1,6 @@
 package ninesstack.nmesos.commands
 
-import org.apache.log4j.Logger
+import org.apache.logging.log4j.LogManager
 
 import ninesstack.nmesos.config.{Fail, Validations}
 import ninesstack.nmesos.config.model.CmdConfig
@@ -104,7 +104,7 @@ case class ReleaseCommand(
 }
 
 trait DeployCommandHelper extends BaseCommand {
-  private val logger = Logger.getLogger(this.getClass.getName)
+  private val logger = LogManager.getLogger(this.getClass.getName)
 
   /**
     * Compare remote deploy running and desired deploy, deploying a new Singularity Deploy if needed.

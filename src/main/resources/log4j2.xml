@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn">
+  <Appenders>
+    <Console name="Console" target="system_out">
+      <PatternLayout pattern="%-5p - %d{ISO8601}: %m (%l)%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="ninesstack.nmesos" level="${sys:ninesstack.nmesos.loglevel:-off}"/>
+    <Root level="error">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>
