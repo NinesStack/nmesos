@@ -58,7 +58,7 @@ makeDeploymentSettings(Universal, packageZipTarball, "tgz")
 // --- aws-s3-resolver ---
 lazy val resolverSettings = Seq(
   publishMavenStyle := true,
-  publishTo := Some("nmesos-releases" at "s3://nmesos-releases/public")
+  publishTo := Some("nmesos-releases" at "s3://s3-eu-west-1.amazonaws.com/nmesos-releases/public")
 )
 
 // --- build ---
