@@ -61,6 +61,17 @@ lazy val resolverSettings = Seq(
   publishTo := Some("nmesos-releases" at "s3://s3-eu-west-1.amazonaws.com/nmesos-releases/public")
 )
 
+// --- scoverage ---
+lazy val scoverageSettings = Seq(
+  coverageExcludedFiles := ".*\\/upickle\\/implicits\\/.*;.*\\/scala\\/quoted\\/.*;.*\\/library\\/src\\/scala\\/runtime\\/.*"
+)
+
+// --- coveralls ---
+import org.scoverage.coveralls.Imports.CoverallsKeys._
+lazy val coverallsSettings = Seq(
+  coverallsTokenFile := Some("~/.coveralls.token")
+)
+
 // --- build ---
 lazy val commonSettings = Seq(
   versionScheme := Some("semver-spec"),
@@ -98,6 +109,8 @@ lazy val root = project
   .settings(assemblySettings)
   .settings(resolverSettings)
   .settings(packerSettings)
+  .settings(scoverageSettings)
+  .settings(coverallsSettings)
   .settings(commonSettings)
   .settings(libsLogging)
   .settings(libsTesting)
