@@ -30,3 +30,24 @@
   * Add/Commit/Push to `trunk`
   * Tag the release (and push the tag)
 * Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --region eu-west-1 s3 rm --recursive s3://nmesos-releases/public/ninesstack/nmesos/<version>`).
+
+## Code coverage
+
+We also have an early-alpha capability to do code coverage reporting.
+
+Note: This only works on MacOS/Linux. And you need Java 1.8.
+
+To make that work you need to ...
+
+* clone `git clone https://github.com/rolandtritsch/scalac-scoverage-plugin.git`
+  * and `git checkout roland/workaround-exclude-wip`
+  * and run `sbt clean && sbt scalafmtAll && sbt "+ reporter/test" "+ domain/test" "+ serializer/test" "+ plugin/test"  "+ runtime/test" && sbt "+ reporter/publishLocal" "+ domain/publishLocal" "+ serializer/publishLocal" "+ plugin/publishLocal"  "+ runtime/publishLocal"`
+* clone `https://github.com/rolandtritsch/sbt-scoverage.git`
+  * and `git checkout roland/workaround-exclude-wip`
+  * and run `sbt clean scalafmtAll compile test scripted publishLocal`
+* clone `https://github.com/rolandtritsch/sbt-coveralls.git`
+  * and `git checkout roland/workaround-exclude-wip`
+  * and run `sbt clean scalafmtAll compile test scripted publishLocal`
+* set `export COVERALLS_REPO_TOKEN=<coveralls-token>`
+  * you need to get that token from [Roland](mailto:roland@tritsch.email)
+* run `sbt clean compile coverage test coverageExclude coverageReport coveralls` to generate the report (in `target/scala-3.2.0-RC1/scoverage-data/scoverage-report`) and upload it to [coveralls](https://coveralls.io/github/rolandtritsch/nmesos)
