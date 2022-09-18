@@ -7,6 +7,7 @@
 * (Start to) Add support for scoverage
 * Migrate to log4j
 * Migrate to supported sbt-s3-resolver
+* Bug-fix for multiple after-deploys (community)
 
 ## 3.0.5 (2022-06-20)
 
