@@ -1,5 +1,7 @@
 package ninesstack.nmesos.commands
 
+import org.apache.logging.log4j.LogManager
+
 import ninesstack.nmesos.config.model.CmdConfig
 import ninesstack.nmesos.singularity.SingularityManager
 import ninesstack.nmesos.singularity.model.SingularityRequestParent.SingularityActiveDeployResponse
@@ -25,7 +27,7 @@ trait Command {
 }
 
 trait BaseCommand extends Command {
-  private val logger = org.log4s.getLogger
+  private val logger = LogManager.getLogger(this.getClass.getName)
   
   val localConfig: CmdConfig
   val fmt: Formatter

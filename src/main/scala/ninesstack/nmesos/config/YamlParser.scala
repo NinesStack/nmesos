@@ -1,5 +1,7 @@
 package ninesstack.nmesos.config
 
+import org.apache.logging.log4j.LogManager
+
 import ninesstack.nmesos.config.YamlParserHelper._
 import ninesstack.nmesos.config.model._
 import ninesstack.nmesos.util.{HashUtil, Formatter}
@@ -12,7 +14,7 @@ import scala.util.{Failure, Success, Try}
   * Yaml conf file to models
   */
 object YamlParser {
-  private val logger = org.log4s.getLogger
+  private val logger = LogManager.getLogger(this.getClass.getName)
 
   sealed trait ParserResult
 

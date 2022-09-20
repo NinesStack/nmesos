@@ -15,8 +15,7 @@ import scala.io.Source
 /**
   * Test Yaml config file
   */
-class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures {
-
+class YmlSpec extends AnyFlatSpec with should.Matchers with YmlTestFixtures { 
   "Yml Parser" should "fail while reading an invalid YML file" in {
     val expectedMessage =
       "Invalid yaml file at line 9, column: 1\n     WTF!\n     ^"

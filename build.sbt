@@ -2,7 +2,7 @@ name := "nmesos"
 version := scala.io.Source.fromFile("VERSION.txt").getLines().next
 maintainer := "roland@tritsch.email"
 organization := "ninesstack"
-scalaVersion := "3.1.2"
+scalaVersion := "3.2.0"
 
 // --- add task to update the asdf versions ---
 import scala.sys.process._
@@ -61,12 +61,24 @@ lazy val resolverSettings = Seq(
   publishTo := Some("nmesos-releases" at "s3://s3-eu-west-1.amazonaws.com/nmesos-releases/public")
 )
 
+// --- scoverage ---
+lazy val scoverageSettings = Seq(
+  coverageExcludedFiles := ".*\\/upickle\\/implicits\\/.*;.*\\/scala\\/quoted\\/.*;.*\\/library\\/src\\/scala\\/runtime\\/.*"
+)
+
+// --- coveralls ---
+import org.scoverage.coveralls.Imports.CoverallsKeys._
+lazy val coverallsSettings = Seq(
+  coverallsTokenFile := Some("~/.coveralls.token")
+)
+
 // --- build ---
 lazy val commonSettings = Seq(
   versionScheme := Some("semver-spec"),
   scalacOptions ++= Seq(
     "-Xfatal-warnings"
   ),
+
   Global / excludeLintKeys += Universal / artifacts,
   Global / excludeLintKeys += Universal / configuration,
   Global / excludeLintKeys += Universal / publishMavenStyle,
@@ -74,9 +86,8 @@ lazy val commonSettings = Seq(
 )
 
 lazy val libsLogging = Seq(
-  libraryDependencies += "org.codehaus.janino" % "janino" % "3.1.7",
-  libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.11",
-  libraryDependencies += "org.log4s" %% "log4s" % "1.10.0"
+  libraryDependencies += "org.apache.logging.log4j" % "log4j-api" % "2.17.2",
+  libraryDependencies += "org.apache.logging.log4j" % "log4j-core" % "2.17.2"
 )
 
 lazy val libsTesting = Seq(
@@ -98,6 +109,8 @@ lazy val root = project
   .settings(assemblySettings)
   .settings(resolverSettings)
   .settings(packerSettings)
+  .settings(scoverageSettings)
+  .settings(coverallsSettings)
   .settings(commonSettings)
   .settings(libsLogging)
   .settings(libsTesting)
