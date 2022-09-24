@@ -8,7 +8,7 @@
 
 ## Contributor
 
-* Create an issue (to get agreement on what you want to add/change)
+* Create an issue to get agreement on what you want to add/change/fix. Feel free to also reach out on [Gitter][].
 * Fork the repo
 * Make the changes (inlcuding writing the test(s) to verify/validate the changes)
 * Create a PR (linking back to the issue; explain what/why/how you changed the code)
@@ -49,5 +49,9 @@ To make that work you need to ...
   * and `git checkout roland/workaround-exclude-wip`
   * and run `sbt clean scalafmtAll compile test scripted publishLocal`
 * set `export COVERALLS_REPO_TOKEN=<coveralls-token>`
-  * you need to get that token from [Roland](mailto:roland@tritsch.email)
-* run `sbt clean compile coverage test coverageExclude coverageReport coveralls` to generate the report (in `target/scala-3.2.0-RC1/scoverage-data/scoverage-report`) and upload it to [coveralls](https://coveralls.io/github/rolandtritsch/nmesos)
+  * you need to get that token from [Roland][]
+* run `sbt clean compile coverage test coverageExclude coverageReport coveralls` to generate the report (in `target/scala-3.2.0-RC1/scoverage-data/scoverage-report`) and upload it to [coveralls][]
+
+[Gitter]: https://gitter.im/NinesStack/nmesos
+[Roland]: mailto:roland@tritsch.email
+[coveralls]: https://coveralls.io/github/rolandtritsch/nmesos
