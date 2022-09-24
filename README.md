@@ -2,6 +2,8 @@
 
 # Nmesos
 
+[![Join the chat at https://gitter.im/NinesStack/nmesos](https://badges.gitter.im/NinesStack/nmesos.svg)](https://gitter.im/NinesStack/nmesos?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ![Build Status](https://github.com/ninesstack/nmesos/actions/workflows/ci.yml/badge.svg)
 
 Nmesos is a command line tool that leverages the [Singularity](https://github.com/HubSpot/Singularity) API to deploy services and schedule jobs in a [Apache Mesos](http://mesos.apache.org/) cluster.
