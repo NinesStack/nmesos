@@ -1,12 +1,13 @@
-![Logo](assets/logo.png)
+![Logo][]
 
 # Nmesos
 
-![Build Status](https://github.com/ninesstack/nmesos/actions/workflows/ci.yml/badge.svg)
+[![Join the chat at https://gitter.im/NinesStack/nmesos][gitter-badge]][gitter-chat]
+![Build Status][build-badge]
 
-Nmesos is a command line tool that leverages the [Singularity](https://github.com/HubSpot/Singularity) API to deploy services and schedule jobs in a [Apache Mesos](http://mesos.apache.org/) cluster.
+Nmesos is a command line tool that leverages the [Singularity][] API to deploy services and schedule jobs in an Apache [Mesos][] cluster.
 
-![Example](assets/example.gif)
+![Example][]
 
 ## Install
 
@@ -94,3 +95,11 @@ You can also have nmesos run `docker-compose` for you with the `docker-run` comm
 ## Troubleshooting
 
 You can set/export the `NMESOS_LOG_LEVEL` env var. Valid log-levels are `error`, `warn`, `info` and `debug`. This will log to `stdout`. You can also set `NMESOS_LOG_APPENDER` to `file`. This will create an `nmesos.log` file in the current directory.
+
+[Example]: ./assets/example.gif
+[Logo]: ./assets/logo.png
+[Mesos]: http://mesos.apache.org/
+[Singularity]: https://github.com/HubSpot/Singularity
+[build-badge]: https://github.com/ninesstack/nmesos/actions/workflows/ci.yml/badge.svg
+[gitter-badge]: https://badges.gitter.im/NinesStack/nmesos.svg
+[gitter-chat]: https://gitter.im/NinesStack/nmesos
