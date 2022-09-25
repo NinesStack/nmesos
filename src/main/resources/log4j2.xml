@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="warn">
   <Appenders>
-    <Console name="Console" target="system_out">
+    <Console name="console" target="system_out">
       <PatternLayout pattern="%-5p - %d{ISO8601}: %m (%l)%n"/>
     </Console>
+    <File name="file" fileName="nmesos.log">
+      <PatternLayout pattern="%-5p - %d{ISO8601}: %m (%l)%n"/>
+    </File>
   </Appenders>
   <Loggers>
-    <Logger name="ninesstack.nmesos" level="${sys:ninesstack.nmesos.loglevel:-off}"/>
+    <Logger name="ninesstack.nmesos" level="${env:NMESOS_LOG_LEVEL:-off}"/>
     <Root level="error">
-      <AppenderRef ref="Console"/>
+      <AppenderRef ref="${env:NMESOS_LOG_APPENDER:-console}"/>
     </Root>
   </Loggers>
 </Configuration>

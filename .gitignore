@@ -1,3 +1,6 @@
 # sbt/scala specific
 **/target/
 project/project/
+
+# misc
+*.log
