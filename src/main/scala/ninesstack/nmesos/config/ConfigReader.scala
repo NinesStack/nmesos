@@ -39,6 +39,7 @@ object ConfigReader {
         ConfigError(msg, file)
 
       case ValidYaml(config, hash) =>
+        logger.debug(s"config: ${config}")
         val envVarDifferences = findMissingContainerEnvVarKeys(config)
         if (envVarDifferences.nonEmpty) {
           fmt.fmtBlock("Environment env_var keys not equal") {
