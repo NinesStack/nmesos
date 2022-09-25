@@ -52,6 +52,12 @@ To `release` the `example-service` from the `examples` directory you would run .
 nmesos release example-service --environment dev --tag latest --dry-run false
 ```
 
+Note: You need to `cd` into the `example` directory first. If you want to run `nmesos` and use configirations that are in a different directory you need to use the `NMESOS_CONFIG_REPOSITORY` environment variable ...
+
+``` bash
+NMESOS_CONFIG_REPOSITORY=<dir> nmesos release example-service --environment dev --tag latest --dry-run false
+```
+
 ## Support to deprecate env_vars
 
 When you do not need an `env_var` anymore, it is hard to remove it from the deployment config right away, because you might need to rollback to a previous version of the service that still needs that `env_var` (and yes, strictly speaking you could say that the deployment config should/could also be rolled back, but then you might loose other changes that you had to make to the config and ... my experience is you do not want to fiddle with that while you are in the middle of a production outage).
@@ -82,7 +88,7 @@ The date is the date, when you deprecated the `env_var`. `nmesos` checks the dat
 
 When the soft-limit is reached a warning is printed. When the hard-limit it reached an error is printed and the deploy is aborted.
 
-The default can be overriden with command line flags (see `nmesos help`.
+The default can be overriden with command line flags (see `nmesos help`).
 
 ## Support to run containers locally
 
@@ -94,7 +100,7 @@ You can also have nmesos run `docker-compose` for you with the `docker-run` comm
 
 ## Troubleshooting
 
-You can set/export the `NMESOS_LOG_LEVEL` env var. Valid log-levels are `error`, `warn`, `info` and `debug`. This will log to `stdout`. You can also set `NMESOS_LOG_APPENDER` to `file`. This will create an `nmesos.log` file in the current directory.
+You can set/export the `NMESOS_LOG_LEVEL` environment variable. Valid log-levels are `error`, `warn`, `info` and `debug`. This will log to `stdout`. You can also set `NMESOS_LOG_APPENDER` to `file`. This will create an `nmesos.log` file in the current directory.
 
 [Example]: ./assets/example.gif
 [Logo]: ./assets/logo.png
