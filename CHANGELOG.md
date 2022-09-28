@@ -1,6 +1,6 @@
 # Change Log
 
-## 3.0.6 (2022-09-20)
+## 3.0.6 (2022-10-01)
 
 * Upgrade to Scala 3.2.0
 * Upgrade to Sbt 1.7.1
