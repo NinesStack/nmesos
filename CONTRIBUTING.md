@@ -29,6 +29,7 @@
   * Build and publish a new distributable `.tgz` with `sbt clean assembly universal:publish updateAsdf updateBrew`
   * Add/Commit/Push to `trunk`
   * Tag the release (and push the tag)
+* Note: For the time being you manually need to grant a/the public READ permission to the object by running `aws s3api put-object-acl --bucket nmesos-releases --key public/ninesstack/nmesos/<VERSION>/nmesos-<VERSION>.tgz --acl public-read`
 * Note: If something goes wrong and you need to re-release you first need to cleanup (with `aws --region eu-west-1 s3 rm --recursive s3://nmesos-releases/public/ninesstack/nmesos/<version>`).
 
 ## Code coverage
