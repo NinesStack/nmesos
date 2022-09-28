@@ -52,7 +52,7 @@ To `release` the `example-service` from the `examples` directory you would run .
 nmesos release example-service --environment dev --tag latest --dry-run false
 ```
 
-Note: You need to `cd` into the `example` directory first. If you want to run `nmesos` and use configirations that are in a different directory you need to use the `NMESOS_CONFIG_REPOSITORY` environment variable ...
+Note: You need to `cd` into the `example` directory first. If you want to run `nmesos` and use configurations that are in a different directory you need to use the `NMESOS_CONFIG_REPOSITORY` environment variable ...
 
 ``` bash
 NMESOS_CONFIG_REPOSITORY=<dir> nmesos release example-service --environment dev --tag latest --dry-run false
@@ -84,7 +84,7 @@ common:
     healthcheckUri: "/hello"
 ```
 
-The date is the date, when you deprecated the `env_var`. `nmesos` checks the date to find `env_vars`, where the grace period is expired. The default for the `--deprecated-soft-grace-period` is 14 days. The default for the `--deprected-hard-grace-period` is 28 days.
+The date is the date, when you deprecated the `env_var`. `nmesos` checks the date to find `env_vars`, where the grace period is expired. The default for the `--deprecated-soft-grace-period` is 14 days. The default for the `--deprecated-hard-grace-period` is 28 days.
 
 When the soft-limit is reached a warning is printed. When the hard-limit it reached an error is printed and the deploy is aborted.
 
