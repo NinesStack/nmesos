@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.7 (2023-01-01)
+
+* Remove the `dryrun` flag for good (please use `dry-run` instead)
+
 ## 3.0.6 (2022-10-01)
 
 * Upgrade to Scala 3.2.0
