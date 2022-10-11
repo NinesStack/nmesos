@@ -85,11 +85,6 @@ object CliParser {
           .text("Force action!!!}")
           .optional()
           .action((input, params) => params.copy(force = true)),
-        opt[Boolean]("dryrun")
-          .abbr("x")
-          .text("Deprecated. Will be removed soon.")
-          .optional()
-          .action((input, params) => params.copy(isDryrun = input)),
         opt[Boolean]("dry-run")
           .abbr("n")
           .text(s"Is this a dry run? Default: ${DefaultValues.IsDryRun}")
