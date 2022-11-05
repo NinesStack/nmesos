@@ -1,7 +1,10 @@
 # Change Log
 
-## 3.0.7 (2023-01-01)
+## 3.0.7 (2022-11-05)
 
+* Bug-Fix: Do not create the `nmesos.log` file, when it is not used.
+* Bug-Fix: Only add new version to `./bin/version.txt` when its not
+  there already.
 * Remove the `dryrun` flag for good (please use `dry-run` instead)
 
 ## 3.0.6 (2022-10-01)
