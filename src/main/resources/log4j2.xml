@@ -4,7 +4,7 @@
     <Console name="console" target="system_out">
       <PatternLayout pattern="%-5p - %d{ISO8601}: %m (%l)%n"/>
     </Console>
-    <File name="file" fileName="nmesos.log">
+    <File name="file" fileName="nmesos.log" createOnDemand="true">
       <PatternLayout pattern="%-5p - %d{ISO8601}: %m (%l)%n"/>
     </File>
   </Appenders>
