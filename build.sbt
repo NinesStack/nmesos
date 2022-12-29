@@ -2,7 +2,7 @@ name := "nmesos"
 version := scala.io.Source.fromFile("VERSION.txt").getLines().next
 maintainer := "roland@tritsch.email"
 organization := "ninesstack"
-scalaVersion := "3.2.0"
+scalaVersion := "3.2.2-RC2"
 
 // --- add task to update the asdf versions ---
 import scala.sys.process._
@@ -61,15 +61,10 @@ lazy val resolverSettings = Seq(
   publishTo := Some("nmesos-releases" at "s3://s3-eu-west-1.amazonaws.com/nmesos-releases/public")
 )
 
-// --- scoverage ---
-lazy val scoverageSettings = Seq(
-  coverageExcludedFiles := ".*\\/upickle\\/implicits\\/.*;.*\\/scala\\/quoted\\/.*;.*\\/library\\/src\\/scala\\/runtime\\/.*"
-)
-
 // --- coveralls ---
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 lazy val coverallsSettings = Seq(
-  coverallsTokenFile := Some("~/.coveralls.token")
+  coverallsTokenFile := Some("./.coveralls.token")
 )
 
 // --- build ---
@@ -109,7 +104,6 @@ lazy val root = project
   .settings(assemblySettings)
   .settings(resolverSettings)
   .settings(packerSettings)
-  .settings(scoverageSettings)
   .settings(coverallsSettings)
   .settings(commonSettings)
   .settings(libsLogging)
