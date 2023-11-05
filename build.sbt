@@ -2,7 +2,7 @@ name := "nmesos"
 version := scala.io.Source.fromFile("VERSION.txt").getLines().next
 maintainer := "roland@tritsch.email"
 organization := "ninesstack"
-scalaVersion := "3.3.0"
+scalaVersion := "3.3.2"
 
 // --- add task to update the asdf versions ---
 import scala.sys.process._
