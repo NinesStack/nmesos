@@ -4,3 +4,6 @@ project/project/
 
 # misc
 *.log
+
+# Claude Code
+.claude
