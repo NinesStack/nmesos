@@ -6,13 +6,13 @@ graph LR
     
     %% Data Processing Stages
     subgraph Parse["🔍 Parsing Stage"]
-        ArgsParsing[CLI Arguments Parsing<br/>→ Cmd Model]
-        YamlParsing[YAML Parsing<br/>→ Config Model]
+        ArgsParsing[CLI Arguments Parsing<br/>to Cmd Model]
+        YamlParsing[YAML Parsing<br/>to Config Model]
     end
     
     subgraph Transform["🔄 Transformation Stage"]
         ConfigMerge[Environment Config Merge<br/>common + environment]
-        ModelConversion[Model Conversion<br/>nmesos → Singularity]
+        ModelConversion[Model Conversion<br/>nmesos to Singularity]
         Validation[Configuration Validation<br/>Resources, Deprecation, etc.]
     end
     
