@@ -1,0 +1,131 @@
+graph LR
+    %% External Data Sources
+    YamlFile[📄 YAML Configuration<br/>service-name.yml]
+    CliArgs[⌨️ CLI Arguments<br/>--environment --tag]
+    SingularityAPI[🏗️ Singularity API<br/>Requests & Deploys]
+    
+    %% Data Processing Stages
+    subgraph Parse["🔍 Parsing Stage"]
+        ArgsParsing[CLI Arguments Parsing<br/>→ Cmd Model]
+        YamlParsing[YAML Parsing<br/>→ Config Model]
+    end
+    
+    subgraph Transform["🔄 Transformation Stage"]
+        ConfigMerge[Environment Config Merge<br/>common + environment]
+        ModelConversion[Model Conversion<br/>nmesos → Singularity]
+        Validation[Configuration Validation<br/>Resources, Deprecation, etc.]
+    end
+    
+    subgraph Execute["⚡ Execution Stage"]
+        SingularityOps[Singularity Operations<br/>CRUD Requests & Deploys]
+        DockerOps[Docker Operations<br/>Local Development]
+        OutputFormat[Output Formatting<br/>Terminal Display]
+    end
+    
+    %% Data Models
+    subgraph Models["📊 Data Models"]
+        CmdModel[Cmd<br/>• serviceName<br/>• environment<br/>• tag<br/>• force<br/>• isDryrun]
+        
+        ConfigModel[Config<br/>• nmesos_version<br/>• environments<br/>• common settings]
+        
+        CmdConfigModel[CmdConfig<br/>• Combined CLI + Config<br/>• Environment specific<br/>• File hash]
+        
+        SingularityModels[Singularity Models<br/>• SingularityRequest<br/>• SingularityDeploy<br/>• SingularityTask]
+        
+        DockerModels[Docker Models<br/>• Container Config<br/>• Port Mappings<br/>• Environment Variables]
+    end
+    
+    %% Data Flow Connections
+    CliArgs --> ArgsParsing
+    YamlFile --> YamlParsing
+    
+    ArgsParsing --> CmdModel
+    YamlParsing --> ConfigModel
+    
+    CmdModel --> ConfigMerge
+    ConfigModel --> ConfigMerge
+    ConfigMerge --> CmdConfigModel
+    
+    CmdConfigModel --> Validation
+    Validation --> ModelConversion
+    ModelConversion --> SingularityModels
+    ModelConversion --> DockerModels
+    
+    SingularityModels --> SingularityOps
+    DockerModels --> DockerOps
+    
+    SingularityOps --> SingularityAPI
+    SingularityAPI --> SingularityOps
+    
+    SingularityOps --> OutputFormat
+    DockerOps --> OutputFormat
+    
+    %% Command Chain Data Flow
+    subgraph ChainFlow["🔗 Command Chain Flow"]
+        ChainConfig[After Deploy Config<br/>• on_success: List[DeployJob]<br/>• on_failure: Option[DeployJob]]
+        
+        ChainValidation[Chain Validation<br/>• Cycle Detection<br/>• Dependency Resolution]
+        
+        ChainExecution[Sequential Execution<br/>• Breadth-first processing<br/>• Failure handling]
+    end
+    
+    CmdConfigModel --> ChainConfig
+    ChainConfig --> ChainValidation
+    ChainValidation --> ChainExecution
+    ChainExecution --> SingularityOps
+    
+    %% Data Validation Flow
+    subgraph ValidationFlow["✅ Validation Flow"]
+        ResourceValidation[Resource Validation<br/>• CPU/Memory limits<br/>• Instance counts]
+        
+        DeprecationCheck[Deprecation Check<br/>• Env var expiration<br/>• Grace periods]
+        
+        VersionCheck[Version Compatibility<br/>• nmesos_version<br/>• API compatibility]
+        
+        ConfigIntegrity[Config Integrity<br/>• Required fields<br/>• Type validation]
+    end
+    
+    CmdConfigModel --> ResourceValidation
+    CmdConfigModel --> DeprecationCheck
+    ConfigModel --> VersionCheck
+    ConfigModel --> ConfigIntegrity
+    
+    %% Output Data Flow
+    subgraph OutputFlow["📤 Output Flow"]
+        TerminalOutput[Terminal Output<br/>• Colored formatting<br/>• Progress animations<br/>• Error messages]
+        
+        LogOutput[Log Output<br/>• Debug information<br/>• Audit trail]
+        
+        FileOutput[File Output<br/>• docker-compose.yml<br/>• .env files]
+    end
+    
+    OutputFormat --> TerminalOutput
+    OutputFormat --> LogOutput
+    DockerOps --> FileOutput
+    
+    %% Environment Variable Processing
+    subgraph EnvVarFlow["🌍 Environment Variable Flow"]
+        EnvVarMerge[Environment Variable Merge<br/>• Common env_vars<br/>• Environment specific<br/>• Executor env_vars]
+        
+        EnvVarValidation[Env Var Validation<br/>• Missing keys detection<br/>• Deprecation tracking]
+        
+        EnvVarInjection[Env Var Injection<br/>• Container runtime<br/>• Executor configuration]
+    end
+    
+    CmdConfigModel --> EnvVarMerge
+    EnvVarMerge --> EnvVarValidation
+    EnvVarValidation --> EnvVarInjection
+    EnvVarInjection --> SingularityModels
+    
+    %% Styling
+    classDef dataSource fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef processing fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef model fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    classDef output fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef validation fill:#ffebee,stroke:#d32f2f,stroke-width:2px
+    
+    class YamlFile,CliArgs,SingularityAPI dataSource
+    class Parse,Transform,Execute,ChainFlow,EnvVarFlow processing
+    class Models,CmdModel,ConfigModel,CmdConfigModel,SingularityModels,DockerModels model
+    class OutputFlow,TerminalOutput,LogOutput,FileOutput output
+    class ValidationFlow,ResourceValidation,DeprecationCheck,VersionCheck,ConfigIntegrity validation
