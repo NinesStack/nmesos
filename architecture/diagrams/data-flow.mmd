@@ -62,7 +62,7 @@ graph LR
     
     %% Command Chain Data Flow
     subgraph ChainFlow["🔗 Command Chain Flow"]
-        ChainConfig[After Deploy Config<br/>• on_success: List[DeployJob]<br/>• on_failure: Option[DeployJob]]
+        ChainConfig[After Deploy Config<br/>• on_success: List of DeployJob<br/>• on_failure: Option of DeployJob]
         
         ChainValidation[Chain Validation<br/>• Cycle Detection<br/>• Dependency Resolution]
         
