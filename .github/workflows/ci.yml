@@ -28,10 +28,3 @@ jobs:
 
     - name: Test
       run: sbt test
-
-    - name: Slack Notification
-      uses: rtCamp/action-slack-notify@v2
-      env:
-        SLACK_USERNAME: nmesos
-        SLACK_MESSAGE: 'Test success'
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
